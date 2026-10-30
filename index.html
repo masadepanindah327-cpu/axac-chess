@@ -9,81 +9,89 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #070913;
-      --bg-card: rgba(19, 27, 46, 0.7);
-      --border-glass: rgba(255, 255, 255, 0.08);
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
+      --bg-deep: #080c14;
+      --bg-card: #111827;
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
       --danger: #ef4444;
       --success: #22c55e;
       --warning: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --sq-light: #cbd5e1;
-      --sq-dark: #334155;
-      --sq-highlight: rgba(59, 130, 246, 0.6);
+      --sq-light: #f0d9b5;
+      --sq-dark: #b58863;
+      --sq-highlight: rgba(37, 99, 235, 0.5);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: radial-gradient(circle at top, #111827 0%, var(--bg-deep) 100%); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    body { background: var(--bg-deep); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
     
-    header { background: rgba(13, 17, 28, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header { background: var(--bg-card); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand { font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; color: #60a5fa; }
     
-    .role-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 8px; display: inline-block; }
+    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; text-transform: uppercase; }
     .role-owner { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
-    .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .role-admin { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.4); }
     .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
-    .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+    .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger); }
     .btn-danger:hover { background: #dc2626; }
-    .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+    .btn-success { background: var(--success); }
     .btn-success:hover { background: #16a34a; }
-    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
 
-    .auth-container { max-width: 420px; margin: 80px auto; background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 32px; border-radius: 16px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .auth-container h2 { text-align: center; margin-bottom: 24px; font-size: 1.5rem; font-weight: 700; }
+    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); border: 1px solid var(--border-glass); padding: 24px; border-radius: 12px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.3rem; }
     
-    .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-    .input-group input, .input-group select { width: 100%; padding: 12px 16px; background: rgba(7, 9, 19, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text); outline: none; font-size: 0.95rem; transition: border-color 0.2s; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+    .input-group input, .input-group select { width: 100%; padding: 10px; background: #070913; border: 1px solid var(--border-glass); border-radius: 6px; color: var(--text); outline: none; font-size: 0.9rem; }
     .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
 
-    .main-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; max-width: 1150px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
-    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1100px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
+    @media (max-width: 850px) { .main-layout { grid-template-columns: 1fr; } }
 
-    .board-container { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
-    .status-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-glass); }
+    .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+    .status-bar { width: 100%; max-width: 440px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); background: var(--bg-card); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-glass); }
     
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 480px; aspect-ratio: 1; border: 3px solid #1e293b; border-radius: 10px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; transition: background 0.15s; }
+    /* Papan Catur Klasik Elegan dengan Shading Kotak */
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 440px; aspect-ratio: 1; border: 4px solid #1f2937; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
     .square.light { background: var(--sq-light); }
     .square.dark { background: var(--sq-dark); }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square svg { width: 82%; height: 82%; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .square svg { width: 85%; height: 85%; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
 
-    .panel { background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-    
-    .audio-player { background: rgba(7, 9, 19, 0.5); border: 1px solid var(--border-glass); border-radius: 10px; padding: 14px; }
-    .track-list { max-height: 130px; overflow-y: auto; margin-top: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); transition: 0.2s; }
-    .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 500; }
+    /* Penanda Koordinat Kotak */
+    .coord-file, .coord-rank { position: absolute; font-size: 0.65rem; font-weight: 700; pointer-events: none; opacity: 0.7; }
+    .coord-file { bottom: 2px; right: 4px; }
+    .coord-rank { top: 2px; left: 4px; }
+    .square.light .coord-file, .square.light .coord-rank { color: #b58863; }
+    .square.dark .coord-file, .square.dark .coord-rank { color: #f0d9b5; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: #131b2e; border: 1px solid var(--border-glass); border-radius: 14px; padding: 24px; width: 90%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .panel { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
     
-    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: rgba(7, 9, 19, 0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); margin-bottom: 8px; font-size: 0.85rem; }
+    .audio-player { background: rgba(7, 9, 19, 0.4); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px; }
+    .track-list { max-height: 110px; overflow-y: auto; margin-top: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; }
+    .track-item { padding: 6px 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); transition: 0.2s; }
+    .track-item:hover, .track-item.active { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 10px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+    
+    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: #070913; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-glass); margin-bottom: 6px; font-size: 0.85rem; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; }
+    footer { text-align: center; padding: 16px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">AXAC CHESS</div>
-    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 12px;">
-      <span id="profileClickable" title="Klik profil untuk info role" style="cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+      <span id="profileClickable" title="Klik profil" style="cursor: pointer; font-weight: 600; font-size: 0.85rem;">
         <span id="usernameDisplay"></span>
         <span id="roleTag" class="role-badge"></span>
       </span>
@@ -91,7 +99,7 @@
     </div>
   </header>
 
-  <!-- Login/Register Screen (Clean & Empty Inputs) -->
+  <!-- Login/Register Screen (Clean, Empty Inputs) -->
   <div id="authScreen" class="auth-container">
     <h2>Masuk ke AXAC</h2>
     <div class="input-group">
@@ -102,7 +110,7 @@
       <label>Password</label>
       <input type="password" id="authPass" placeholder="Masukkan password" autocomplete="new-password" value="">
     </div>
-    <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="handleAuth(false)">Login</button>
+    <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="handleAuth(false)">Login</button>
     <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
   </div>
 
@@ -113,15 +121,15 @@
       <div id="chessboard" class="board"></div>
       <div class="status-bar" id="playerInfoBottom">Kamu: -</div>
       
-      <div style="display: flex; gap: 12px; width: 100%; max-width: 480px; margin-top: 4px;">
+      <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 4px;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
-        <button class="btn" id="stopAiBtn" style="flex: 1; background: #334155;" onclick="stopAI()">Hentikan AI</button>
+        <button class="btn" id="stopAiBtn" style="flex: 1; background: #374151;" onclick="stopAI()">Hentikan AI</button>
       </div>
     </div>
 
     <div class="panel">
       <div>
-        <h3 style="margin-bottom: 10px; font-size: 1rem; font-weight: 600;">Mode Permainan</h3>
+        <h3 style="margin-bottom: 8px; font-size: 0.95rem;">Mode Permainan</h3>
         <select id="modeSelect" onchange="changeMode()" class="input-group" style="margin-bottom: 0;">
           <option value="ai-easy">VS AI (Mudah)</option>
           <option value="ai-medium">VS AI (Sedang)</option>
@@ -131,30 +139,31 @@
         </select>
       </div>
 
-      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
-        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Mabar Online (P2P)</h4>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">ID Kamu: <span id="myPeerId" style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
-        <div class="input-group" style="margin-bottom: 10px;">
+      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
+        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Mabar Online (P2P)</h4>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">ID Kamu: <span id="myPeerId" style="color: #60a5fa; font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
+        <div class="input-group" style="margin-bottom: 8px;">
           <input type="text" id="targetPeerId" placeholder="Masukkan ID Lawan">
         </div>
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
-      <!-- Owner / Admin Control Panel -->
-      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
-        <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--warning);">Panel Kontrol Owner (Persetujuan Admin)</h4>
-        <div id="adminReqList" style="font-size: 0.85rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
+      <!-- Owner Panel -->
+      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
+        <h4 style="margin-bottom: 8px; font-size: 0.85rem; color: var(--warning);">Persetujuan Admin (Owner)</h4>
+        <div id="adminReqList" style="font-size: 0.8rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
       </div>
 
-      <div id="adminPanelInfo" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
-        <h4 style="margin-bottom: 6px; font-size: 0.9rem; color: var(--accent);">Panel Admin Aktif</h4>
-        <p style="font-size: 0.8rem; color: var(--text-muted);">Anda memiliki hak akses moderator sistem.</p>
+      <!-- Admin Panel Info -->
+      <div id="adminPanelInfo" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
+        <h4 style="margin-bottom: 4px; font-size: 0.85rem; color: #60a5fa;">Panel Admin Aktif</h4>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">Akses moderator sistem diaktifkan.</p>
       </div>
 
-      <!-- Music Player with Working Auto-Playlist -->
+      <!-- Music Player with Working Stable Audio URLs -->
       <div class="audio-player">
-        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
-        <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 6px; margin-bottom: 8px;"></audio>
+        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Music Player Auto Playlist</h4>
+        <audio id="bgAudio" controls style="width: 100%; height: 32px; border-radius: 4px; margin-bottom: 6px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
@@ -165,9 +174,9 @@
   <!-- Modal Upgrade -->
   <div id="upgradeModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Pengajuan Upgrade Role</h3>
-      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Akun Anda saat ini berstatus <b>Member</b>. Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
-      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Pengajuan Upgrade Role</h3>
+      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Akun Anda saat ini berstatus <b>Member</b>. Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('upgradeModal')">Batal</button>
         <button class="btn btn-sm" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
       </div>
@@ -177,9 +186,9 @@
   <!-- Modal Resign -->
   <div id="confirmModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Konfirmasi Nyerah</h3>
-      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Apakah Anda yakin ingin menyerah dari pertandingan ini?</p>
-      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Konfirmasi Nyerah</h3>
+      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Apakah Anda yakin ingin menyerah dari pertandingan ini?</p>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('confirmModal')">Batal</button>
         <button class="btn btn-sm btn-danger" onclick="executeResign()">Ya, Nyerah</button>
       </div>
@@ -202,9 +211,10 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
+  // URL audio publik yang stabil & dapat diputar langsung
   const TRACKS = [
-    { name: "Merry Christmas Please Don't Call", url: "https://cdn.pixabay.com/download/audio/2022/11/22/audio_febc508215.mp3" },
-    { name: "Terranova (Original Radio Mix)", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" }
+    { name: "Merry Christmas Please Don't Call", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+    { name: "Terranova (Original Radio Mix)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
   ];
 
   let game = null;
@@ -307,7 +317,7 @@
       div.className = 'admin-req-item';
       div.innerHTML = `
         <span><b>${user}</b> minta Admin</span>
-        <div style="display:flex; gap:6px;">
+        <div style="display:flex; gap:4px;">
           <button class="btn btn-sm btn-success" onclick="approveAdmin('${user}')">Setujui</button>
           <button class="btn btn-sm btn-danger" onclick="rejectAdmin('${user}')">Tolak</button>
         </div>
@@ -377,16 +387,34 @@
       for (let c = 0; c < 8; c++) {
         const squareRow = playerColor === 'w' ? r : 7 - r;
         const squareCol = playerColor === 'w' ? c : 7 - c;
-        const square = String.fromCharCode(97 + squareCol) + (8 - squareRow);
+        const fileChar = String.fromCharCode(97 + squareCol);
+        const rankNum = 8 - squareRow;
+        const square = fileChar + rankNum;
         const piece = board[squareRow][squareCol];
 
         const sqDiv = document.createElement('div');
         sqDiv.className = `square ${(squareRow + squareCol) % 2 === 0 ? 'light' : 'dark'}`;
         if (selectedSquare === square) sqDiv.classList.add('highlight');
 
+        // Render notasi koordinat di pinggir papan
+        if (squareCol === 0) {
+          const rankEl = document.createElement('span');
+          rankEl.className = 'coord-rank';
+          rankEl.innerText = rankNum;
+          sqDiv.appendChild(rankEl);
+        }
+        if (squareRow === 7) {
+          const fileEl = document.createElement('span');
+          fileEl.className = 'coord-file';
+          fileEl.innerText = fileChar;
+          sqDiv.appendChild(fileEl);
+        }
+
         if (piece) {
           const pieceKey = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
-          sqDiv.innerHTML = PIECE_SVGS[pieceKey] || '';
+          const pieceContainer = document.createElement('div');
+          pieceContainer.innerHTML = PIECE_SVGS[pieceKey] || '';
+          sqDiv.appendChild(pieceContainer.firstChild);
         }
 
         sqDiv.onclick = () => handleSquareClick(square);
@@ -438,26 +466,24 @@
   function makeAIMove() {
     if (!game || game.game_over()) return;
     const mode = document.getElementById('modeSelect').value;
-    const moves = game.moves();
+    const moves = game.moves({ verbose: true });
     if (moves.length === 0) return;
 
     let selectedMove;
     if (mode === 'ai-easy') {
       selectedMove = moves[Math.floor(Math.random() * moves.length)];
     } else if (mode === 'ai-medium') {
-      let captureMoves = game.moves({ verbose: true }).filter(m => m.captured);
+      let captureMoves = moves.filter(m => m.captured);
       selectedMove = captureMoves.length > 0 ? captureMoves[Math.floor(Math.random() * captureMoves.length)] : moves[Math.floor(Math.random() * moves.length)];
     } else if (mode === 'ai-hard') {
-      let captureOrCheck = game.moves({ verbose: true }).filter(m => m.captured || m.san.includes('+'));
-      selectedMove = captureOrCheck.length > 0 ? captureOrCheck[Math.floor(Math.random() * captureOrCheck.length)] : moves[Math.floor(Math.random() * moves.length)];
+      let smartMoves = moves.filter(m => m.captured || m.san.includes('+') || m.san.includes('#'));
+      selectedMove = smartMoves.length > 0 ? smartMoves[Math.floor(Math.random() * smartMoves.length)] : moves[Math.floor(Math.random() * moves.length)];
     } else if (mode === 'ai-impossible') {
       let bestScore = -9999;
-      let verboseMoves = game.moves({ verbose: true });
-      if (verboseMoves.length === 0) return;
-      selectedMove = verboseMoves[0];
+      selectedMove = moves[0];
       const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
 
-      for (let m of verboseMoves) {
+      for (let m of moves) {
         game.move(m);
         let score = 0;
         const b = game.board();
@@ -477,6 +503,7 @@
       }
     }
 
+    // Eksekusi langkah AI yang dijamin sah secara aturan catur resmi via chess.js
     game.move(selectedMove);
     renderBoard();
   }
