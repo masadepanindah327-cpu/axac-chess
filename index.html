@@ -9,89 +9,102 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #080c14;
-      --bg-card: #111827;
-      --border-glass: rgba(255, 255, 255, 0.1);
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
       --danger: #ef4444;
       --success: #22c55e;
       --warning: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --sq-light: #f0d9b5;
-      --sq-dark: #b58863;
-      --sq-highlight: rgba(37, 99, 235, 0.5);
+      --sq-light: #e2e8f0;
+      --sq-dark: #475569;
+      --sq-highlight: rgba(59, 130, 246, 0.6);
+      --sq-guide: rgba(34, 197, 94, 0.5);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg-deep); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
     
-    header { background: var(--bg-card); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .brand { font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; color: #60a5fa; }
+    /* Background kustom menggunakan gambar yang Anda unggah dengan efek gelap elegan */
+    body { 
+      background: linear-gradient(rgba(5, 7, 13, 0.82), rgba(5, 7, 13, 0.92)), 
+                  url('data:image/jpeg;base64,...') no-repeat center center fixed; 
+      background-size: cover;
+      color: var(--text); 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      overflow-x: hidden; 
+      perspective: 1000px; 
+    }
     
-    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; text-transform: uppercase; }
+    header { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .role-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-left: 8px; display: inline-block; }
     .role-owner { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
-    .role-admin { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.4); }
+    .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
     .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn:hover { background: var(--accent-hover); }
-    .btn-danger { background: var(--danger); }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
     .btn-danger:hover { background: #dc2626; }
-    .btn-success { background: var(--success); }
+    .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
     .btn-success:hover { background: #16a34a; }
-    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); border: 1px solid var(--border-glass); padding: 24px; border-radius: 12px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.3rem; }
+    .auth-container { max-width: 420px; margin: 80px auto; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 32px; border-radius: 16px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .auth-container h2 { text-align: center; margin-bottom: 24px; font-size: 1.5rem; font-weight: 700; }
     
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
-    .input-group input, .input-group select { width: 100%; padding: 10px; background: #070913; border: 1px solid var(--border-glass); border-radius: 6px; color: var(--text); outline: none; font-size: 0.9rem; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .input-group input, .input-group select { width: 100%; padding: 12px 16px; background: rgba(5, 7, 13, 0.8); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text); outline: none; font-size: 0.95rem; transition: border-color 0.2s; }
     .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
 
-    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1100px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
-    @media (max-width: 850px) { .main-layout { grid-template-columns: 1fr; } }
+    .main-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1200px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
+    @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
-    .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-    .status-bar { width: 100%; max-width: 440px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); background: var(--bg-card); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-glass); }
+    .board-container { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); background: var(--bg-card); padding: 12px 18px; border-radius: 10px; border: 1px solid var(--border-glass); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
     
-    /* Papan Catur Klasik Elegan dengan Shading Kotak */
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 440px; aspect-ratio: 1; border: 4px solid #1f2937; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
-    .square.light { background: var(--sq-light); }
-    .square.dark { background: var(--sq-dark); }
+    .board-perspective { width: 100%; max-width: 520px; aspect-ratio: 1; transform: rotateX(8deg); transition: transform 0.3s ease; margin: 10px 0; }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0,0,0,0.5); position: relative; background: #1e293b; }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; transition: background 0.15s, transform 0.1s; }
+    .square.light { background: #e2e8f0; }
+    .square.dark { background: #475569; }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square svg { width: 85%; height: 85%; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+    .square.guide::after { content: ''; position: absolute; width: 18px; height: 18px; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 8px var(--sq-guide); z-index: 10; }
+    .square svg { width: 85%; height: 85%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); transition: transform 0.2s; }
+    .square:hover svg { transform: scale(1.08); }
 
-    /* Penanda Koordinat Kotak */
-    .coord-file, .coord-rank { position: absolute; font-size: 0.65rem; font-weight: 700; pointer-events: none; opacity: 0.7; }
-    .coord-file { bottom: 2px; right: 4px; }
-    .coord-rank { top: 2px; left: 4px; }
-    .square.light .coord-file, .square.light .coord-rank { color: #b58863; }
-    .square.dark .coord-file, .square.dark .coord-rank { color: #f0d9b5; }
+    .coord-file, .coord-rank { position: absolute; font-size: 0.65rem; font-weight: 700; pointer-events: none; opacity: 0.6; z-index: 5; }
+    .coord-file { bottom: 3px; right: 5px; }
+    .coord-rank { top: 3px; left: 5px; }
+    .square.light .coord-file, .square.light .coord-rank { color: #475569; }
+    .square.dark .coord-file, .square.dark .coord-rank { color: #cbd5e1; }
 
-    .panel { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    .panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
     
-    .audio-player { background: rgba(7, 9, 19, 0.4); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px; }
-    .track-list { max-height: 110px; overflow-y: auto; margin-top: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 6px 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); transition: 0.2s; }
-    .track-item:hover, .track-item.active { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+    .audio-player { background: rgba(5, 7, 13, 0.6); border: 1px solid var(--border-glass); border-radius: 10px; padding: 14px; }
+    .track-list { max-height: 140px; overflow-y: auto; margin-top: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px; }
+    .track-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); transition: 0.2s; background: rgba(255,255,255,0.02); }
+    .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: 600; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 10px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 14px; padding: 24px; width: 90%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
     
-    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: #070913; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-glass); margin-bottom: 6px; font-size: 0.85rem; }
+    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: rgba(5, 7, 13, 0.8); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); margin-bottom: 8px; font-size: 0.85rem; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 16px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; }
+    footer { text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: rgba(15, 23, 42, 0.85); }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">AXAC CHESS</div>
-    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 10px;">
-      <span id="profileClickable" title="Klik profil" style="cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 12px;">
+      <span id="profileClickable" title="Klik profil" style="cursor: pointer; font-weight: 600; font-size: 0.9rem;">
         <span id="usernameDisplay"></span>
         <span id="roleTag" class="role-badge"></span>
       </span>
@@ -99,7 +112,7 @@
     </div>
   </header>
 
-  <!-- Login/Register Screen (Clean, Empty Inputs) -->
+  <!-- Login/Register Screen -->
   <div id="authScreen" class="auth-container">
     <h2>Masuk ke AXAC</h2>
     <div class="input-group">
@@ -110,7 +123,7 @@
       <label>Password</label>
       <input type="password" id="authPass" placeholder="Masukkan password" autocomplete="new-password" value="">
     </div>
-    <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="handleAuth(false)">Login</button>
+    <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="handleAuth(false)">Login</button>
     <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
   </div>
 
@@ -118,18 +131,22 @@
   <div id="gameScreen" class="main-layout hidden">
     <div class="board-container">
       <div class="status-bar" id="playerInfoTop">Lawan: -</div>
-      <div id="chessboard" class="board"></div>
+      
+      <div class="board-perspective">
+        <div id="chessboard" class="board"></div>
+      </div>
+
       <div class="status-bar" id="playerInfoBottom">Kamu: -</div>
       
-      <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 4px;">
+      <div style="display: flex; gap: 12px; width: 100%; max-width: 520px; margin-top: 6px;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
-        <button class="btn" id="stopAiBtn" style="flex: 1; background: #374151;" onclick="stopAI()">Hentikan AI</button>
+        <button class="btn" id="stopAiBtn" style="flex: 1; background: #334155;" onclick="stopAI()">Hentikan AI</button>
       </div>
     </div>
 
     <div class="panel">
       <div>
-        <h3 style="margin-bottom: 8px; font-size: 0.95rem;">Mode Permainan</h3>
+        <h3 style="margin-bottom: 8px; font-size: 1rem; font-weight: 600;">Mode Permainan</h3>
         <select id="modeSelect" onchange="changeMode()" class="input-group" style="margin-bottom: 0;">
           <option value="ai-easy">VS AI (Mudah)</option>
           <option value="ai-medium">VS AI (Sedang)</option>
@@ -139,31 +156,31 @@
         </select>
       </div>
 
-      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
-        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Mabar Online (P2P)</h4>
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">ID Kamu: <span id="myPeerId" style="color: #60a5fa; font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
-        <div class="input-group" style="margin-bottom: 8px;">
+      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Mabar Online (P2P)</h4>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">ID Kamu: <span id="myPeerId" style="color: #60a5fa; font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
+        <div class="input-group" style="margin-bottom: 10px;">
           <input type="text" id="targetPeerId" placeholder="Masukkan ID Lawan">
         </div>
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
       <!-- Owner Panel -->
-      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
-        <h4 style="margin-bottom: 8px; font-size: 0.85rem; color: var(--warning);">Persetujuan Admin (Owner)</h4>
-        <div id="adminReqList" style="font-size: 0.8rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
+      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: var(--warning);">Persetujuan Admin (Owner)</h4>
+        <div id="adminReqList" style="font-size: 0.85rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
       </div>
 
       <!-- Admin Panel Info -->
-      <div id="adminPanelInfo" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
-        <h4 style="margin-bottom: 4px; font-size: 0.85rem; color: #60a5fa;">Panel Admin Aktif</h4>
-        <p style="font-size: 0.75rem; color: var(--text-muted);">Akses moderator sistem diaktifkan.</p>
+      <div id="adminPanelInfo" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 4px; font-size: 0.9rem; color: #60a5fa;">Panel Admin Aktif</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Hak akses moderator sistem aktif.</p>
       </div>
 
-      <!-- Music Player with Working Stable Audio URLs -->
+      <!-- Music Player dengan Audio Stabil & Playlist Lengkap -->
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Music Player Auto Playlist</h4>
-        <audio id="bgAudio" controls style="width: 100%; height: 32px; border-radius: 4px; margin-bottom: 6px;"></audio>
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
+        <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 6px; margin-bottom: 8px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
@@ -174,9 +191,9 @@
   <!-- Modal Upgrade -->
   <div id="upgradeModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1rem;">Pengajuan Upgrade Role</h3>
-      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Akun Anda saat ini berstatus <b>Member</b>. Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Pengajuan Upgrade Role</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Akun Anda berstatus <b>Member</b>. Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('upgradeModal')">Batal</button>
         <button class="btn btn-sm" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
       </div>
@@ -186,9 +203,9 @@
   <!-- Modal Resign -->
   <div id="confirmModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1rem;">Konfirmasi Nyerah</h3>
-      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Apakah Anda yakin ingin menyerah dari pertandingan ini?</p>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Konfirmasi Nyerah</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Apakah Anda yakin ingin menyerah dari pertandingan?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('confirmModal')">Batal</button>
         <button class="btn btn-sm btn-danger" onclick="executeResign()">Ya, Nyerah</button>
       </div>
@@ -211,7 +228,6 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // URL audio publik yang stabil & dapat diputar langsung
   const TRACKS = [
     { name: "Merry Christmas Please Don't Call", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
     { name: "Terranova (Original Radio Mix)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
@@ -219,6 +235,7 @@
 
   let game = null;
   let selectedSquare = null;
+  let possibleMoves = [];
   let currentUser = null;
   let currentRole = 'member';
   let peer = null, conn = null;
@@ -236,6 +253,26 @@
       }
       game = new Chess();
       setupAudioPlayer();
+
+      // Fitur Auto-Login Persistens: Memeriksa apakah sesi pengguna sudah tersimpan sebelumnya
+      const savedUser = localStorage.getItem('axac_active_user');
+      const savedRole = localStorage.getItem('axac_active_role');
+      if (savedUser && savedRole) {
+        currentUser = savedUser;
+        currentRole = savedRole;
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.remove('hidden');
+        document.getElementById('userHeaderControls').classList.remove('hidden');
+        updateProfileDisplay();
+        initGame();
+        initP2P();
+        if (currentRole === 'owner') {
+          document.getElementById('ownerPanel').classList.remove('hidden');
+          renderOwnerRequests();
+        } else if (currentRole === 'admin') {
+          document.getElementById('adminPanelInfo').classList.remove('hidden');
+        }
+      }
     } catch (e) {
       console.error("Init error:", e);
     }
@@ -257,6 +294,10 @@
       if (users[u] && users[u].pass === p) {
         currentUser = u;
         currentRole = users[u].role;
+        // Simpan sesi aktif ke localStorage agar auto-login berfungsi
+        localStorage.setItem('axac_active_user', currentUser);
+        localStorage.setItem('axac_active_role', currentRole);
+
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('gameScreen').classList.remove('hidden');
         document.getElementById('userHeaderControls').classList.remove('hidden');
@@ -394,9 +435,14 @@
 
         const sqDiv = document.createElement('div');
         sqDiv.className = `square ${(squareRow + squareCol) % 2 === 0 ? 'light' : 'dark'}`;
-        if (selectedSquare === square) sqDiv.classList.add('highlight');
+        
+        if (selectedSquare === square) {
+          sqDiv.classList.add('highlight');
+        }
+        if (possibleMoves.includes(square)) {
+          sqDiv.classList.add('guide');
+        }
 
-        // Render notasi koordinat di pinggir papan
         if (squareCol === 0) {
           const rankEl = document.createElement('span');
           rankEl.className = 'coord-rank';
@@ -446,11 +492,14 @@
       const piece = game.get(sq);
       if (piece && piece.color === game.turn()) {
         selectedSquare = sq;
+        const legalMoves = game.moves({ square: sq, verbose: true });
+        possibleMoves = legalMoves.map(m => m.to);
         renderBoard();
       }
     } else {
       const move = game.move({ from: selectedSquare, to: sq, promotion: 'q' });
       selectedSquare = null;
+      possibleMoves = [];
       renderBoard();
 
       if (move) {
@@ -458,6 +507,14 @@
           conn.send({ type: 'MOVE', move: move });
         } else if (mode.startsWith('ai') && !game.game_over()) {
           aiTimeout = setTimeout(makeAIMove, 250);
+        }
+      } else {
+        const piece = game.get(sq);
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = sq;
+          const legalMoves = game.moves({ square: sq, verbose: true });
+          possibleMoves = legalMoves.map(m => m.to);
+          renderBoard();
         }
       }
     }
@@ -503,7 +560,6 @@
       }
     }
 
-    // Eksekusi langkah AI yang dijamin sah secara aturan catur resmi via chess.js
     game.move(selectedMove);
     renderBoard();
   }
@@ -520,6 +576,7 @@
     if (!game) game = new Chess();
     game.reset();
     selectedSquare = null;
+    possibleMoves = [];
     renderBoard();
   }
 
@@ -597,6 +654,9 @@
   }
 
   function logout() {
+    // Menghapus sesi tersimpan sehingga fitur logout berfungsi membersihkan auto-login
+    localStorage.removeItem('axac_active_user');
+    localStorage.removeItem('axac_active_role');
     location.reload();
   }
 
