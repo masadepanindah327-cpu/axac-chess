@@ -6,133 +6,155 @@
   <title>AXAC Chess Engine & Platform</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card: #131b2e;
+      --bg-deep: #070913;
+      --bg-card: rgba(19, 27, 46, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.08);
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --danger: #ef4444;
       --success: #22c55e;
+      --warning: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --border: #1e293b;
-      --sq-light: #e2e8f0;
-      --sq-dark: #475569;
-      --sq-highlight: rgba(59, 130, 246, 0.5);
+      --sq-light: #cbd5e1;
+      --sq-dark: #334155;
+      --sq-highlight: rgba(59, 130, 246, 0.6);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; color: var(--accent); }
-    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; cursor: pointer; user-select: none; }
-    .role-owner { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .role-admin { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .role-member { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
-    .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn:hover { background: var(--accent-hover); }
-    .btn-danger { background: var(--danger); }
+    body { background: radial-gradient(circle at top, #111827 0%, var(--bg-deep) 100%); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    
+    header { background: rgba(13, 17, 28, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .role-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 8px; display: inline-block; }
+    .role-owner { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
+
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
     .btn-danger:hover { background: #dc2626; }
-    .btn-success { background: var(--success); }
+    .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
     .btn-success:hover { background: #16a34a; }
-    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 12px; width: 90%; }
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
-    .input-group input, .input-group select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); outline: none; }
-    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1100px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
-    @media (max-width: 850px) { .main-layout { grid-template-columns: 1fr; } }
-    .board-container { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 460px; aspect-ratio: 1; border: 2px solid var(--border); border-radius: 6px; overflow: hidden; position: relative; }
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    .auth-container { max-width: 420px; margin: 80px auto; background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 32px; border-radius: 16px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .auth-container h2 { text-align: center; margin-bottom: 24px; font-size: 1.5rem; font-weight: 700; }
+    
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .input-group input, .input-group select { width: 100%; padding: 12px 16px; background: rgba(7, 9, 19, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text); outline: none; font-size: 0.95rem; transition: border-color 0.2s; }
+    .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
+
+    .main-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; max-width: 1150px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+
+    .board-container { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+    .status-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-glass); }
+    
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 480px; aspect-ratio: 1; border: 3px solid #1e293b; border-radius: 10px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; transition: background 0.15s; }
     .square.light { background: var(--sq-light); }
     .square.dark { background: var(--sq-dark); }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square svg { width: 80%; height: 80%; pointer-events: none; }
-    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-    .audio-player { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-    .track-list { max-height: 120px; overflow-y: auto; margin-top: 8px; font-size: 0.85rem; }
-    .track-item { padding: 6px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 90%; max-width: 420px; }
-    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.85rem; }
+    .square svg { width: 82%; height: 82%; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+    .panel { background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    
+    .audio-player { background: rgba(7, 9, 19, 0.5); border: 1px solid var(--border-glass); border-radius: 10px; padding: 14px; }
+    .track-list { max-height: 130px; overflow-y: auto; margin-top: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; }
+    .track-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); transition: 0.2s; }
+    .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 500; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: #131b2e; border: 1px solid var(--border-glass); border-radius: 14px; padding: 24px; width: 90%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    
+    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: rgba(7, 9, 19, 0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-glass); margin-bottom: 8px; font-size: 0.85rem; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 16px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: auto; }
+    footer { text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">AXAC CHESS</div>
-    <div id="userHeaderControls" class="hidden">
-      <span id="profileClickable" title="Klik profil untuk upgrade role" style="cursor: pointer; font-weight: 600;">
+    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 12px;">
+      <span id="profileClickable" title="Klik profil untuk info role" style="cursor: pointer; font-weight: 600; font-size: 0.9rem;">
         <span id="usernameDisplay"></span>
         <span id="roleTag" class="role-badge"></span>
       </span>
-      <button class="btn btn-sm btn-danger" style="margin-left: 12px;" onclick="logout()">Logout</button>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
     </div>
   </header>
 
-  <!-- Login/Register Screen -->
+  <!-- Login/Register Screen (Clean & Empty Inputs) -->
   <div id="authScreen" class="auth-container">
-    <h2 style="margin-bottom: 16px; text-align: center;">Masuk ke AXAC</h2>
+    <h2>Masuk ke AXAC</h2>
     <div class="input-group">
       <label>Username</label>
-      <input type="text" id="authUser" placeholder="Username" value="axac">
+      <input type="text" id="authUser" placeholder="Masukkan username" autocomplete="off" value="">
     </div>
     <div class="input-group">
       <label>Password</label>
-      <input type="password" id="authPass" placeholder="Password" value="axacintop">
+      <input type="password" id="authPass" placeholder="Masukkan password" autocomplete="new-password" value="">
     </div>
-    <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="handleAuth(false)">Login</button>
-    <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
+    <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="handleAuth(false)">Login</button>
+    <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
   </div>
 
   <!-- Game Screen -->
   <div id="gameScreen" class="main-layout hidden">
     <div class="board-container">
-      <div style="width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;" id="playerInfoTop">Lawan: -</div>
+      <div class="status-bar" id="playerInfoTop">Lawan: -</div>
       <div id="chessboard" class="board"></div>
-      <div style="width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;" id="playerInfoBottom">Kamu: -</div>
+      <div class="status-bar" id="playerInfoBottom">Kamu: -</div>
       
-      <div style="display: flex; gap: 8px; width: 100%; max-width: 460px; margin-top: 8px;">
+      <div style="display: flex; gap: 12px; width: 100%; max-width: 480px; margin-top: 4px;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
-        <button class="btn" id="stopAiBtn" style="flex: 1; background: #64748b;" onclick="stopAI()">Hentikan AI</button>
+        <button class="btn" id="stopAiBtn" style="flex: 1; background: #334155;" onclick="stopAI()">Hentikan AI</button>
       </div>
     </div>
 
     <div class="panel">
       <div>
-        <h3 style="margin-bottom: 8px; font-size: 1rem;">Mode Permainan</h3>
-        <select id="modeSelect" onchange="changeMode()" class="input-group">
+        <h3 style="margin-bottom: 10px; font-size: 1rem; font-weight: 600;">Mode Permainan</h3>
+        <select id="modeSelect" onchange="changeMode()" class="input-group" style="margin-bottom: 0;">
           <option value="ai-easy">VS AI (Mudah)</option>
+          <option value="ai-medium">VS AI (Sedang)</option>
           <option value="ai-hard">VS AI (Sulit)</option>
           <option value="ai-impossible">VS AI (Mustahil)</option>
           <option value="online">Mabar Online (P2P)</option>
         </select>
       </div>
 
-      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border); padding-top: 10px;">
-        <h4 style="margin-bottom: 6px; font-size: 0.9rem;">Mabar Online</h4>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">ID Kamu: <span id="myPeerId" style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Connecting...</span></div>
-        <div class="input-group">
+      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Mabar Online (P2P)</h4>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">ID Kamu: <span id="myPeerId" style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
+        <div class="input-group" style="margin-bottom: 10px;">
           <input type="text" id="targetPeerId" placeholder="Masukkan ID Lawan">
         </div>
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
-      <!-- Owner Panel Approval Section -->
-      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border); padding-top: 10px;">
-        <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: #f59e0b;">Permintaan Role Admin</h4>
-        <div id="adminReqList"><i>Tidak ada permintaan pending.</i></div>
+      <!-- Owner / Admin Control Panel -->
+      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--warning);">Panel Kontrol Owner (Persetujuan Admin)</h4>
+        <div id="adminReqList" style="font-size: 0.85rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
       </div>
 
-      <!-- Music Player -->
+      <div id="adminPanelInfo" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+        <h4 style="margin-bottom: 6px; font-size: 0.9rem; color: var(--accent);">Panel Admin Aktif</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Anda memiliki hak akses moderator sistem.</p>
+      </div>
+
+      <!-- Music Player with Working Auto-Playlist -->
       <div class="audio-player">
         <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
-        <audio id="bgAudio" controls style="width: 100%; height: 32px; margin-bottom: 8px;"></audio>
+        <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 6px; margin-bottom: 8px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
@@ -140,26 +162,26 @@
 
   <footer>Made by AXAC</footer>
 
-  <!-- Modal Request Upgrade -->
+  <!-- Modal Upgrade -->
   <div id="upgradeModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px;">Pengajuan Upgrade Admin</h3>
-      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Kamu saat ini berkedudukan sebagai <b>Member</b>. Ajukan permohonan ke Owner untuk dijadikan <b>Admin</b>?</p>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Pengajuan Upgrade Role</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Akun Anda saat ini berstatus <b>Member</b>. Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="btn" style="background: var(--border);" onclick="closeModal('upgradeModal')">Batal</button>
-        <button class="btn" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
+        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('upgradeModal')">Batal</button>
+        <button class="btn btn-sm" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Resign Confirmation -->
+  <!-- Modal Resign -->
   <div id="confirmModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px;">Konfirmasi Nyerah</h3>
-      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Apakah kamu yakin ingin menyerah dari permainan ini?</p>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Konfirmasi Nyerah</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Apakah Anda yakin ingin menyerah dari pertandingan ini?</p>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="btn" style="background: var(--border);" onclick="closeModal('confirmModal')">Batal</button>
-        <button class="btn btn-danger" onclick="executeResign()">Ya, Nyerah</button>
+        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('confirmModal')">Batal</button>
+        <button class="btn btn-sm btn-danger" onclick="executeResign()">Ya, Nyerah</button>
       </div>
     </div>
   </div>
@@ -192,6 +214,7 @@
   let peer = null, conn = null;
   let playerColor = 'w';
   let aiTimeout = null;
+  let currentTrackIdx = 0;
 
   function initApp() {
     try {
@@ -213,13 +236,13 @@
     const p = document.getElementById('authPass').value.trim();
     const users = JSON.parse(localStorage.getItem('axac_users') || '{}');
 
-    if (!u || !p) return alert('Username dan password wajib diisi');
+    if (!u || !p) return alert('Username dan password wajib diisi.');
 
     if (isRegister) {
-      if (users[u]) return alert('Username sudah terdaftar');
+      if (users[u]) return alert('Username sudah terdaftar.');
       users[u] = { pass: p, role: 'member' };
       localStorage.setItem('axac_users', JSON.stringify(users));
-      alert('Registrasi berhasil! Role Anda: Member. Silakan Login.');
+      alert('Registrasi berhasil! Silakan login.');
     } else {
       if (users[u] && users[u].pass === p) {
         currentUser = u;
@@ -235,9 +258,11 @@
         if (currentRole === 'owner') {
           document.getElementById('ownerPanel').classList.remove('hidden');
           renderOwnerRequests();
+        } else if (currentRole === 'admin') {
+          document.getElementById('adminPanelInfo').classList.remove('hidden');
         }
       } else {
-        alert('Credential tidak ditemukan atau password salah.');
+        alert('Username atau password salah.');
       }
     }
   }
@@ -262,9 +287,9 @@
     if (!reqs.includes(currentUser)) {
       reqs.push(currentUser);
       localStorage.setItem('axac_requests', JSON.stringify(reqs));
-      alert('Pengajuan upgrade berhasil dikirimkan ke Owner!');
+      alert('Pengajuan upgrade berhasil dikirim ke Owner!');
     } else {
-      alert('Pengajuan Anda sudah ada dalam antrean Owner.');
+      alert('Pengajuan Anda sudah ada dalam antrean.');
     }
     closeModal('upgradeModal');
   }
@@ -281,8 +306,8 @@
       const div = document.createElement('div');
       div.className = 'admin-req-item';
       div.innerHTML = `
-        <span><b>${user}</b> minta Role Admin</span>
-        <div>
+        <span><b>${user}</b> minta Admin</span>
+        <div style="display:flex; gap:6px;">
           <button class="btn btn-sm btn-success" onclick="approveAdmin('${user}')">Setujui</button>
           <button class="btn btn-sm btn-danger" onclick="rejectAdmin('${user}')">Tolak</button>
         </div>
@@ -299,7 +324,7 @@
     localStorage.setItem('axac_users', JSON.stringify(users));
     localStorage.setItem('axac_requests', JSON.stringify(reqs));
     renderOwnerRequests();
-    alert(`Berhasil menyetujui ${user} sebagai Admin.`);
+    alert(`Berhasil menjadikan ${user} sebagai Admin.`);
   }
 
   function rejectAdmin(user) {
@@ -315,11 +340,12 @@
     if (!list) return;
     list.innerHTML = '';
     
-    TRACKS.forEach((track) => {
+    TRACKS.forEach((track, idx) => {
       const div = document.createElement('div');
-      div.className = 'track-item';
+      div.className = `track-item ${idx === 0 ? 'active' : ''}`;
       div.innerHTML = `<span>${track.name}</span>`;
       div.onclick = () => {
+        currentTrackIdx = idx;
         audio.src = track.url;
         audio.play().catch(err => console.log("Audio play blocked:", err));
         document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
@@ -327,7 +353,18 @@
       };
       list.appendChild(div);
     });
-    if (TRACKS.length > 0) audio.src = TRACKS[0].url;
+    if (TRACKS.length > 0) {
+      audio.src = TRACKS[0].url;
+      audio.onended = () => {
+        currentTrackIdx = (currentTrackIdx + 1) % TRACKS.length;
+        audio.src = TRACKS[currentTrackIdx].url;
+        audio.play().catch(e => {});
+        document.querySelectorAll('.track-item').forEach((el, i) => {
+          if(i === currentTrackIdx) el.classList.add('active');
+          else el.classList.remove('active');
+        });
+      };
+    }
   }
 
   function renderBoard() {
@@ -356,6 +393,21 @@
         boardEl.appendChild(sqDiv);
       }
     }
+    updateStatusText();
+  }
+
+  function updateStatusText() {
+    const topEl = document.getElementById('playerInfoTop');
+    const botEl = document.getElementById('playerInfoBottom');
+    const mode = document.getElementById('modeSelect').value;
+
+    if (mode.startsWith('ai')) {
+      topEl.innerText = `Lawan (AI): ${mode.replace('ai-', '').toUpperCase()}`;
+      botEl.innerText = `Kamu (${currentUser || 'Player'})`;
+    } else {
+      topEl.innerText = `Lawan (Online)`;
+      botEl.innerText = `Kamu (${currentUser || 'Player'})`;
+    }
   }
 
   function handleSquareClick(sq) {
@@ -377,7 +429,7 @@
         if (mode === 'online' && conn) {
           conn.send({ type: 'MOVE', move: move });
         } else if (mode.startsWith('ai') && !game.game_over()) {
-          aiTimeout = setTimeout(makeAIMove, 300);
+          aiTimeout = setTimeout(makeAIMove, 250);
         }
       }
     }
@@ -392,19 +444,17 @@
     let selectedMove;
     if (mode === 'ai-easy') {
       selectedMove = moves[Math.floor(Math.random() * moves.length)];
-    } else if (mode === 'ai-hard') {
+    } else if (mode === 'ai-medium') {
       let captureMoves = game.moves({ verbose: true }).filter(m => m.captured);
-      if (captureMoves.length > 0) {
-        selectedMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
-      } else {
-        selectedMove = moves[Math.floor(Math.random() * moves.length)];
-      }
+      selectedMove = captureMoves.length > 0 ? captureMoves[Math.floor(Math.random() * captureMoves.length)] : moves[Math.floor(Math.random() * moves.length)];
+    } else if (mode === 'ai-hard') {
+      let captureOrCheck = game.moves({ verbose: true }).filter(m => m.captured || m.san.includes('+'));
+      selectedMove = captureOrCheck.length > 0 ? captureOrCheck[Math.floor(Math.random() * captureOrCheck.length)] : moves[Math.floor(Math.random() * moves.length)];
     } else if (mode === 'ai-impossible') {
       let bestScore = -9999;
       let verboseMoves = game.moves({ verbose: true });
       if (verboseMoves.length === 0) return;
       selectedMove = verboseMoves[0];
-
       const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
 
       for (let m of verboseMoves) {
@@ -435,7 +485,7 @@
     if (aiTimeout) {
       clearTimeout(aiTimeout);
       aiTimeout = null;
-      alert('Perhitungan giliran AI dihentikan.');
+      alert('Giliran AI dihentikan.');
     }
   }
 
@@ -469,7 +519,7 @@
         setupConn();
       });
     } catch (e) {
-      console.error("PeerJS init error:", e);
+      console.error("PeerJS error:", e);
     }
   }
 
@@ -485,7 +535,7 @@
   function setupConn() {
     if (!conn) return;
     conn.on('open', () => {
-      alert('Terhubung secara Online dengan lawan!');
+      alert('Terhubung online dengan lawan!');
       initGame();
     });
     conn.on('data', data => {
@@ -493,7 +543,7 @@
         game.move(data.move);
         renderBoard();
       } else if (data.type === 'RESIGN') {
-        alert('Lawan menyerah! Anda memenangkan pertandingan.');
+        alert('Lawan menyerah! Anda menang.');
         initGame();
       }
     });
@@ -515,7 +565,7 @@
     if (mode === 'online' && conn) {
       conn.send({ type: 'RESIGN' });
     }
-    alert('Kamu telah menyerah.');
+    alert('Anda menyerah.');
     initGame();
   }
 
