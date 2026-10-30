@@ -165,7 +165,6 @@
   </div>
 
 <script>
-  // SVG Vector Pieces (100% Offline & Anti-Break)
   const PIECE_SVGS = {
     p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#000"/></svg>',
     r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#000"/></svg>',
@@ -186,7 +185,7 @@
     { name: "Terranova (Original Radio Mix)", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" }
   ];
 
-  let game = new Chess();
+  let game = null;
   let selectedSquare = null;
   let currentUser = null;
   let currentRole = 'member';
@@ -195,19 +194,24 @@
   let aiTimeout = null;
 
   function initApp() {
-    if (!localStorage.getItem('axac_users')) {
-      localStorage.setItem('axac_users', JSON.stringify({ axac: { pass: 'axacintop', role: 'owner' } }));
+    try {
+      if (!localStorage.getItem('axac_users')) {
+        localStorage.setItem('axac_users', JSON.stringify({ axac: { pass: 'axacintop', role: 'owner' } }));
+      }
+      if (!localStorage.getItem('axac_requests')) {
+        localStorage.setItem('axac_requests', JSON.stringify([]));
+      }
+      game = new Chess();
+      setupAudioPlayer();
+    } catch (e) {
+      console.error("Init error:", e);
     }
-    if (!localStorage.getItem('axac_requests')) {
-      localStorage.setItem('axac_requests', JSON.stringify([]));
-    }
-    setupAudioPlayer();
   }
 
   function handleAuth(isRegister) {
     const u = document.getElementById('authUser').value.trim();
     const p = document.getElementById('authPass').value.trim();
-    const users = JSON.parse(localStorage.getItem('axac_users'));
+    const users = JSON.parse(localStorage.getItem('axac_users') || '{}');
 
     if (!u || !p) return alert('Username dan password wajib diisi');
 
@@ -254,7 +258,7 @@
   }
 
   function requestAdminUpgrade() {
-    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
     if (!reqs.includes(currentUser)) {
       reqs.push(currentUser);
       localStorage.setItem('axac_requests', JSON.stringify(reqs));
@@ -267,7 +271,7 @@
 
   function renderOwnerRequests() {
     const list = document.getElementById('adminReqList');
-    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
     if (reqs.length === 0) {
       list.innerHTML = '<i>Tidak ada permintaan pending.</i>';
       return;
@@ -288,8 +292,8 @@
   }
 
   function approveAdmin(user) {
-    let users = JSON.parse(localStorage.getItem('axac_users'));
-    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
+    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
     if (users[user]) users[user].role = 'admin';
     reqs = reqs.filter(r => r !== user);
     localStorage.setItem('axac_users', JSON.stringify(users));
@@ -299,7 +303,7 @@
   }
 
   function rejectAdmin(user) {
-    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
     reqs = reqs.filter(r => r !== user);
     localStorage.setItem('axac_requests', JSON.stringify(reqs));
     renderOwnerRequests();
@@ -308,15 +312,16 @@
   function setupAudioPlayer() {
     const audio = document.getElementById('bgAudio');
     const list = document.getElementById('trackList');
+    if (!list) return;
     list.innerHTML = '';
     
-    TRACKS.forEach((track, idx) => {
+    TRACKS.forEach((track) => {
       const div = document.createElement('div');
       div.className = 'track-item';
       div.innerHTML = `<span>${track.name}</span>`;
       div.onclick = () => {
         audio.src = track.url;
-        audio.play();
+        audio.play().catch(err => console.log("Audio play blocked:", err));
         document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
         div.classList.add('active');
       };
@@ -327,6 +332,7 @@
 
   function renderBoard() {
     const boardEl = document.getElementById('chessboard');
+    if (!boardEl || !game) return;
     boardEl.innerHTML = '';
     const board = game.board();
 
@@ -378,6 +384,7 @@
   }
 
   function makeAIMove() {
+    if (!game || game.game_over()) return;
     const mode = document.getElementById('modeSelect').value;
     const moves = game.moves();
     if (moves.length === 0) return;
@@ -386,7 +393,6 @@
     if (mode === 'ai-easy') {
       selectedMove = moves[Math.floor(Math.random() * moves.length)];
     } else if (mode === 'ai-hard') {
-      // Prioritaskan Skakmat/Makan Bidak jika ada
       let captureMoves = game.moves({ verbose: true }).filter(m => m.captured);
       if (captureMoves.length > 0) {
         selectedMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
@@ -394,9 +400,9 @@
         selectedMove = moves[Math.floor(Math.random() * moves.length)];
       }
     } else if (mode === 'ai-impossible') {
-      // AI Mustahil (Evaluasi Posisi & Material Terkuat)
       let bestScore = -9999;
       let verboseMoves = game.moves({ verbose: true });
+      if (verboseMoves.length === 0) return;
       selectedMove = verboseMoves[0];
 
       const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
@@ -434,6 +440,7 @@
   }
 
   function initGame() {
+    if (!game) game = new Chess();
     game.reset();
     selectedSquare = null;
     renderBoard();
@@ -450,24 +457,33 @@
   }
 
   function initP2P() {
-    peer = new Peer(currentUser + '-' + Math.floor(Math.random() * 1000));
-    peer.on('open', id => {
-      document.getElementById('myPeerId').innerText = id;
-    });
-    peer.on('connection', c => {
-      conn = c;
-      setupConn();
-    });
+    try {
+      if (typeof Peer === 'undefined') return;
+      peer = new Peer(currentUser + '-' + Math.floor(Math.random() * 1000));
+      peer.on('open', id => {
+        const el = document.getElementById('myPeerId');
+        if (el) el.innerText = id;
+      });
+      peer.on('connection', c => {
+        conn = c;
+        setupConn();
+      });
+    } catch (e) {
+      console.error("PeerJS init error:", e);
+    }
   }
 
   function connectToPeer() {
     const target = document.getElementById('targetPeerId').value.trim();
     if (!target) return;
-    conn = peer.connect(target);
-    setupConn();
+    if (peer) {
+      conn = peer.connect(target);
+      setupConn();
+    }
   }
 
   function setupConn() {
+    if (!conn) return;
     conn.on('open', () => {
       alert('Terhubung secara Online dengan lawan!');
       initGame();
@@ -484,11 +500,13 @@
   }
 
   function confirmResign() {
-    document.getElementById('confirmModal').style.display = 'flex';
+    const modal = document.getElementById('confirmModal');
+    if (modal) modal.style.display = 'flex';
   }
 
   function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
   }
 
   function executeResign() {
