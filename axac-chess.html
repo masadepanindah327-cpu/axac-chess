@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AXAC Chess Engine & Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #131b2e;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --sq-light: #e2e8f0;
+      --sq-dark: #475569;
+      --sq-highlight: rgba(59, 130, 246, 0.5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; color: var(--accent); }
+    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; cursor: pointer; user-select: none; }
+    .role-owner { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .role-admin { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .role-member { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success { background: var(--success); }
+    .btn-success:hover { background: #16a34a; }
+    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+    .auth-container { max-width: 400px; margin: 60px auto; background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 12px; width: 90%; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+    .input-group input, .input-group select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); outline: none; }
+    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1100px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
+    @media (max-width: 850px) { .main-layout { grid-template-columns: 1fr; } }
+    .board-container { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 460px; aspect-ratio: 1; border: 2px solid var(--border); border-radius: 6px; overflow: hidden; position: relative; }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; position: relative; }
+    .square.light { background: var(--sq-light); }
+    .square.dark { background: var(--sq-dark); }
+    .square.highlight { background: var(--sq-highlight) !important; }
+    .square svg { width: 80%; height: 80%; pointer-events: none; }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .audio-player { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .track-list { max-height: 120px; overflow-y: auto; margin-top: 8px; font-size: 0.85rem; }
+    .track-item { padding: 6px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 90%; max-width: 420px; }
+    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.85rem; }
+    .hidden { display: none !important; }
+    footer { text-align: center; padding: 16px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: auto; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">AXAC CHESS</div>
+    <div id="userHeaderControls" class="hidden">
+      <span id="profileClickable" title="Klik profil untuk upgrade role" style="cursor: pointer; font-weight: 600;">
+        <span id="usernameDisplay"></span>
+        <span id="roleTag" class="role-badge"></span>
+      </span>
+      <button class="btn btn-sm btn-danger" style="margin-left: 12px;" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Login/Register Screen -->
+  <div id="authScreen" class="auth-container">
+    <h2 style="margin-bottom: 16px; text-align: center;">Masuk ke AXAC</h2>
+    <div class="input-group">
+      <label>Username</label>
+      <input type="text" id="authUser" placeholder="Username" value="axac">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="authPass" placeholder="Password" value="axacintop">
+    </div>
+    <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="handleAuth(false)">Login</button>
+    <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="gameScreen" class="main-layout hidden">
+    <div class="board-container">
+      <div style="width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;" id="playerInfoTop">Lawan: -</div>
+      <div id="chessboard" class="board"></div>
+      <div style="width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;" id="playerInfoBottom">Kamu: -</div>
+      
+      <div style="display: flex; gap: 8px; width: 100%; max-width: 460px; margin-top: 8px;">
+        <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
+        <button class="btn" id="stopAiBtn" style="flex: 1; background: #64748b;" onclick="stopAI()">Hentikan AI</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div>
+        <h3 style="margin-bottom: 8px; font-size: 1rem;">Mode Permainan</h3>
+        <select id="modeSelect" onchange="changeMode()" class="input-group">
+          <option value="ai-easy">VS AI (Mudah)</option>
+          <option value="ai-hard">VS AI (Sulit)</option>
+          <option value="ai-impossible">VS AI (Mustahil)</option>
+          <option value="online">Mabar Online (P2P)</option>
+        </select>
+      </div>
+
+      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border); padding-top: 10px;">
+        <h4 style="margin-bottom: 6px; font-size: 0.9rem;">Mabar Online</h4>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">ID Kamu: <span id="myPeerId" style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Connecting...</span></div>
+        <div class="input-group">
+          <input type="text" id="targetPeerId" placeholder="Masukkan ID Lawan">
+        </div>
+        <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
+      </div>
+
+      <!-- Owner Panel Approval Section -->
+      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border); padding-top: 10px;">
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: #f59e0b;">Permintaan Role Admin</h4>
+        <div id="adminReqList"><i>Tidak ada permintaan pending.</i></div>
+      </div>
+
+      <!-- Music Player -->
+      <div class="audio-player">
+        <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
+        <audio id="bgAudio" controls style="width: 100%; height: 32px; margin-bottom: 8px;"></audio>
+        <div class="track-list" id="trackList"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made by AXAC</footer>
+
+  <!-- Modal Request Upgrade -->
+  <div id="upgradeModal" class="modal-overlay">
+    <div class="modal">
+      <h3 style="margin-bottom: 12px;">Pengajuan Upgrade Admin</h3>
+      <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Kamu saat ini berkedudukan sebagai <b>Member</b>. Ajukan permohonan ke Owner untuk dijadikan <b>Admin</b>?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn" style="background: var(--border);" onclick="closeModal('upgradeModal')">Batal</button>
+        <button class="btn" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Resign Confirmation -->
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal">
+      <h3 style="margin-bottom: 12px;">Konfirmasi Nyerah</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Apakah kamu yakin ingin menyerah dari permainan ini?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn" style="background: var(--border);" onclick="closeModal('confirmModal')">Batal</button>
+        <button class="btn btn-danger" onclick="executeResign()">Ya, Nyerah</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // SVG Vector Pieces (100% Offline & Anti-Break)
+  const PIECE_SVGS = {
+    p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#000"/></svg>',
+    r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#000"/></svg>',
+    n: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#000"/></svg>',
+    b: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#000"/></svg>',
+    q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#000"/></svg>',
+    k: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#000"/></svg>',
+    P: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>',
+    R: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>',
+    N: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>',
+    B: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>',
+    Q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>',
+    K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
+  };
+
+  const TRACKS = [
+    { name: "Merry Christmas Please Don't Call", url: "https://cdn.pixabay.com/download/audio/2022/11/22/audio_febc508215.mp3" },
+    { name: "Terranova (Original Radio Mix)", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" }
+  ];
+
+  let game = new Chess();
+  let selectedSquare = null;
+  let currentUser = null;
+  let currentRole = 'member';
+  let peer = null, conn = null;
+  let playerColor = 'w';
+  let aiTimeout = null;
+
+  function initApp() {
+    if (!localStorage.getItem('axac_users')) {
+      localStorage.setItem('axac_users', JSON.stringify({ axac: { pass: 'axacintop', role: 'owner' } }));
+    }
+    if (!localStorage.getItem('axac_requests')) {
+      localStorage.setItem('axac_requests', JSON.stringify([]));
+    }
+    setupAudioPlayer();
+  }
+
+  function handleAuth(isRegister) {
+    const u = document.getElementById('authUser').value.trim();
+    const p = document.getElementById('authPass').value.trim();
+    const users = JSON.parse(localStorage.getItem('axac_users'));
+
+    if (!u || !p) return alert('Username dan password wajib diisi');
+
+    if (isRegister) {
+      if (users[u]) return alert('Username sudah terdaftar');
+      users[u] = { pass: p, role: 'member' };
+      localStorage.setItem('axac_users', JSON.stringify(users));
+      alert('Registrasi berhasil! Role Anda: Member. Silakan Login.');
+    } else {
+      if (users[u] && users[u].pass === p) {
+        currentUser = u;
+        currentRole = users[u].role;
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.remove('hidden');
+        document.getElementById('userHeaderControls').classList.remove('hidden');
+        
+        updateProfileDisplay();
+        initGame();
+        initP2P();
+
+        if (currentRole === 'owner') {
+          document.getElementById('ownerPanel').classList.remove('hidden');
+          renderOwnerRequests();
+        }
+      } else {
+        alert('Credential tidak ditemukan atau password salah.');
+      }
+    }
+  }
+
+  function updateProfileDisplay() {
+    document.getElementById('usernameDisplay').innerText = currentUser;
+    const badge = document.getElementById('roleTag');
+    badge.innerText = currentRole.toUpperCase();
+    badge.className = `role-badge role-${currentRole}`;
+
+    document.getElementById('profileClickable').onclick = () => {
+      if (currentRole === 'member') {
+        document.getElementById('upgradeModal').style.display = 'flex';
+      } else {
+        alert(`Role Anda saat ini: ${currentRole.toUpperCase()}`);
+      }
+    };
+  }
+
+  function requestAdminUpgrade() {
+    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    if (!reqs.includes(currentUser)) {
+      reqs.push(currentUser);
+      localStorage.setItem('axac_requests', JSON.stringify(reqs));
+      alert('Pengajuan upgrade berhasil dikirimkan ke Owner!');
+    } else {
+      alert('Pengajuan Anda sudah ada dalam antrean Owner.');
+    }
+    closeModal('upgradeModal');
+  }
+
+  function renderOwnerRequests() {
+    const list = document.getElementById('adminReqList');
+    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    if (reqs.length === 0) {
+      list.innerHTML = '<i>Tidak ada permintaan pending.</i>';
+      return;
+    }
+    list.innerHTML = '';
+    reqs.forEach(user => {
+      const div = document.createElement('div');
+      div.className = 'admin-req-item';
+      div.innerHTML = `
+        <span><b>${user}</b> minta Role Admin</span>
+        <div>
+          <button class="btn btn-sm btn-success" onclick="approveAdmin('${user}')">Setujui</button>
+          <button class="btn btn-sm btn-danger" onclick="rejectAdmin('${user}')">Tolak</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function approveAdmin(user) {
+    let users = JSON.parse(localStorage.getItem('axac_users'));
+    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    if (users[user]) users[user].role = 'admin';
+    reqs = reqs.filter(r => r !== user);
+    localStorage.setItem('axac_users', JSON.stringify(users));
+    localStorage.setItem('axac_requests', JSON.stringify(reqs));
+    renderOwnerRequests();
+    alert(`Berhasil menyetujui ${user} sebagai Admin.`);
+  }
+
+  function rejectAdmin(user) {
+    let reqs = JSON.parse(localStorage.getItem('axac_requests'));
+    reqs = reqs.filter(r => r !== user);
+    localStorage.setItem('axac_requests', JSON.stringify(reqs));
+    renderOwnerRequests();
+  }
+
+  function setupAudioPlayer() {
+    const audio = document.getElementById('bgAudio');
+    const list = document.getElementById('trackList');
+    list.innerHTML = '';
+    
+    TRACKS.forEach((track, idx) => {
+      const div = document.createElement('div');
+      div.className = 'track-item';
+      div.innerHTML = `<span>${track.name}</span>`;
+      div.onclick = () => {
+        audio.src = track.url;
+        audio.play();
+        document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+      };
+      list.appendChild(div);
+    });
+    if (TRACKS.length > 0) audio.src = TRACKS[0].url;
+  }
+
+  function renderBoard() {
+    const boardEl = document.getElementById('chessboard');
+    boardEl.innerHTML = '';
+    const board = game.board();
+
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const squareRow = playerColor === 'w' ? r : 7 - r;
+        const squareCol = playerColor === 'w' ? c : 7 - c;
+        const square = String.fromCharCode(97 + squareCol) + (8 - squareRow);
+        const piece = board[squareRow][squareCol];
+
+        const sqDiv = document.createElement('div');
+        sqDiv.className = `square ${(squareRow + squareCol) % 2 === 0 ? 'light' : 'dark'}`;
+        if (selectedSquare === square) sqDiv.classList.add('highlight');
+
+        if (piece) {
+          const pieceKey = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
+          sqDiv.innerHTML = PIECE_SVGS[pieceKey] || '';
+        }
+
+        sqDiv.onclick = () => handleSquareClick(square);
+        boardEl.appendChild(sqDiv);
+      }
+    }
+  }
+
+  function handleSquareClick(sq) {
+    const mode = document.getElementById('modeSelect').value;
+    if (mode.startsWith('ai') && game.turn() !== playerColor) return;
+
+    if (!selectedSquare) {
+      const piece = game.get(sq);
+      if (piece && piece.color === game.turn()) {
+        selectedSquare = sq;
+        renderBoard();
+      }
+    } else {
+      const move = game.move({ from: selectedSquare, to: sq, promotion: 'q' });
+      selectedSquare = null;
+      renderBoard();
+
+      if (move) {
+        if (mode === 'online' && conn) {
+          conn.send({ type: 'MOVE', move: move });
+        } else if (mode.startsWith('ai') && !game.game_over()) {
+          aiTimeout = setTimeout(makeAIMove, 300);
+        }
+      }
+    }
+  }
+
+  function makeAIMove() {
+    const mode = document.getElementById('modeSelect').value;
+    const moves = game.moves();
+    if (moves.length === 0) return;
+
+    let selectedMove;
+    if (mode === 'ai-easy') {
+      selectedMove = moves[Math.floor(Math.random() * moves.length)];
+    } else if (mode === 'ai-hard') {
+      // Prioritaskan Skakmat/Makan Bidak jika ada
+      let captureMoves = game.moves({ verbose: true }).filter(m => m.captured);
+      if (captureMoves.length > 0) {
+        selectedMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
+      } else {
+        selectedMove = moves[Math.floor(Math.random() * moves.length)];
+      }
+    } else if (mode === 'ai-impossible') {
+      // AI Mustahil (Evaluasi Posisi & Material Terkuat)
+      let bestScore = -9999;
+      let verboseMoves = game.moves({ verbose: true });
+      selectedMove = verboseMoves[0];
+
+      const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+
+      for (let m of verboseMoves) {
+        game.move(m);
+        let score = 0;
+        const b = game.board();
+        for (let r=0; r<8; r++) {
+          for (let c=0; c<8; c++) {
+            if (b[r][c]) {
+              let val = pieceValues[b[r][c].type];
+              score += (b[r][c].color === 'b' ? val : -val);
+            }
+          }
+        }
+        game.undo();
+        if (score > bestScore) {
+          bestScore = score;
+          selectedMove = m;
+        }
+      }
+    }
+
+    game.move(selectedMove);
+    renderBoard();
+  }
+
+  function stopAI() {
+    if (aiTimeout) {
+      clearTimeout(aiTimeout);
+      aiTimeout = null;
+      alert('Perhitungan giliran AI dihentikan.');
+    }
+  }
+
+  function initGame() {
+    game.reset();
+    selectedSquare = null;
+    renderBoard();
+  }
+
+  function changeMode() {
+    initGame();
+    const mode = document.getElementById('modeSelect').value;
+    if (mode === 'online') {
+      document.getElementById('p2pPanel').classList.remove('hidden');
+    } else {
+      document.getElementById('p2pPanel').classList.add('hidden');
+    }
+  }
+
+  function initP2P() {
+    peer = new Peer(currentUser + '-' + Math.floor(Math.random() * 1000));
+    peer.on('open', id => {
+      document.getElementById('myPeerId').innerText = id;
+    });
+    peer.on('connection', c => {
+      conn = c;
+      setupConn();
+    });
+  }
+
+  function connectToPeer() {
+    const target = document.getElementById('targetPeerId').value.trim();
+    if (!target) return;
+    conn = peer.connect(target);
+    setupConn();
+  }
+
+  function setupConn() {
+    conn.on('open', () => {
+      alert('Terhubung secara Online dengan lawan!');
+      initGame();
+    });
+    conn.on('data', data => {
+      if (data.type === 'MOVE') {
+        game.move(data.move);
+        renderBoard();
+      } else if (data.type === 'RESIGN') {
+        alert('Lawan menyerah! Anda memenangkan pertandingan.');
+        initGame();
+      }
+    });
+  }
+
+  function confirmResign() {
+    document.getElementById('confirmModal').style.display = 'flex';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function executeResign() {
+    closeModal('confirmModal');
+    const mode = document.getElementById('modeSelect').value;
+    if (mode === 'online' && conn) {
+      conn.send({ type: 'RESIGN' });
+    }
+    alert('Kamu telah menyerah.');
+    initGame();
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  window.onload = initApp;
+</script>
+</body>
+</html>
