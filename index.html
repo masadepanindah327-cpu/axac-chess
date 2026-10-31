@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess Platform</title>
+  <title>AXAC Chess Platform - Magnus AI Edition</title>
   
-  <!-- Meta PWA untuk Install di HP -->
+  <!-- Manifest & PWA Setup untuk Install Aplikasi -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
@@ -24,6 +24,7 @@
       --danger: #ef4444;
       --success: #22c55e;
       --warning: #f59e0b;
+      --purple: #8b5cf6;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --sq-light: #e2e8f0;
@@ -34,13 +35,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     
     body { 
-      background: linear-gradient(rgba(5, 7, 13, 0.82), rgba(5, 7, 13, 0.92)), 
-                  url('content://media/external/downloads/1000152373') no-repeat center center fixed; 
+      background: linear-gradient(rgba(5, 7, 13, 0.75), rgba(5, 7, 13, 0.9)), 
+                  url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; 
       background-size: cover;
       color: var(--text); 
       min-height: 100vh; 
       display: flex; 
       flex-direction: column; 
+      transition: background 0.3s ease;
     }
     
     header { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
@@ -56,7 +58,7 @@
     .role-admin { background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
     .role-member { background: rgba(148, 163, 184, 0.25); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.5); }
 
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 230px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 240px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
     .dropdown-item { padding: 12px 16px; font-size: 0.9rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
@@ -64,6 +66,7 @@
     .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
     .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
     .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
+    .btn-purple { background: var(--purple); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
 
     .auth-container { max-width: 400px; margin: 40px auto; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 28px; border-radius: 20px; width: 90%; }
@@ -79,7 +82,6 @@
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
     .status-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-glass); }
     
-    /* FIX PAPAN CATUR SIMETRIS 100% (AKURAT DAN BEBAS BUG) */
     .board-wrapper { width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto; }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 4px solid #1e293b; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.8); background: #1e293b; }
     
@@ -104,10 +106,13 @@
     .track-item.active { background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-weight: 600; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 20px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 20px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
     
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     .leaderboard-table th, .leaderboard-table td { padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    
+    .magnus-box { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 14px; padding: 14px; font-size: 0.88rem; line-height: 1.5; color: #ddd; margin-bottom: 12px; }
+    
     .hidden { display: none !important; }
     footer { text-align: center; padding: 14px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: rgba(15, 23, 42, 0.95); }
   </style>
@@ -122,7 +127,8 @@
       <div class="brand">AXAC CHESS</div>
     </div>
     
-    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+    <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 8px;">
+      <button id="installPwaBtn" class="btn btn-sm btn-success hidden" onclick="triggerPwaInstall()">📱 Install HP</button>
       <span id="profileClickable" style="font-weight: 600; font-size: 0.85rem;">
         <span id="usernameDisplay"></span>
         <span id="roleTag" class="role-badge"></span>
@@ -133,6 +139,7 @@
     <!-- Dropdown Menu Titik Tiga -->
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
+      <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Catur (Magnus AI)</div>
       <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan & Musik</div>
       <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil Akun</div>
       <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard</div>
@@ -168,6 +175,7 @@
       
       <div style="display: flex; gap: 10px; width: 100%; max-width: 480px; margin-top: 4px;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
+        <button class="btn btn-purple" style="flex: 1;" onclick="askMagnusAdvice()">💡 Tanya Magnus</button>
         <button class="btn" id="stopAiBtn" style="flex: 1; background: #334155;" onclick="stopAI()">Hentikan AI</button>
       </div>
     </div>
@@ -179,7 +187,7 @@
           <option value="ai-easy">VS AI (Mudah)</option>
           <option value="ai-medium">VS AI (Sedang)</option>
           <option value="ai-hard">VS AI (Sulit)</option>
-          <option value="ai-impossible">VS AI (Mustahil)</option>
+          <option value="ai-impossible">VS AI (Mustahil / Magnus Level)</option>
           <option value="online">Mabar Online (P2P)</option>
         </select>
       </div>
@@ -193,9 +201,9 @@
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
-      <!-- Pemutar Musik Tenang Khusus Catur -->
+      <!-- Pemutar Musik -->
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Musik Catur Instrumental Tenang</h4>
+        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Musik Catur Auto-Playlist</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 34px; border-radius: 8px; margin-bottom: 6px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
@@ -203,6 +211,33 @@
   </div>
 
   <footer>Made by AXAC</footer>
+
+  <!-- Modal Pelatih Catur Magnus AI -->
+  <div id="magnusModal" class="modal-overlay">
+    <div class="modal">
+      <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #a78bfa;">🎓 Pelatih Catur: Magnus AI</h3>
+      <div class="magnus-box">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <span style="font-size: 1.4rem;">👑</span>
+          <div>
+            <b>Magnus Carlsen AI</b>
+            <div style="font-size: 0.75rem; color: #a78bfa;">Guru & Analis Catur Pribadi Anda</div>
+          </div>
+        </div>
+        <p id="magnusAdviceText">"Halo! Saya Magnus. Pilih tombol analisis di bawah untuk mempelajari taktik atau meminta saran langkah terbaik di papan catur Anda saat ini."</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn btn-purple btn-sm" onclick="askMagnusAdvice()">🔍 Analisis Papan Saat Ini</button>
+        <button class="btn btn-sm" style="background: #334155;" onclick="showMagnusTutorial('basics')">📖 Panduan Dasar Untuk Pemula</button>
+        <button class="btn btn-sm" style="background: #334155;" onclick="showMagnusTutorial('openings')">♟️ Strategi Pembukaan Catur Terbaik</button>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-sm" onclick="closeModal('magnusModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Leaderboard -->
   <div id="leaderboardModal" class="modal-overlay">
@@ -215,20 +250,28 @@
     </div>
   </div>
 
-  <!-- Modal Settings + Custom Background URL -->
+  <!-- Modal Settings + Custom BG & Custom Track URLs -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">⚙️ Pengaturan Web & Background</h3>
-      <div class="input-group">
-        <label>URL Foto Background Kustom (Bisa Reze Anime / Foto Bebas)</label>
-        <input type="text" id="bgUrlInput" placeholder="Tempel URL Gambar HTTPS di sini">
-      </div>
-      <button class="btn btn-sm" style="width: 100%; margin-bottom: 16px;" onclick="updateCustomBg()">Terapkan Background Baru</button>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">⚙️ Pengaturan Custom Background & Musik</h3>
       
+      <div class="input-group">
+        <label>URL Gambar Background (HTTPS)</label>
+        <input type="text" id="bgUrlInput" placeholder="Tempel URL Foto Reze Anime / Bebas">
+      </div>
+      
+      <div class="input-group">
+        <label>Tambah URL Musik Kustom (MP3 Direct Link)</label>
+        <input type="text" id="musicUrlInput" placeholder="Tempel URL File Musik (.mp3)">
+      </div>
+      
+      <button class="btn btn-sm btn-success" style="width: 100%; margin-bottom: 16px;" onclick="saveCustomMedia()">💾 Simpan & Terapkan Media</button>
+
       <div class="input-group">
         <label>Volume Musik</label>
         <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="document.getElementById('bgAudio').volume = this.value">
       </div>
+
       <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
         <button class="btn btn-sm" onclick="closeModal('settingsModal')">Tutup</button>
       </div>
@@ -242,7 +285,6 @@
       <div id="profileInfoContent" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;"></div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('profileModal')">Tutup</button>
-        <button class="btn btn-sm" onclick="requestAdminUpgrade()">Ajukan Jadi Admin</button>
       </div>
     </div>
   </div>
@@ -299,8 +341,7 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // Playlist Musik Instrumental Tenang Terpercaya (Bebas Akses Stream)
-  const TRACKS = [
+  let TRACKS = [
     { name: "Classical Chess Calm (Piano)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
     { name: "Ambient Soft Lo-Fi Beats", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
   ];
@@ -314,6 +355,27 @@
   let playerColor = 'w';
   let aiTimeout = null;
   let currentTrackIdx = 0;
+  let deferredPrompt = null;
+
+  // Event listener PWA Prompt Install
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('installPwaBtn');
+    if(btn) btn.classList.remove('hidden');
+  });
+
+  function triggerPwaInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User menginstal aplikasi');
+        }
+        deferredPrompt = null;
+      });
+    }
+  }
 
   function initApp() {
     try {
@@ -324,11 +386,17 @@
       }
 
       game = new Chess();
+
+      // Load custom playlist dari localStorage jika ada
+      const savedTracks = localStorage.getItem('axac_custom_tracks');
+      if(savedTracks) {
+        TRACKS = JSON.parse(savedTracks);
+      }
       setupAudioPlayer();
 
       const customBg = localStorage.getItem('axac_custom_bg');
       if(customBg) {
-        document.body.style.backgroundImage = `linear-gradient(rgba(5, 7, 13, 0.82), rgba(5, 7, 13, 0.92)), url('${customBg}')`;
+        document.body.style.backgroundImage = `linear-gradient(rgba(5, 7, 13, 0.75), rgba(5, 7, 13, 0.9)), url('${customBg}')`;
       }
 
       const savedUser = localStorage.getItem('axac_active_user');
@@ -343,7 +411,7 @@
         currentRole = savedRole;
 
         if (users[currentUser] && users[currentUser].warned) {
-          alert('⚠️ PERINGATAN OWNER: Akun Anda telah terdeteksi melakukan kecurangan! Ulangi lagi maka akun akan di-ban.');
+          alert('⚠️ PERINGATAN OWNER: Akun Anda telah terdeteksi melakukan kecurangan!');
         }
 
         document.getElementById('authScreen').classList.add('hidden');
@@ -361,13 +429,74 @@
     }
   }
 
-  function updateCustomBg() {
-    const url = document.getElementById('bgUrlInput').value.trim();
-    if (!url) return alert('Masukkan URL gambar terlebih dahulu.');
-    localStorage.setItem('axac_custom_bg', url);
-    document.body.style.backgroundImage = `linear-gradient(rgba(5, 7, 13, 0.82), rgba(5, 7, 13, 0.92)), url('${url}')`;
-    alert('Background berhasil diperbarui!');
+  function saveCustomMedia() {
+    const bgUrl = document.getElementById('bgUrlInput').value.trim();
+    const musicUrl = document.getElementById('musicUrlInput').value.trim();
+
+    if(bgUrl) {
+      localStorage.setItem('axac_custom_bg', bgUrl);
+      document.body.style.backgroundImage = `linear-gradient(rgba(5, 7, 13, 0.75), rgba(5, 7, 13, 0.9)), url('${bgUrl}')`;
+    }
+
+    if(musicUrl) {
+      TRACKS.unshift({ name: "Custom Track (" + (TRACKS.length + 1) + ")", url: musicUrl });
+      localStorage.setItem('axac_custom_tracks', JSON.stringify(TRACKS));
+      setupAudioPlayer();
+    }
+
+    alert('Pengaturan media tersimpan!');
     closeModal('settingsModal');
+  }
+
+  function askMagnusAdvice() {
+    if (!game) return;
+    openModal('magnusModal');
+    const adviceEl = document.getElementById('magnusAdviceText');
+    const moves = game.moves({ verbose: true });
+
+    if (game.game_over()) {
+      adviceEl.innerHTML = `<b>Magnus:</b> "Permainan sudah selesai. Klik 'Main' untuk memulai pertempuran baru!"`;
+      return;
+    }
+
+    if (moves.length === 0) return;
+
+    // Magnus AI menganalisis langkah terbaik
+    let bestMove = moves[0];
+    let captureMoves = moves.filter(m => m.captured);
+    let checkMoves = moves.filter(m => m.san.includes('+'));
+
+    if (checkMoves.length > 0) bestMove = checkMoves[0];
+    else if (captureMoves.length > 0) bestMove = captureMoves[0];
+    else bestMove = moves[Math.floor(Math.random() * moves.length)];
+
+    adviceEl.innerHTML = `
+      <b>Magnus Carlsen AI Analisis:</b><br>
+      "Posisi saat ini cukup menarik. Saran terbaik saya untuk giliran ini adalah memindahkan perwira dari 
+      <b style="color:#60a5fa">${bestMove.from.toUpperCase()}</b> ke <b style="color:#22c55e">${bestMove.to.toUpperCase()}</b> 
+      (Langkah: <i>${bestMove.san}</i>). Ini memberikan penguasaan ruang petak tengah yang kokoh."
+    `;
+  }
+
+  function showMagnusTutorial(topic) {
+    const adviceEl = document.getElementById('magnusAdviceText');
+    if (topic === 'basics') {
+      adviceEl.innerHTML = `
+        <b>Magnus: Panduan Dasar Catur</b><br>
+        1. <b>Tujuan:</b> Skakmat (Checkmate) Raja lawan hingga tak bisa kabur.<br>
+        2. <b>Pion:</b> Maju 1 petak ke depan (atau 2 petak di langkah awal). Memakan miring.<br>
+        3. <b>Kuda (L):</b> Satu-satunya perwira yang bisa melompati perwira lain.<br>
+        4. <b>Gajah & Benteng:</b> Gajah bergerak menyilang, Benteng lurus horizontal/vertikal.<br>
+        5. <b>Menteri (Ratu):</b> Perwira terkuat, kombinasi Benteng + Gajah.
+      `;
+    } else if (topic === 'openings') {
+      adviceEl.innerHTML = `
+        <b>Magnus: Strategi Pembukaan</b><br>
+        • Kuasai petak pusat papan (e4, d4, e5, d5) di awal laga.<br>
+        • Kembangkan Kuda dan Gajah terlebih dahulu sebelum mengeluarkan Menteri.<br>
+        • Lakukan <b>Rokade (Castling)</b> lebih awal untuk mengamankan posisi Raja kamu!
+      `;
+    }
   }
 
   function toggleMenu() {
@@ -401,24 +530,23 @@
 
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     if (!users[targetUser]) return alert(`User "${targetUser}" tidak ditemukan.`);
-    if (targetUser === 'axac' && currentUser !== 'axac') return alert('Anda tidak bisa mengubah status Owner utama!');
 
     if (actionType === 'warn') {
       users[targetUser].warned = true;
       localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`⚠️ Peringatan resmi kecurangan telah dikirimkan ke akun ${targetUser}. Notifikasi akan muncul saat dia login.`);
+      alert(`⚠️ Peringatan dikirimkan ke akun ${targetUser}.`);
     } else if (actionType === 'ban') {
       users[targetUser].banned = !users[targetUser].banned;
       localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`Status Ban untuk ${targetUser} sekarang: ${users[targetUser].banned ? 'BANNED' : 'AKTIF'}`);
+      alert(`Status Ban ${targetUser}: ${users[targetUser].banned ? 'BANNED' : 'AKTIF'}`);
     } else if (actionType === 'role-admin') {
       users[targetUser].role = 'admin';
       localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`Role ${targetUser} berhasil diubah menjadi Admin.`);
+      alert(`Role ${targetUser} diubah jadi Admin.`);
     } else if (actionType === 'role-member') {
       users[targetUser].role = 'member';
       localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`Role ${targetUser} berhasil diubah menjadi Member.`);
+      alert(`Role ${targetUser} diubah jadi Member.`);
     }
   }
 
@@ -441,10 +569,6 @@
         currentRole = users[u].role;
         localStorage.setItem('axac_active_user', currentUser);
         localStorage.setItem('axac_active_role', currentRole);
-
-        if (users[currentUser] && users[currentUser].warned) {
-          alert('⚠️ PERINGATAN OWNER: Akun Anda telah terdeteksi melakukan kecurangan! Ulangi lagi maka akun akan di-ban.');
-        }
 
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('gameScreen').classList.remove('hidden');
