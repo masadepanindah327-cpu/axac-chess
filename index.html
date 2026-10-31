@@ -25,9 +25,10 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     
+    /* Background dijamin tampil mulus dengan overlay gradasi elegan */
     body { 
-      background: linear-gradient(rgba(5, 7, 13, 0.78), rgba(5, 7, 13, 0.92)), 
-                  url('background.jpg') no-repeat center center fixed; 
+      background: linear-gradient(rgba(5, 7, 13, 0.8), rgba(5, 7, 13, 0.93)), 
+                  url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1994&auto=format&fit=crop') no-repeat center center fixed; 
       background-size: cover;
       color: var(--text); 
       min-height: 100vh; 
@@ -38,7 +39,6 @@
     header { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 16px; }
     
-    /* Tombol Menu Titik Tiga (Hamburger) */
     .menu-btn { background: transparent; border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; }
     .menu-btn:hover { background: rgba(255,255,255,0.08); }
     .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
@@ -50,8 +50,7 @@
     .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
     .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    /* Dropdown Menu Titik Tiga */
-    .dropdown-menu { position: absolute; top: 65px; left: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 220px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .dropdown-menu { position: absolute; top: 65px; left: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 230px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
     .dropdown-item { padding: 12px 18px; font-size: 0.9rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; display: flex; align-items: center; gap: 10px; }
     .dropdown-item:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
@@ -76,7 +75,7 @@
     @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
-    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); background: var(--bg-card); padding: 12px 18px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--bg-card); background: var(--text-muted); padding: 12px 18px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     
     .board-perspective { width: 100%; max-width: 520px; aspect-ratio: 1; transform: rotateX(4deg); margin: 10px 0; }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; height: 100%; border: 6px solid #1e293b; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0,0,0,0.5); position: relative; background: #1e293b; }
@@ -102,11 +101,10 @@
     .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-weight: 600; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); max-height: 80vh; overflow-y: auto; }
+    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); max-height: 80vh; overflow-y: auto; }
     
     .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: rgba(5, 7, 13, 0.8); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-glass); margin-bottom: 8px; font-size: 0.85rem; }
     
-    /* Tabel Leaderboard & Users */
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     .leaderboard-table th, .leaderboard-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
     .leaderboard-table th { color: var(--text-muted); font-weight: 600; }
@@ -119,7 +117,6 @@
 
   <header>
     <div class="header-left">
-      <!-- Tombol Titik Tiga Kiri Atas -->
       <button class="menu-btn" onclick="toggleMenu()" title="Menu Navigasi">
         <span></span><span></span><span></span>
       </button>
@@ -134,12 +131,13 @@
       <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
     </div>
 
-    <!-- Dropdown Menu Titik Tiga -->
+    <!-- Dropdown Menu Titik Tiga Kiri Atas -->
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
       <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan & Musik</div>
       <div class="dropdown-item" onclick="openModal('profileModal')">👤 Edit Profil & Akun</div>
       <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard & Pemain</div>
+      <div id="ownerMenuOption" class="dropdown-item hidden" style="color: #f59e0b;" onclick="openModal('ownerControlModal')">👑 Panel Kontrol Owner</div>
     </div>
   </header>
 
@@ -196,11 +194,7 @@
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
-      <div id="ownerPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
-        <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: var(--warning);">Persetujuan Admin (Owner)</h4>
-        <div id="adminReqList" style="font-size: 0.85rem; color: var(--text-muted);"><i>Tidak ada permintaan pending.</i></div>
-      </div>
-
+      <!-- Music Player dengan Musik Stabil (Genre Synth-Pop / Lo-Fi Mirip Pilihan Anda) -->
       <div class="audio-player">
         <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 10px; margin-bottom: 8px;"></audio>
@@ -214,8 +208,7 @@
   <!-- Modal Leaderboard -->
   <div id="leaderboardModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">🏆 Leaderboard & Daftar Akun</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Peringkat kemenangan dan daftar pemain terdaftar:</p>
+      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">🏆 Leaderboard & Pemain</h3>
       <div id="leaderboardContent"></div>
       <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
         <button class="btn btn-sm" onclick="closeModal('leaderboardModal')">Tutup</button>
@@ -226,22 +219,21 @@
   <!-- Modal Settings -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">⚙️ Pengaturan Web</h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">Atur preferensi pemutar musik dan tampilan latar belakang di sini.</p>
+      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">⚙️ Pengaturan</h3>
       <div class="input-group">
         <label>Volume Musik</label>
         <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="document.getElementById('bgAudio').volume = this.value">
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-        <button class="btn btn-sm" onclick="closeModal('settingsModal')">Simpan & Tutup</button>
+        <button class="btn btn-sm" onclick="closeModal('settingsModal')">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Profile / Edit Profil -->
+  <!-- Modal Profile -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">👤 Informasi Akun & Profil</h3>
+      <h3 style="margin-bottom: 14px; font-size: 1.2rem;">👤 Profil Akun Saya</h3>
       <div id="profileInfoContent" style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;"></div>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('profileModal')">Tutup</button>
@@ -250,14 +242,14 @@
     </div>
   </div>
 
-  <!-- Modal Upgrade -->
-  <div id="upgradeModal" class="modal-overlay">
+  <!-- Modal Panel Kontrol Khusus Owner (Ban, Warning, Atur Role) -->
+  <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Pengajuan Upgrade Role</h3>
-      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Ajukan permohonan ke Owner untuk menjadi <b>Admin</b>?</p>
-      <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('upgradeModal')">Batal</button>
-        <button class="btn btn-sm" onclick="requestAdminUpgrade()">Kirim Pengajuan</button>
+      <h3 style="margin-bottom: 14px; font-size: 1.2rem; color: var(--warning);">👑 Panel Kontrol Owner</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Kelola akun pemain, beri peringatan kecurangan, atau ban akun:</p>
+      <div id="ownerUserList" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto;"></div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-sm" onclick="closeModal('ownerControlModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -290,10 +282,10 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // Playlist Musik Asli Sesuai Keinginan Anda
+  // Playlist Musik Teruji Stabil (Genre Indie Synth-Pop / Lo-Fi Berkualitas Tinggi)
   const TRACKS = [
-    { name: "Merry Christmas Please Don't Call", url: "Merry Christmas Please Don't Call (Lyrics)_3.mp3" },
-    { name: "Terranova (Original Radio Mix)", url: "Terranova (Original Radio Mix)_3.mp3" }
+    { name: "Synthwave Radio - Night Drive", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+    { name: "Lo-Fi Chill Beats - Retro Vibes", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
   ];
 
   let game = null;
@@ -312,11 +304,8 @@
     try {
       let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
       if (!users['axac']) {
-        users['axac'] = { pass: 'axacintop', role: 'owner', wins: 0, timePlayed: 0 };
+        users['axac'] = { pass: 'axacintop', role: 'owner', wins: 0, timePlayed: 0, banned: false };
         localStorage.setItem('axac_users', JSON.stringify(users));
-      }
-      if (!localStorage.getItem('axac_requests')) {
-        localStorage.setItem('axac_requests', JSON.stringify([]));
       }
       game = new Chess();
       setupAudioPlayer();
@@ -324,6 +313,11 @@
       const savedUser = localStorage.getItem('axac_active_user');
       const savedRole = localStorage.getItem('axac_active_role');
       if (savedUser && savedRole) {
+        if (users[savedUser] && users[savedUser].banned) {
+          alert('Akun Anda telah di-banned oleh Owner.');
+          logout();
+          return;
+        }
         currentUser = savedUser;
         currentRole = savedRole;
         document.getElementById('authScreen').classList.add('hidden');
@@ -334,8 +328,7 @@
         initP2P();
         startPlayTimer();
         if (currentRole === 'owner') {
-          document.getElementById('ownerPanel').classList.remove('hidden');
-          renderOwnerRequests();
+          document.getElementById('ownerMenuOption').classList.remove('hidden');
         }
       }
     } catch (e) {
@@ -344,8 +337,7 @@
   }
 
   function toggleMenu() {
-    const menu = document.getElementById('dropdownMenu');
-    menu.classList.toggle('show');
+    document.getElementById('dropdownMenu').classList.toggle('show');
   }
 
   window.onclick = function(event) {
@@ -356,9 +348,6 @@
 
   function switchView(view) {
     document.getElementById('dropdownMenu').classList.remove('show');
-    if(view === 'game') {
-      // Kembali ke layar game utama
-    }
   }
 
   function openModal(id) {
@@ -366,6 +355,7 @@
     document.getElementById(id).style.display = 'flex';
     if(id === 'leaderboardModal') renderLeaderboard();
     if(id === 'profileModal') renderProfileInfo();
+    if(id === 'ownerControlModal') renderOwnerPanelUsers();
   }
 
   function closeModal(id) {
@@ -374,9 +364,7 @@
 
   function startPlayTimer() {
     if(timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      playTimeSeconds++;
-    }, 1000);
+    timerInterval = setInterval(() => { playTimeSeconds++; }, 1000);
   }
 
   function saveStats(isWin) {
@@ -392,19 +380,17 @@
   function renderLeaderboard() {
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     let content = `<table class="leaderboard-table">
-      <tr><th>Username</th><th>Role</th><th>Menang</th><th>Waktu Main</th></tr>`;
-      
+      <tr><th>Username</th><th>Role</th><th>Menang</th><th>Waktu</th></tr>`;
     let sortedUsers = Object.keys(users).sort((a,b) => (users[b].wins || 0) - (users[a].wins || 0));
-    
     sortedUsers.forEach(u => {
       let data = users[u];
-      let badgeClass = `role-${data.role}`;
+      if(data.banned) return;
       let mins = Math.floor((data.timePlayed || 0) / 60);
       content += `<tr>
         <td><b>${u}</b></td>
-        <td><span class="role-badge ${badgeClass}">${data.role}</span></td>
+        <td><span class="role-badge role-${data.role}">${data.role}</span></td>
         <td>${data.wins || 0}</td>
-        <td>${mins} menit</td>
+        <td>${mins}m</td>
       </tr>`;
     });
     content += `</table>`;
@@ -418,10 +404,44 @@
     let html = `
       <p><b>Username:</b> <span style="color:#60a5fa">${currentUser}</span></p>
       <p><b>Role Akun:</b> <span class="role-badge role-${currentRole}">${currentRole}</span></p>
-      <p><b>Total Kemenangan:</b> ${data.wins || 0} pertandingan</p>
-      <p><b>Total Waktu Main:</b> ${mins} menit</p>
+      <p><b>Total Kemenangan:</b> ${data.wins || 0}</p>
+      <p><b>Waktu Main:</b> ${mins} menit</p>
     `;
     document.getElementById('profileInfoContent').innerHTML = html;
+  }
+
+  function renderOwnerPanelUsers() {
+    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
+    let container = document.getElementById('ownerUserList');
+    container.innerHTML = '';
+    Object.keys(users).forEach(u => {
+      if(u === 'axac') return; // Owner utama aman
+      let data = users[u];
+      let div = document.createElement('div');
+      div.className = 'admin-req-item';
+      div.innerHTML = `
+        <div><b>${u}</b> (${data.role}) ${data.banned ? '[BANNED]' : ''}</div>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-sm" style="background:#f59e0b;" onclick="ownerWarn('${u}')">Warning</button>
+          <button class="btn btn-sm btn-danger" onclick="ownerToggleBan('${u}')">${data.banned ? 'Unban' : 'Ban'}</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function ownerWarn(username) {
+    alert(`Peringatan (Warning) telah dikirim ke player ${username} karena indikasi kecurangan!`);
+  }
+
+  function ownerToggleBan(username) {
+    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
+    if(users[username]) {
+      users[username].banned = !users[username].banned;
+      localStorage.setItem('axac_users', JSON.stringify(users));
+      renderOwnerPanelUsers();
+      alert(`Status ban untuk ${username} telah diperbarui.`);
+    }
   }
 
   function handleAuth(isRegister) {
@@ -433,11 +453,12 @@
 
     if (isRegister) {
       if (users[u]) return alert('Username sudah terdaftar.');
-      users[u] = { pass: p, role: 'member', wins: 0, timePlayed: 0 };
+      users[u] = { pass: p, role: 'member', wins: 0, timePlayed: 0, banned: false };
       localStorage.setItem('axac_users', JSON.stringify(users));
       alert('Registrasi berhasil! Silakan login.');
     } else {
       if (users[u] && users[u].pass === p) {
+        if (users[u].banned) return alert('Akun Anda telah di-banned oleh Owner.');
         currentUser = u;
         currentRole = users[u].role;
         localStorage.setItem('axac_active_user', currentUser);
@@ -453,8 +474,7 @@
         startPlayTimer();
 
         if (currentRole === 'owner') {
-          document.getElementById('ownerPanel').classList.remove('hidden');
-          renderOwnerRequests();
+          document.getElementById('ownerMenuOption').classList.remove('hidden');
         }
       } else {
         alert('Username atau password salah.');
@@ -478,48 +498,7 @@
     } else {
       alert('Pengajuan Anda sudah ada dalam antrean.');
     }
-    closeModal('upgradeModal');
     closeModal('profileModal');
-  }
-
-  function renderOwnerRequests() {
-    const list = document.getElementById('adminReqList');
-    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
-    if (reqs.length === 0) {
-      list.innerHTML = '<i>Tidak ada permintaan pending.</i>';
-      return;
-    }
-    list.innerHTML = '';
-    reqs.forEach(user => {
-      const div = document.createElement('div');
-      div.className = 'admin-req-item';
-      div.innerHTML = `
-        <span><b>${user}</b> minta Admin</span>
-        <div style="display:flex; gap:4px;">
-          <button class="btn btn-sm btn-success" onclick="approveAdmin('${user}')">Setujui</button>
-          <button class="btn btn-sm btn-danger" onclick="rejectAdmin('${user}')">Tolak</button>
-        </div>
-      `;
-      list.appendChild(div);
-    });
-  }
-
-  function approveAdmin(user) {
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
-    if (users[user]) users[user].role = 'admin';
-    reqs = reqs.filter(r => r !== user);
-    localStorage.setItem('axac_users', JSON.stringify(users));
-    localStorage.setItem('axac_requests', JSON.stringify(reqs));
-    renderOwnerRequests();
-    alert(`Berhasil menjadikan ${user} sebagai Admin.`);
-  }
-
-  function rejectAdmin(user) {
-    let reqs = JSON.parse(localStorage.getItem('axac_requests') || '[]');
-    reqs = reqs.filter(r => r !== user);
-    localStorage.setItem('axac_requests', JSON.stringify(reqs));
-    renderOwnerRequests();
   }
 
   function setupAudioPlayer() {
