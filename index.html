@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AXAC Chess Engine & Platform</title>
+  <title>AXAC Chess Platform - Reze Edition</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-card: rgba(15, 23, 42, 0.9);
-      --border-glass: rgba(255, 255, 255, 0.12);
+      --bg-card: rgba(15, 23, 42, 0.92);
+      --border-glass: rgba(255, 255, 255, 0.15);
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --danger: #ef4444;
       --success: #22c55e;
       --warning: #f59e0b;
+      --purple: #8b5cf6;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --sq-light: #e2e8f0;
@@ -25,10 +26,10 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     
-    /* Background dijamin tampil mulus dengan overlay gradasi elegan */
+    /* Latar Belakang Anime Reze (Chainsaw Man) */
     body { 
-      background: linear-gradient(rgba(5, 7, 13, 0.8), rgba(5, 7, 13, 0.93)), 
-                  url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1994&auto=format&fit=crop') no-repeat center center fixed; 
+      background: linear-gradient(rgba(5, 7, 13, 0.82), rgba(5, 7, 13, 0.92)), 
+                  url('1000152372.jpg') no-repeat center center fixed; 
       background-size: cover;
       color: var(--text); 
       min-height: 100vh; 
@@ -36,7 +37,7 @@
       flex-direction: column; 
     }
     
-    header { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    header { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-glass); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 16px; }
     
     .menu-btn { background: transparent; border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; }
@@ -46,11 +47,12 @@
     .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
     .role-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-left: 8px; display: inline-block; }
-    .role-owner { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
-    .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
-    .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
+    .role-owner { background: rgba(245, 158, 11, 0.25); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.5); }
+    .role-admin { background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
+    .role-tester { background: rgba(139, 92, 246, 0.25); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.5); }
+    .role-member { background: rgba(148, 163, 184, 0.25); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.5); }
 
-    .dropdown-menu { position: absolute; top: 65px; left: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 230px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .dropdown-menu { position: absolute; top: 65px; left: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 14px; width: 240px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
     .dropdown-item { padding: 12px 18px; font-size: 0.9rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; display: flex; align-items: center; gap: 10px; }
     .dropdown-item:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
@@ -60,7 +62,7 @@
     .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
     .btn-danger:hover { background: #dc2626; }
     .btn-success { background: var(--success); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
-    .btn-success:hover { background: #16a34a; }
+    .btn-warning { background: var(--warning); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); color: #000; }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
 
     .auth-container { max-width: 420px; margin: 80px auto; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 32px; border-radius: 24px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
@@ -75,7 +77,7 @@
     @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
-    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--bg-card); background: var(--text-muted); padding: 12px 18px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; color: var(--text); background: var(--bg-card); padding: 12px 18px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     
     .board-perspective { width: 100%; max-width: 520px; aspect-ratio: 1; transform: rotateX(4deg); margin: 10px 0; }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; height: 100%; border: 6px solid #1e293b; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0,0,0,0.5); position: relative; background: #1e293b; }
@@ -101,9 +103,7 @@
     .track-item:hover, .track-item.active { background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-weight: 600; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); max-height: 80vh; overflow-y: auto; }
-    
-    .admin-req-item { display: flex; justify-content: space-between; align-items: center; background: rgba(5, 7, 13, 0.8); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-glass); margin-bottom: 8px; font-size: 0.85rem; }
+    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; }
     
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     .leaderboard-table th, .leaderboard-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -131,7 +131,7 @@
       <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
     </div>
 
-    <!-- Dropdown Menu Titik Tiga Kiri Atas -->
+    <!-- Dropdown Menu Titik Tiga -->
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
       <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan & Musik</div>
@@ -154,6 +154,11 @@
     </div>
     <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="handleAuth(false)">Login</button>
     <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass);" onclick="handleAuth(true)">Daftar Akun Baru (Member)</button>
+    
+    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-glass); font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+      <span>Akun Tester Resmi:</span><br>
+      <code style="color: #a78bfa;">usn: axac tester | pw: tester1</code>
+    </div>
   </div>
 
   <!-- Game Screen -->
@@ -194,7 +199,7 @@
         <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
-      <!-- Music Player dengan Musik Stabil (Genre Synth-Pop / Lo-Fi Mirip Pilihan Anda) -->
+      <!-- Music Player Sesuai Permintaan Asli -->
       <div class="audio-player">
         <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Music Player Auto Playlist</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 10px; margin-bottom: 8px;"></audio>
@@ -242,12 +247,26 @@
     </div>
   </div>
 
-  <!-- Modal Panel Kontrol Khusus Owner (Ban, Warning, Atur Role) -->
+  <!-- Modal Panel Kontrol Owner Interaktif (Target Username) -->
   <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 14px; font-size: 1.2rem; color: var(--warning);">👑 Panel Kontrol Owner</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Kelola akun pemain, beri peringatan kecurangan, atau ban akun:</p>
-      <div id="ownerUserList" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto;"></div>
+      <h3 style="margin-bottom: 14px; font-size: 1.2rem; color: var(--warning);">👑 Panel Kontrol Admin / Owner</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Masukkan Username Target untuk mengeksekusi fitur kontrol:</p>
+      
+      <div class="input-group">
+        <label>Username Target</label>
+        <input type="text" id="ownerTargetUser" placeholder="Contoh: axac tester">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-warning btn-sm" onclick="executeOwnerAction('warn')">⚠️ Beri Peringatan Kecurangan</button>
+        <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban / Unban Akun Target</button>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button class="btn btn-sm" style="flex: 1;" onclick="executeOwnerAction('role-admin')">Ubah Ke Admin</button>
+          <button class="btn btn-sm" style="flex: 1; background: #475569;" onclick="executeOwnerAction('role-member')">Ubah Ke Member</button>
+        </div>
+      </div>
+
       <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
         <button class="btn btn-sm" onclick="closeModal('ownerControlModal')">Tutup</button>
       </div>
@@ -282,10 +301,10 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // Playlist Musik Teruji Stabil (Genre Indie Synth-Pop / Lo-Fi Berkualitas Tinggi)
+  // Playlist Musik Sesuai Judul Asli
   const TRACKS = [
-    { name: "Synthwave Radio - Night Drive", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-    { name: "Lo-Fi Chill Beats - Retro Vibes", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+    { name: "Merry Christmas Please Don't Call", url: "Merry Christmas Please Don't Call (Lyrics)_3.mp3" },
+    { name: "Terranova (Original Radio Mix)", url: "Terranova (Original Radio Mix)_3.mp3" }
   ];
 
   let game = null;
@@ -305,8 +324,13 @@
       let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
       if (!users['axac']) {
         users['axac'] = { pass: 'axacintop', role: 'owner', wins: 0, timePlayed: 0, banned: false };
-        localStorage.setItem('axac_users', JSON.stringify(users));
       }
+      // Akun default Tester
+      if (!users['axac tester']) {
+        users['axac tester'] = { pass: 'tester1', role: 'tester', wins: 0, timePlayed: 0, banned: false };
+      }
+      localStorage.setItem('axac_users', JSON.stringify(users));
+
       game = new Chess();
       setupAudioPlayer();
 
@@ -327,7 +351,7 @@
         initGame();
         initP2P();
         startPlayTimer();
-        if (currentRole === 'owner') {
+        if (currentRole === 'owner' || currentRole === 'tester') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
         }
       }
@@ -355,7 +379,6 @@
     document.getElementById(id).style.display = 'flex';
     if(id === 'leaderboardModal') renderLeaderboard();
     if(id === 'profileModal') renderProfileInfo();
-    if(id === 'ownerControlModal') renderOwnerPanelUsers();
   }
 
   function closeModal(id) {
@@ -410,37 +433,28 @@
     document.getElementById('profileInfoContent').innerHTML = html;
   }
 
-  function renderOwnerPanelUsers() {
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    let container = document.getElementById('ownerUserList');
-    container.innerHTML = '';
-    Object.keys(users).forEach(u => {
-      if(u === 'axac') return; // Owner utama aman
-      let data = users[u];
-      let div = document.createElement('div');
-      div.className = 'admin-req-item';
-      div.innerHTML = `
-        <div><b>${u}</b> (${data.role}) ${data.banned ? '[BANNED]' : ''}</div>
-        <div style="display:flex; gap:4px;">
-          <button class="btn btn-sm" style="background:#f59e0b;" onclick="ownerWarn('${u}')">Warning</button>
-          <button class="btn btn-sm btn-danger" onclick="ownerToggleBan('${u}')">${data.banned ? 'Unban' : 'Ban'}</button>
-        </div>
-      `;
-      container.appendChild(div);
-    });
-  }
+  function executeOwnerAction(actionType) {
+    const targetUser = document.getElementById('ownerTargetUser').value.trim();
+    if (!targetUser) return alert('Silakan masukkan Username Target terlebih dahulu.');
 
-  function ownerWarn(username) {
-    alert(`Peringatan (Warning) telah dikirim ke player ${username} karena indikasi kecurangan!`);
-  }
-
-  function ownerToggleBan(username) {
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    if(users[username]) {
-      users[username].banned = !users[username].banned;
+    if (!users[targetUser]) return alert(`User "${targetUser}" tidak ditemukan.`);
+    if (targetUser === 'axac' && currentUser !== 'axac') return alert('Anda tidak bisa mengubah status Owner utama!');
+
+    if (actionType === 'warn') {
+      alert(`⚠️ Peringatan resmi kecurangan telah dikirimkan ke ${targetUser}.`);
+    } else if (actionType === 'ban') {
+      users[targetUser].banned = !users[targetUser].banned;
       localStorage.setItem('axac_users', JSON.stringify(users));
-      renderOwnerPanelUsers();
-      alert(`Status ban untuk ${username} telah diperbarui.`);
+      alert(`Status Ban untuk ${targetUser} sekarang: ${users[targetUser].banned ? 'BANNED' : 'AKTIF'}`);
+    } else if (actionType === 'role-admin') {
+      users[targetUser].role = 'admin';
+      localStorage.setItem('axac_users', JSON.stringify(users));
+      alert(`Role ${targetUser} berhasil diubah menjadi Admin.`);
+    } else if (actionType === 'role-member') {
+      users[targetUser].role = 'member';
+      localStorage.setItem('axac_users', JSON.stringify(users));
+      alert(`Role ${targetUser} berhasil diubah menjadi Member.`);
     }
   }
 
@@ -473,7 +487,7 @@
         initP2P();
         startPlayTimer();
 
-        if (currentRole === 'owner') {
+        if (currentRole === 'owner' || currentRole === 'tester') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
         }
       } else {
