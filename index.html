@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Ultimate Master Edition</title>
+  <title>AXAC Chess - Zero Lag Master Edition</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#090d16">
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFYQUMgQ2hlc3MgUGxhdGZvcm0iLAogICJzaG9ydF9uYW1lIjogIkFYQUMgQ2hlc3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwOTA5MTYiLAogICJ0aGVtZV9jb2xvciI6ICIjMDkwOTE2Igp9">
+  <meta name="theme-color" content="#070a12">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFYQUMgQ2hlc3MgUGxhdGZvcm0iLAogICJzaG9ydF9uYW1lIjogIkFYQUMgQ2hlc3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNzBhMTIiLAogICJ0aGVtZV9jb2xvciI6ICIjMDcwYTEyIgp9">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -16,9 +16,9 @@
   
   <style>
     :root {
-      --bg-dark: #090d16;
-      --bg-card: rgba(15, 23, 42, 0.95);
-      --border-glass: rgba(255, 255, 255, 0.1);
+      --bg-dark: #070a12;
+      --bg-card: rgba(13, 19, 33, 0.96);
+      --border-glass: rgba(255, 255, 255, 0.08);
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --danger: #ef4444;
@@ -30,31 +30,23 @@
       --text-muted: #94a3b8;
       --sq-light: #cbd5e1;
       --sq-dark: #334155;
-      --sq-highlight: rgba(59, 130, 246, 0.6);
-      --sq-guide: rgba(34, 197, 94, 0.7);
+      --sq-highlight: rgba(59, 130, 246, 0.65);
+      --sq-guide: rgba(34, 197, 94, 0.85);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
     
     body { 
-      background: linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.96)), 
-                  url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; 
-      background-size: cover;
+      background: radial-gradient(circle at 50% 20%, #111827 0%, #070a12 100%);
       color: var(--text); 
       min-height: 100vh; 
       display: flex; 
       flex-direction: column; 
-      animation: fadeInBody 0.5s ease-in-out;
-    }
-
-    @keyframes fadeInBody {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     
-    header { background: rgba(9, 13, 22, 0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    header { background: rgba(7, 10, 18, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 14px; }
     
-    .menu-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; }
+    .menu-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: 0.15s; }
     .menu-btn:hover { background: rgba(255,255,255,0.1); }
     .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
 
@@ -66,13 +58,12 @@
     .role-vip { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
     .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 14px; width: 270px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); display: none; flex-direction: column; overflow: hidden; z-index: 200; animation: slideDown 0.2s ease; }
+    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(13, 19, 33, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 14px; width: 270px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .dropdown-item { padding: 12px 16px; font-size: 0.88rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: 0.2s; }
+    .dropdown-item { padding: 12px 16px; font-size: 0.88rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: 0.15s; }
     .dropdown-item:hover { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: 0.2s; }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: 0.15s; }
     .btn:hover { transform: translateY(-1px); }
     .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
     .btn-success { background: var(--success); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
@@ -80,31 +71,33 @@
     .btn-purple { background: var(--purple); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
 
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.7); animation: scaleUp 0.3s ease; }
-    @keyframes scaleUp { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
     .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.4rem; font-weight: 700; }
     
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
-    .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 11px 14px; background: rgba(5, 7, 13, 0.8); border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text); outline: none; font-size: 0.9rem; }
+    .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 11px 14px; background: rgba(5, 7, 13, 0.9); border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text); outline: none; font-size: 0.9rem; }
 
     .main-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; max-width: 1150px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
     @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
 
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-    .status-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-glass); }
+    .status-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-glass); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     
-    .board-wrapper { width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #1e293b; border-radius: 14px; overflow: hidden; background: #1e293b; box-shadow: inset 0 0 15px rgba(0,0,0,0.6); }
+    .board-wrapper { width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.7)); }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #131c31; border-radius: 14px; overflow: hidden; background: #131c31; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
     
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; transition: background 0.08s; }
-    .square.light { background: #cbd5e1; box-shadow: inset 0 0 6px rgba(0,0,0,0.08); }
-    .square.dark { background: #334155; box-shadow: inset 0 0 8px rgba(0,0,0,0.4); }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; }
+    .square.light { background: #cbd5e1; box-shadow: inset 0 0 10px rgba(0,0,0,0.15); }
+    .square.dark { background: #334155; box-shadow: inset 0 0 12px rgba(0,0,0,0.45); }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square.guide::after { content: ''; position: absolute; width: 32%; height: 32%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 10px var(--sq-guide); z-index: 10; }
-    .square svg { width: 84%; height: 84%; pointer-events: none; filter: drop-shadow(0 5px 6px rgba(0,0,0,0.6)); }
+    
+    /* BULET-BULETAN / DOTS UNTUK LANGKAH BIDAK */
+    .square.guide::after { content: ''; position: absolute; width: 32%; height: 32%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 12px var(--sq-guide); z-index: 10; }
+    
+    .square svg { width: 84%; height: 84%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); }
 
-    .coord-file, .coord-rank { position: absolute; font-size: 0.58rem; font-weight: 700; pointer-events: none; opacity: 0.65; z-index: 5; font-family: 'JetBrains Mono', monospace; }
+    .coord-file, .coord-rank { position: absolute; font-size: 0.58rem; font-weight: 700; pointer-events: none; opacity: 0.6; z-index: 5; font-family: 'JetBrains Mono', monospace; }
     .coord-file { bottom: 2px; right: 4px; }
     .coord-rank { top: 2px; left: 4px; }
     .square.light .coord-file, .square.light .coord-rank { color: #334155; }
@@ -114,20 +107,23 @@
     
     .audio-player { background: rgba(5, 7, 13, 0.7); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; }
     .track-list { max-height: 110px; overflow-y: auto; margin-top: 8px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: rgba(255,255,255,0.02); }
+    .track-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: rgba(255,255,255,0.02); transition: 0.1s; }
     .track-item.active { background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-weight: 600; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeInModal 0.15s ease; }
-    @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
-    .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: #0d1321; border: 1px solid var(--border-glass); border-radius: 20px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
     
-    /* STORY 50 STAGE & PNG/VECTOR CHARACTER STYLES */
-    .story-modal { background: linear-gradient(135deg, #0f172a, #1e1b4b); border: 2px solid var(--purple); max-width: 520px; }
-    .chibi-container { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 14px; border: 1px solid var(--border-glass); }
-    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #1e293b; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #3b82f6; overflow: hidden; box-shadow: 0 0 15px rgba(59,130,246,0.4); }
+    /* STORY & 3D DETAILED SHADING CHARACTER AVATAR */
+    .story-modal { background: linear-gradient(135deg, #0d1321, #171c33); border: 2px solid var(--purple); max-width: 520px; }
+    .chibi-container { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; background: rgba(0,0,0,0.4); padding: 14px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); }
+    .chibi-avatar { width: 85px; height: 85px; border-radius: 50%; background: #131c31; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #3b82f6; overflow: hidden; box-shadow: 0 0 20px rgba(59,130,246,0.5); }
     .chibi-avatar svg { width: 100%; height: 100%; }
     .dialog-box { font-size: 0.9rem; line-height: 1.5; color: #f8fafc; }
     .dialog-speaker { font-weight: 700; color: #a78bfa; margin-bottom: 4px; font-size: 0.95rem; }
+
+    /* IN-GAME NOTIFICATION DIALOG (TANPA SPAM ALERT) */
+    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(13, 19, 33, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--purple); padding: 12px 20px; border-radius: 14px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); z-index: 500; display: none; max-width: 450px; width: 90%; align-items: center; gap: 12px; animation: slideUpToast 0.2s ease; }
+    @keyframes slideUpToast { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     .leaderboard-table th, .leaderboard-table td { padding: 9px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -135,7 +131,7 @@
     
     .magnus-box { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 14px; padding: 14px; font-size: 0.86rem; line-height: 1.5; color: #ddd; margin-bottom: 12px; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: rgba(9, 13, 22, 0.95); font-family: 'JetBrains Mono', monospace; }
+    footer { text-align: center; padding: 14px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: rgba(7, 10, 18, 0.95); font-family: 'JetBrains Mono', monospace; }
   </style>
 </head>
 <body>
@@ -169,7 +165,7 @@
     </div>
   </header>
 
-  <!-- Login/Register Screen dengan Animasi Transisi Mulus -->
+  <!-- Login/Register Screen -->
   <div id="authScreen" class="auth-container">
     <h2>Masuk ke AXAC</h2>
     <div class="input-group">
@@ -226,16 +222,26 @@
       </div>
 
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Playlist Musik Catur Baru</h4>
+        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Playlist Musik Catur Favorit</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 34px; border-radius: 8px; margin-bottom: 6px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
   </div>
 
-  <footer>AXAC CHESS PLATFORM • 50 STAGES MASTER EDITION</footer>
+  <!-- IN-GAME DIALOG TOAST (PENGGANTI SPAM ALERT) -->
+  <div id="inGameToast" class="in-game-dialog">
+    <div id="toastAvatar" style="width: 45px; height: 45px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid var(--purple);"></div>
+    <div style="flex: 1; font-size: 0.84rem; line-height: 1.4;">
+      <b id="toastSpeaker" style="color: #a78bfa;">Lawan</b>
+      <p id="toastText" style="color: #cbd5e1; margin-top: 2px;"></p>
+    </div>
+    <button class="btn btn-sm btn-purple" onclick="closeToast()">Tutup</button>
+  </div>
 
-  <!-- Modal Story Mode Dialog dengan Gambar Karakter Kustom -->
+  <footer>AXAC CHESS PLATFORM • ZERO LAG MASTER EDITION</footer>
+
+  <!-- Modal Story Mode Dialog -->
   <div id="storyModal" class="modal-overlay">
     <div class="modal story-modal">
       <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #a78bfa;" id="storyStageTitle">📖 Story Mode (50 Stages)</h3>
@@ -372,38 +378,49 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // PLAYLIST BARU SESUAI PERMINTAAN (CATBOX MP3)
+  // PLAYLIST MUSIK CATBOX SESUAI PERMINTAAN
   let TRACKS = [
     { name: "Merry Christmas Please Dont Call", url: "https://files.catbox.moe/qaz1xd.mp3" },
     { name: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" },
     { name: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  // GENERATOR ILUSTRASI KARAKTER PNG / VECTOR UNTUK 50 STAGE
+  // GENERATOR KARAKTER DENGAN SHADING GELAP-TERANG 3D
   function getCharacterAvatarSvg(seed) {
-    const palettes = [
-      { bg: '#3b82f6', skin: '#fbcfe8', hair: '#1e293b' },
-      { bg: '#8b5cf6', skin: '#fed7aa', hair: '#581c87' },
-      { bg: '#ec4899', skin: '#fef08a', hair: '#831843' },
-      { bg: '#f59e0b', skin: '#e2e8f0', hair: '#78350f' },
-      { bg: '#22c55e', skin: '#ffedd5', hair: '#14532d' },
-      { bg: '#06b6d4', skin: '#fbcfe8', hair: '#164e63' },
-      { bg: '#ef4444', skin: '#fef08a', hair: '#7f1d1d' },
-      { bg: '#6366f1', skin: '#fed7aa', hair: '#312e81' }
+    const themes = [
+      { bg: '#3b82f6', dark: '#1d4ed8', skin: '#fed7aa', hair: '#1e293b' },
+      { bg: '#8b5cf6', dark: '#5b21b6', skin: '#fbcfe8', hair: '#312e81' },
+      { bg: '#ec4899', dark: '#be185d', skin: '#fef08a', hair: '#831843' },
+      { bg: '#f59e0b', dark: '#b45309', skin: '#ffedd5', hair: '#78350f' },
+      { bg: '#22c55e', dark: '#15803d', skin: '#e2e8f0', hair: '#14532d' },
+      { bg: '#06b6d4', dark: '#0e7490', skin: '#fed7aa', hair: '#164e63' },
+      { bg: '#ef4444', dark: '#b91c1c', skin: '#fef08a', hair: '#7f1d1d' }
     ];
-    let p = palettes[seed % palettes.length];
+    let t = themes[seed % themes.length];
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="50" fill="${p.bg}"/>
-      <path d="M30 35c0-12 10-20 20-20s20 8 20 20v10H30z" fill="${p.hair}"/>
-      <circle cx="50" cy="45" r="18" fill="${p.skin}"/>
-      <path d="M25 85c0-14 11-25 25-25s25 11 25 25z" fill="${p.hair}"/>
-      <circle cx="43" cy="43" r="2.5" fill="#0f172a"/>
-      <circle cx="57" cy="43" r="2.5" fill="#0f172a"/>
-      <path d="M46 54q4 3 8 0" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <defs>
+        <radialGradient id="grad${seed}" cx="35%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="${t.bg}"/>
+          <stop offset="100%" stop-color="${t.dark}"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="url(#grad${seed})"/>
+      <!-- Shading Helm / Rambut -->
+      <path d="M30 40c0-14 9-22 20-22s20 8 20 22v8H30z" fill="${t.hair}"/>
+      <!-- Wajah dengan Shading Gelap Terang -->
+      <circle cx="50" cy="48" r="17" fill="${t.skin}"/>
+      <path d="M50 31c9 0 17 8 17 17 0 9-8 17-17 17v-34z" fill="rgba(0,0,0,0.15)" pointer-events="none"/>
+      <!-- Baju / Armor -->
+      <path d="M22 88c0-15 12-26 28-26s28 11 28 26z" fill="${t.dark}"/>
+      <path d="M50 62l28 26H22z" fill="${t.bg}"/>
+      <!-- Mata & Ekspresi Dinamis -->
+      <circle cx="43" cy="46" r="2.5" fill="#0f172a"/>
+      <circle cx="57" cy="46" r="2.5" fill="#0f172a"/>
+      <path d="M46 56q4 3 8 0" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none"/>
     </svg>`;
   }
 
-  // 50 STAGE STORY MODE DENGAN TINGKAT KESULITAN & DIALOG LENGKAP
+  // 50 STAGE STORY MODE
   const STORY_STAGES = [];
   const namesList = [
     "Budi (Pemula)", "Joko (Tetangga)", "Siska (Klub Sekolah)", "Rian (Senior Sombong)", "Coach Hendra",
@@ -425,10 +442,10 @@
       name: namesList[i-1] || `Challenger #${i}`,
       difficulty: diff,
       dialogs: {
-        intro: `Halo! Aku ${namesList[i-1] || 'Lawan'}. Di stage ${i} ini, jangan harap kamu bisa menang dengan mudah!`,
-        mid: `Hmm, langkahmu lumayan juga. Tapi pertahananmu mulai rapuh di tahap ini!`,
-        win: `Luar biasa... Aku mengaku kalah di stage ${i} ini. Kamu memang tangguh!`,
-        lose: `Haha, pertahananmu hancur! Coba lagi latihan catur yang benar ya!`
+        intro: `Halo! Aku ${namesList[i-1] || 'Lawan'}. Di stage ${i} ini, buktikan kemampuan caturmu!`,
+        mid: `Langkahmu menarik, tapi pertahananmu mulai terbaca!`,
+        win: `Luar biasa... Aku mengaku kalah di stage ${i} ini. Kamu hebat!`,
+        lose: `Haha, pertahananmu runtuh! Ayo latihan lagi yang giat!`
       }
     });
   }
@@ -483,7 +500,7 @@
 
       const customBg = localStorage.getItem('axac_custom_bg');
       if(customBg) {
-        document.body.style.backgroundImage = `linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.96)), url('${customBg}')`;
+        document.body.style.backgroundImage = `radial-gradient(circle at 50% 20%, #111827 0%, #070a12 100%), url('${customBg}')`;
       }
 
       const savedUser = localStorage.getItem('axac_active_user');
@@ -533,12 +550,23 @@
     const stageData = STORY_STAGES[currentStoryIndex];
     document.getElementById('modeSelect').value = stageData.difficulty;
     changeMode();
-    alert(`Pertandingan Stage ${stageData.stage} (${stageData.name}) dimulai! Lawan siap menyerang.`);
+    showInGameToast(stageData.name, `Stage ${stageData.stage} dimulai! Pertandingan sengit menantimu.`, stageData.stage);
+  }
+
+  function showInGameToast(speaker, text, seed) {
+    const toast = document.getElementById('inGameToast');
+    document.getElementById('toastSpeaker').innerText = speaker;
+    document.getElementById('toastText').innerText = text;
+    document.getElementById('toastAvatar').innerHTML = getCharacterAvatarSvg(seed || 1);
+    toast.style.display = 'flex';
+  }
+
+  function closeToast() {
+    document.getElementById('inGameToast').style.display = 'none';
   }
 
   function ownerInstantWin() {
     if(currentRole !== 'owner') return alert('Khusus Owner!');
-    alert('⚡ [Owner Cheat] Instant Win diaktifkan!');
     handleMatchWin(true);
   }
 
@@ -552,21 +580,23 @@
       
       if(inStoryMode) {
         const stageData = STORY_STAGES[currentStoryIndex];
-        alert(stageData.dialogs.win);
+        showInGameToast(stageData.name, stageData.dialogs.win, stageData.stage);
         currentStoryIndex++;
         localStorage.setItem('axac_story_progress', currentStoryIndex);
-        if(currentStoryIndex < STORY_STAGES.length) {
-          openStoryMode();
-          return;
-        } else {
-          alert('🏆 LUAR BIASA! Kamu menamatkan seluruh 50 Stage dan menjadi Raja Catur Sejati!');
-          inStoryMode = false;
-        }
+        setTimeout(() => {
+          if(currentStoryIndex < STORY_STAGES.length) {
+            openStoryMode();
+          } else {
+            alert('🏆 LUAR BIASA! Kamu menamatkan seluruh 50 Stage Story Mode!');
+            inStoryMode = false;
+          }
+        }, 2000);
+        return;
       }
     } else {
       if(inStoryMode) {
         const stageData = STORY_STAGES[currentStoryIndex];
-        alert(stageData.dialogs.lose);
+        showInGameToast(stageData.name, stageData.dialogs.lose, stageData.stage);
       }
     }
     initGame();
@@ -586,7 +616,7 @@
     const musicUrl = document.getElementById('musicUrlInput').value.trim();
     if(bgUrl) {
       localStorage.setItem('axac_custom_bg', bgUrl);
-      document.body.style.backgroundImage = `linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.96)), url('${bgUrl}')`;
+      document.body.style.backgroundImage = `radial-gradient(circle at 50% 20%, #111827 0%, #070a12 100%), url('${bgUrl}')`;
     }
     if(musicUrl) {
       TRACKS.push({ name: "Custom Track (" + (TRACKS.length + 1) + ")", url: musicUrl });
@@ -639,7 +669,7 @@
 
   function showMagnusTutorial(topic) {
     const adviceEl = document.getElementById('magnusAdviceText');
-    adviceEl.innerHTML = `<b>Panduan Pro:</b> Kendalikan petak tengah, lindungi Raja, dan antisipasi serangan balik musuh di stage tinggi.`;
+    adviceEl.innerHTML = `<b>Panduan Pro:</b> Kuasai petak tengah, lakukan rokade kilat, dan perhatikan langkah taktis musuh.`;
   }
 
   function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
@@ -748,6 +778,7 @@
     `;
   }
 
+  // RENDER PAPAN CATUR ZERO-LAG & DOTS GUIDE
   function renderBoard() {
     const boardEl = document.getElementById('chessboard');
     if (!boardEl || !game) return;
@@ -841,7 +872,7 @@
         if (mode === 'online' && conn) {
           conn.send({ type: 'MOVE', move: move });
         } else if (mode.startsWith('ai') && !game.game_over()) {
-          aiTimeout = setTimeout(makeAIMove, 150);
+          aiTimeout = setTimeout(makeAIMove, 50); // Eksekusi super kilat tanpa lag
         }
       } else {
         const piece = game.get(sq);
@@ -897,9 +928,9 @@
     game.move(selectedMove);
     renderBoard();
 
-    if(inStoryMode && Math.random() < 0.25) {
+    if(inStoryMode && Math.random() < 0.2) {
       const stageData = STORY_STAGES[currentStoryIndex];
-      alert(`💬 ${stageData.name}: "${stageData.dialogs.mid}"`);
+      showInGameToast(stageData.name, stageData.dialogs.mid, stageData.stage);
     }
   }
 
@@ -953,7 +984,6 @@
   function executeResign() {
     closeModal('confirmModal');
     if (document.getElementById('modeSelect').value === 'online' && conn) conn.send({ type: 'RESIGN' });
-    alert('Anda menyerah.');
     handleMatchWin(false);
   }
 
