@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Master & Global Edition</title>
+  <title>AXAC Chess - Ultimate Master Edition</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -43,6 +43,12 @@
       min-height: 100vh; 
       display: flex; 
       flex-direction: column; 
+      animation: fadeInBody 0.5s ease-in-out;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     header { background: rgba(9, 13, 22, 0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
@@ -57,13 +63,12 @@
     .role-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; display: inline-block; letter-spacing: 0.5px; }
     .role-owner { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
     .role-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
-    .role-semi-admin { background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); }
     .role-vip { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
-    .role-semi-vip { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
     .role-member { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 14px; width: 270px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 14px; width: 270px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); display: none; flex-direction: column; overflow: hidden; z-index: 200; animation: slideDown 0.2s ease; }
     .dropdown-menu.show { display: flex; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     .dropdown-item { padding: 12px 16px; font-size: 0.88rem; color: var(--text); cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: 0.2s; }
     .dropdown-item:hover { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
 
@@ -73,10 +78,10 @@
     .btn-success { background: var(--success); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
     .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
     .btn-purple { background: var(--purple); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-    .btn-pink { background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3); }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
 
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
+    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.7); animation: scaleUp 0.3s ease; }
+    @keyframes scaleUp { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.4rem; font-weight: 700; }
     
     .input-group { margin-bottom: 16px; }
@@ -92,7 +97,7 @@
     .board-wrapper { width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #1e293b; border-radius: 14px; overflow: hidden; background: #1e293b; box-shadow: inset 0 0 15px rgba(0,0,0,0.6); }
     
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; transition: background 0.1s; }
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; transition: background 0.08s; }
     .square.light { background: #cbd5e1; box-shadow: inset 0 0 6px rgba(0,0,0,0.08); }
     .square.dark { background: #334155; box-shadow: inset 0 0 8px rgba(0,0,0,0.4); }
     .square.highlight { background: var(--sq-highlight) !important; }
@@ -112,18 +117,15 @@
     .track-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: rgba(255,255,255,0.02); }
     .track-item.active { background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-weight: 600; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeInModal 0.15s ease; }
+    @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
     .modal { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
     
-    /* CHAT GLOBAL & LOBI STYLES */
-    .chat-box { height: 220px; overflow-y: auto; background: rgba(5, 7, 13, 0.6); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; font-size: 0.85rem; }
-    .chat-msg { background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px; line-height: 1.4; }
-    .chat-msg b { color: #60a5fa; }
-
-    /* STORY MODAL STYLES */
+    /* STORY 50 STAGE & PNG/VECTOR CHARACTER STYLES */
     .story-modal { background: linear-gradient(135deg, #0f172a, #1e1b4b); border: 2px solid var(--purple); max-width: 520px; }
     .chibi-container { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 14px; border: 1px solid var(--border-glass); }
-    .chibi-avatar { width: 70px; height: 70px; border-radius: 50%; background: #3b82f6; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 15px rgba(59,130,246,0.5); flex-shrink: 0; border: 2px solid #fff; }
+    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #1e293b; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #3b82f6; overflow: hidden; box-shadow: 0 0 15px rgba(59,130,246,0.4); }
+    .chibi-avatar svg { width: 100%; height: 100%; }
     .dialog-box { font-size: 0.9rem; line-height: 1.5; color: #f8fafc; }
     .dialog-speaker { font-weight: 700; color: #a78bfa; margin-bottom: 4px; font-size: 0.95rem; }
 
@@ -143,7 +145,7 @@
       <button class="menu-btn" onclick="toggleMenu()" title="Menu">
         <span></span><span></span><span></span>
       </button>
-      <div class="brand">AXAC CHEST</div>
+      <div class="brand">AXAC CHESS</div>
     </div>
     
     <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 8px;">
@@ -154,21 +156,20 @@
       <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
     </div>
 
-    <!-- Dropdown Menu Titik Tiga -->
+    <!-- Dropdown Menu -->
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
-      <div class="dropdown-item" style="color: #a78bfa;" onclick="openStoryMode()">📖 <b>Story Mode (Auto-Save 20 Stage)</b></div>
-      <div class="dropdown-item" style="color: #38bdf8;" onclick="openModal('chatModal')">💬 <b>Global Chat & Tantangan Online</b></div>
+      <div class="dropdown-item" style="color: #a78bfa;" onclick="openStoryMode()">📖 <b>Story Mode (50 Stages)</b></div>
       <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus AI (<span id="magnusCount">3</span> Sisa)</div>
-      <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media</div>
-      <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil & Info Role</div>
-      <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard & Bot</div>
+      <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media & Musik</div>
+      <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil Akun</div>
+      <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard</div>
       <div class="dropdown-item" style="color: #22c55e;" onclick="triggerPwaInstall()">📥 Install Aplikasi (APK)</div>
-      <div id="ownerMenuOption" class="dropdown-item hidden" style="color: #f59e0b;" onclick="openModal('ownerControlModal')">👑 Panel Owner & Admin</div>
+      <div id="ownerMenuOption" class="dropdown-item hidden" style="color: #f59e0b;" onclick="openModal('ownerControlModal')">👑 Panel Owner</div>
     </div>
   </header>
 
-  <!-- Login/Register Screen -->
+  <!-- Login/Register Screen dengan Animasi Transisi Mulus -->
   <div id="authScreen" class="auth-container">
     <h2>Masuk ke AXAC</h2>
     <div class="input-group">
@@ -225,42 +226,22 @@
       </div>
 
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Musik Catur Lo-Fi / Piano</h4>
+        <h4 style="margin-bottom: 6px; font-size: 0.85rem;">Playlist Musik Catur Baru</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 34px; border-radius: 8px; margin-bottom: 6px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
   </div>
 
-  <footer>AXAC CHESS PLATFORM • ROLE & GLOBAL CHAT EDITION</footer>
+  <footer>AXAC CHESS PLATFORM • 50 STAGES MASTER EDITION</footer>
 
-  <!-- Modal Global Chat & Lobi Tantangan -->
-  <div id="chatModal" class="modal-overlay">
-    <div class="modal" style="max-width: 520px;">
-      <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #38bdf8;">💬 Global Chat & Lobi Tantangan Online</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Ngobrol bareng pemain lain secara online dan ajak mabar langsung!</p>
-      
-      <div class="chat-box" id="globalChatContainer"></div>
-
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <input type="text" id="chatInputMessage" placeholder="Ketik pesan atau ajakan mabar..." style="flex: 1; padding: 10px; background: rgba(5,7,13,0.8); border: 1px solid var(--border-glass); border-radius: 8px; color: #fff; font-size: 0.85rem;" onkeypress="if(event.key==='Enter') sendGlobalChat()">
-        <button class="btn btn-sm" onclick="sendGlobalChat()">Kirim</button>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <button class="btn btn-sm btn-pink" onclick="sendGlobalChallenge()">⚔️ Sebarkan Tantangan Mabar</button>
-        <button class="btn btn-sm" onclick="closeModal('chatModal')">Tutup</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Story Mode Dialog -->
+  <!-- Modal Story Mode Dialog dengan Gambar Karakter Kustom -->
   <div id="storyModal" class="modal-overlay">
     <div class="modal story-modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #a78bfa;" id="storyStageTitle">📖 Story Mode (Auto-Save)</h3>
+      <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #a78bfa;" id="storyStageTitle">📖 Story Mode (50 Stages)</h3>
       
       <div class="chibi-container">
-        <div class="chibi-avatar" id="storyAvatar">😁</div>
+        <div class="chibi-avatar" id="storyAvatarContainer"></div>
         <div class="dialog-box">
           <div class="dialog-speaker" id="storySpeaker">Nama Lawan</div>
           <p id="storyDialogText">Teks dialog cerita...</p>
@@ -268,13 +249,13 @@
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('storyModal')">Pause / Keluar Story</button>
+        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('storyModal')">Pause / Keluar</button>
         <button class="btn btn-sm btn-success" id="storyActionBtn" onclick="startStoryBattle()">Mulai Pertandingan!</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Pelatih Catur Magnus AI -->
+  <!-- Modal Pelatih Magnus AI -->
   <div id="magnusModal" class="modal-overlay">
     <div class="modal">
       <h3 style="margin-bottom: 12px; font-size: 1.15rem; color: #a78bfa;">🎓 Pelatih Catur: Magnus AI</h3>
@@ -303,7 +284,7 @@
   <!-- Modal Leaderboard -->
   <div id="leaderboardModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🏆 Leaderboard & Bot Master</h3>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🏆 Leaderboard</h3>
       <div id="leaderboardContent"></div>
       <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
         <button class="btn btn-sm" onclick="closeModal('leaderboardModal')">Tutup</button>
@@ -320,7 +301,7 @@
         <input type="text" id="bgUrlInput" placeholder="Tempel URL Foto / Wallpaper">
       </div>
       <div class="input-group">
-        <label>URL Musik MP3 Direct Link</label>
+        <label>Tambah URL Musik MP3 Direct Link</label>
         <input type="text" id="musicUrlInput" placeholder="Contoh link audio HTTPS .mp3">
       </div>
       <button class="btn btn-sm btn-success" style="width: 100%; margin-bottom: 16px;" onclick="saveCustomMedia()">💾 Simpan & Terapkan</button>
@@ -334,10 +315,10 @@
     </div>
   </div>
 
-  <!-- Modal Profile & Penjelasan Role -->
+  <!-- Modal Profile -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">👤 Profil & Penjelasan Role</h3>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">👤 Profil Akun</h3>
       <div id="profileInfoContent" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;"></div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass);" onclick="closeModal('profileModal')">Tutup</button>
@@ -345,19 +326,17 @@
     </div>
   </div>
 
-  <!-- Modal Panel Kontrol Owner & Admin -->
+  <!-- Modal Panel Owner -->
   <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--warning);">👑 Panel Kontrol Admin / Owner</h3>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--warning);">👑 Panel Owner & Cheat</h3>
       <div class="input-group">
         <label>Username Target</label>
         <input type="text" id="ownerTargetUser" placeholder="Masukkan username akun">
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="btn btn-warning btn-sm" onclick="executeAdminAction('warn')">⚠️ Beri Peringatan Kecurangan</button>
-        <button class="btn btn-danger btn-sm" onclick="executeAdminAction('ban')">🚫 Ban / Unban Akun Target (Admin+)</button>
-        <button class="btn btn-purple btn-sm" onclick="executeAdminAction('setrole-vip')">⭐ Ubah Role Jadi VIP</button>
-        <button class="btn btn-sm" style="background:#334155;" onclick="executeAdminAction('autowin')">⚡ [Owner] Auto Win Target</button>
+        <button class="btn btn-warning btn-sm" onclick="executeOwnerAction('autowin')">⚡ Berikan Auto Win (+10 Kemenangan)</button>
+        <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban / Unban Akun Target</button>
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
         <button class="btn btn-sm" onclick="closeModal('ownerControlModal')">Tutup</button>
@@ -393,34 +372,66 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // 20 STAGES STORY MODE DENGAN DIALOG & CHIBI EKSPRESI
-  const STORY_STAGES = [
-    { stage: 1, name: "Budi (Teman Sebangku)", emoji: "😅", text: "Eh bro, katanya lu jago catur? Main yuk, gw cuma bisa gerakin pion doang nih wkwk!" },
-    { stage: 2, name: "Joko (Tetangga Depan)", emoji: "😎", text: "Jangan remehkan gw ya! Walau amatir, gw sering nonton tutorial Grandmaster di YouTube." },
-    { stage: 3, name: "Siska (Klub Catur Sekolah)", emoji: "🤓", text: "Halo! Aku kapten klub catur sekolah. Mari kita buktikan siapa yang paling teliti menghitung langkah." },
-    { stage: 4, name: "Rian (Senior Sombong)", emoji: "😏", text: "Hati-hati ya dek, senior macam gw ga bakal kasih ampun. Eh, jangan intip langkah gw!" },
-    { stage: 5, name: "Coach Hendra (Pelatih Lokal)", emoji: "🧐", text: "Bagus kalau kamu sampai sini. Tapi pertahananmu masih bolong di sayap menteri. Hadapi aku!" },
-    { stage: 6, name: "Beni (Pemain Tarkam)", emoji: "😠", text: "Udah 10 tahun gw main di pos ronda! Jangan kira lu bisa menang gampang lawan gaya tarkam gw!" },
-    { stage: 7, name: "Deni (Pecinta King's Gambit)", emoji: "🔥", text: "Siapin mentalmu! Gw bakal serang Raja kamu pakai taktik King's Gambit paling agresif!" },
-    { stage: 8, name: "Kiki (Juara Kota Pelajar)", emoji: "😌", text: "Piala kota ada di tangan gw. Giliran kamu yang bakal gw pangkas bentengnya." },
-    { stage: 9, name: "Alex (Master Nasional)", emoji: "🧊", text: "Gelar Master Nasional bukan didapat dari keberuntungan. Tunjukkan kemampuan terbaikmu." },
-    { stage: 10, name: "Pak Broto (Legenda Senior)", emoji: "👴", text: "Anak muda zaman sekarang kurang sabar. Orang tua ini bakal ajarin arti kesabaran di atas papan." },
-    { stage: 11, name: "Vino (Pakar Taktik Modern)", emoji: "💻", text: "Semua kalkulasi caturmu sudah terbaca oleh database neural network buatan gw!" },
-    { stage: 12, name: "Dewi (Ratu Taktik Jihant)", emoji: "👑", text: "Langkahmu indah, tapi catur butuh ketajaman insting pembunuh. Siap-siap kalah!" },
-    { stage: 13, name: "Guntur (Kandidat Master FIDE)", emoji: "⚡", text: "Kecepatan berpikir adalah kunci. Jangan harap bisa mikir lama di hadapanku!" },
-    { stage: 14, name: "Reza (Kolektor Gelar FIDE)", emoji: "🏆", text: "Satu langkah salah dari kamu, pionmu bakal rata dengan tanah dalam 3 giliran." },
-    { stage: 15, name: "Grandmaster Aris", emoji: "🧙‍♂️", text: "Kamu sudah melewati jalan panjang. Tapi gerbang menuju Grandmaster sejati ada di sini." },
-    { stage: 16, name: "Internasional Master Leo", emoji: "🦾", text: "Konsentrasi penuh! Lawanmu kali ini tidak akan membuat kesalahan sekecil apapun." },
-    { stage: 17, name: "Super GM Viktor", emoji: "🥶", text: "Gaya permainanmu menarik. Mari kita lihat apakah ia tahan tekanan turnamen dunia." },
-    { stage: 18, name: "The Challenger X", emoji: "🦹‍♂️", text: "Hehe... Aku sudah mengawasi permainanmu dari stage pertama. Rasakan taktik rahasia ini!" },
-    { stage: 19, name: "Wakil Juara Dunia", emoji: "🥈", text: "Langkah terakhir sebelum puncak. Aku adalah dinding terkuat sebelum kamu menantang sang legenda." },
-    { stage: 20, name: "Grandmaster Magnus Carlsen", emoji: "👑🔥", text: "Selamat datang di partai puncak. Aku adalah Magnus. Tunjukkan apakah kamu layak menjadi legenda baru!" }
+  // PLAYLIST BARU SESUAI PERMINTAAN (CATBOX MP3)
+  let TRACKS = [
+    { name: "Merry Christmas Please Dont Call", url: "https://files.catbox.moe/qaz1xd.mp3" },
+    { name: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" },
+    { name: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  let TRACKS = [
-    { name: "Chess Piano Chill Stream", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-    { name: "Lo-Fi Beats Calm Stream", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+  // GENERATOR ILUSTRASI KARAKTER PNG / VECTOR UNTUK 50 STAGE
+  function getCharacterAvatarSvg(seed) {
+    const palettes = [
+      { bg: '#3b82f6', skin: '#fbcfe8', hair: '#1e293b' },
+      { bg: '#8b5cf6', skin: '#fed7aa', hair: '#581c87' },
+      { bg: '#ec4899', skin: '#fef08a', hair: '#831843' },
+      { bg: '#f59e0b', skin: '#e2e8f0', hair: '#78350f' },
+      { bg: '#22c55e', skin: '#ffedd5', hair: '#14532d' },
+      { bg: '#06b6d4', skin: '#fbcfe8', hair: '#164e63' },
+      { bg: '#ef4444', skin: '#fef08a', hair: '#7f1d1d' },
+      { bg: '#6366f1', skin: '#fed7aa', hair: '#312e81' }
+    ];
+    let p = palettes[seed % palettes.length];
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="50" fill="${p.bg}"/>
+      <path d="M30 35c0-12 10-20 20-20s20 8 20 20v10H30z" fill="${p.hair}"/>
+      <circle cx="50" cy="45" r="18" fill="${p.skin}"/>
+      <path d="M25 85c0-14 11-25 25-25s25 11 25 25z" fill="${p.hair}"/>
+      <circle cx="43" cy="43" r="2.5" fill="#0f172a"/>
+      <circle cx="57" cy="43" r="2.5" fill="#0f172a"/>
+      <path d="M46 54q4 3 8 0" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>`;
+  }
+
+  // 50 STAGE STORY MODE DENGAN TINGKAT KESULITAN & DIALOG LENGKAP
+  const STORY_STAGES = [];
+  const namesList = [
+    "Budi (Pemula)", "Joko (Tetangga)", "Siska (Klub Sekolah)", "Rian (Senior Sombong)", "Coach Hendra",
+    "Beni (Pemain Pos Ronda)", "Deni (King's Gambit Fan)", "Kiki (Juara Kota)", "Alex (Master Nasional)", "Pak Broto (Legenda)",
+    "Vino (Pakar Neural)", "Dewi (Ratu Taktik)", "Guntur (Kandidat FIDE)", "Reza (Kolektor Gelar)", "GM Aris",
+    "IM Leo", "Super GM Viktor", "The Challenger X", "Wakil Juara Dunia", "Grandmaster Magnus",
+    "Kael (Anak Ajaib)", "Tyson (Brawler Catur)", "Maya (Strategist)", "Zack (Blitz Master)", "Prof. Xavier",
+    "Hacker Anon", "Shadow Knight", "Master Zen", "Ghost Player", "Titan Chess",
+    "Oracle AI", "Cyber Pawn", "Neo Matrix", "Quantum Rook", "Stellar King",
+    "Dark Bishop", "Light Paladin", "Iron Empress", "Blaze Lord", "Frost Queen",
+    "Abyss Walker", "Solar Guard", "Eclipse Phantom", "Cosmic Sage", "Astral Knight",
+    "Dimension Lord", "Time Bender", "Eternity Guardian", "Void Master", "Grandmaster Magnus Carlsen (Final Apex)"
   ];
+
+  for(let i=1; i<=50; i++) {
+    let diff = i <= 10 ? 'ai-easy' : i <= 25 ? 'ai-medium' : i <= 40 ? 'ai-hard' : 'ai-god';
+    STORY_STAGES.push({
+      stage: i,
+      name: namesList[i-1] || `Challenger #${i}`,
+      difficulty: diff,
+      dialogs: {
+        intro: `Halo! Aku ${namesList[i-1] || 'Lawan'}. Di stage ${i} ini, jangan harap kamu bisa menang dengan mudah!`,
+        mid: `Hmm, langkahmu lumayan juga. Tapi pertahananmu mulai rapuh di tahap ini!`,
+        win: `Luar biasa... Aku mengaku kalah di stage ${i} ini. Kamu memang tangguh!`,
+        lose: `Haha, pertahananmu hancur! Coba lagi latihan catur yang benar ya!`
+      }
+    });
+  }
 
   let game = null;
   let selectedSquare = null;
@@ -457,10 +468,8 @@
         users['axac'] = { pass: 'axacintop', role: 'owner', wins: 50, timePlayed: 90000, banned: false };
       }
       if (!users['Magnus_Bot']) users['Magnus_Bot'] = { role: 'admin', wins: 200, timePlayed: 90000, banned: false };
-      if (!users['Stockfish_GM']) users['Stockfish_GM'] = { role: 'admin', wins: 180, timePlayed: 82000, banned: false };
       localStorage.setItem('axac_users', JSON.stringify(users));
 
-      // Load progress story dari localStorage
       const savedStory = localStorage.getItem('axac_story_progress');
       if(savedStory !== null) {
         currentStoryIndex = parseInt(savedStory);
@@ -483,12 +492,7 @@
         currentUser = savedUser;
         currentRole = savedRole;
         
-        // Atur kuota Magnus berdasarkan Role: Member (3), Semi VIP (10), VIP (20), Owner/Admin (99)
-        if (currentRole === 'vip') magnusUsesLeft = 20;
-        else if (currentRole === 'semi-vip') magnusUsesLeft = 10;
-        else if (currentRole === 'member') magnusUsesLeft = 3;
-        else magnusUsesLeft = 99;
-
+        magnusUsesLeft = (currentRole === 'owner') ? 99 : 3;
         updateMagnusUI();
 
         document.getElementById('authScreen').classList.add('hidden');
@@ -498,69 +502,28 @@
         initGame();
         initP2P();
         
-        if (['owner', 'admin', 'semi-admin'].includes(currentRole)) {
+        if (currentRole === 'owner') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
-          if(currentRole === 'owner') {
-            document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
-          }
+          document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
         }
       }
-      loadGlobalChat();
     } catch (e) {
       console.error("Init error:", e);
     }
   }
 
-  // GLOBAL CHAT & LOBI TANTANGAN
-  function loadGlobalChat() {
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    const container = document.getElementById('globalChatContainer');
-    if(!container) return;
-    container.innerHTML = '';
-    chats.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'chat-msg';
-      div.innerHTML = `<b>${c.user} (${c.role}):</b> ${c.text}`;
-      container.appendChild(div);
-    });
-    container.scrollTop = container.scrollHeight;
-  }
-
-  function sendGlobalChat() {
-    const input = document.getElementById('chatInputMessage');
-    const text = input.value.trim();
-    if(!text) return;
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    chats.push({ user: currentUser || 'Guest', role: currentRole, text: text });
-    if(chats.length > 50) chats.shift(); // Batasi 50 pesan terakhir
-    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
-    input.value = '';
-    loadGlobalChat();
-  }
-
-  function sendGlobalChallenge() {
-    let myId = document.getElementById('myPeerId').innerText;
-    if(myId.includes('Menghubungkan')) return alert('Tunggu koneksi PeerJS siap dulu.');
-    let challengeText = `⚔️ [TANTANGAN MABAR ONLINE] ID Peer saya: <code>${myId}</code>. Siapa yang berani mbulet catur bareng?`;
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    chats.push({ user: currentUser, role: currentRole, text: challengeText });
-    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
-    loadGlobalChat();
-    alert('Undangan mabar berhasil disiarkan ke chat global!');
-  }
-
-  // STORY MODE CONTROLLER
+  // STORY MODE 50 STAGE HANDLER
   function openStoryMode() {
     document.getElementById('dropdownMenu').classList.remove('show');
     if(currentStoryIndex >= STORY_STAGES.length) {
       currentStoryIndex = 0;
-      alert('Selamat! Anda sudah menamatkan seluruh 20 Stage Story Mode. Mengulang dari awal.');
+      alert('Selamat! Kamu sudah menamatkan seluruh 50 Stage Story Mode! Mengulang dari awal.');
     }
     const stageData = STORY_STAGES[currentStoryIndex];
-    document.getElementById('storyStageTitle').innerText = `📖 Story Mode (Auto-Save) - Stage ${stageData.stage}/20`;
-    document.getElementById('storyAvatar').innerText = stageData.emoji;
+    document.getElementById('storyStageTitle').innerText = `📖 Story Mode (50 Stages) - Stage ${stageData.stage}/50`;
+    document.getElementById('storyAvatarContainer').innerHTML = getCharacterAvatarSvg(stageData.stage);
     document.getElementById('storySpeaker').innerText = stageData.name;
-    document.getElementById('storyDialogText').innerText = stageData.text;
+    document.getElementById('storyDialogText').innerText = stageData.dialogs.intro;
     document.getElementById('storyModal').style.display = 'flex';
   }
 
@@ -568,14 +531,14 @@
     closeModal('storyModal');
     inStoryMode = true;
     const stageData = STORY_STAGES[currentStoryIndex];
-    document.getElementById('modeSelect').value = 'ai-god';
+    document.getElementById('modeSelect').value = stageData.difficulty;
     changeMode();
-    alert(`Pertandingan Story Stage ${stageData.stage} dimulai melawan: ${stageData.name}!`);
+    alert(`Pertandingan Stage ${stageData.stage} (${stageData.name}) dimulai! Lawan siap menyerang.`);
   }
 
   function ownerInstantWin() {
-    if(currentRole !== 'owner') return alert('Fitur khusus Owner!');
-    alert('⚡ [Owner Cheat] Anda memenangkan ronde ini secara instan!');
+    if(currentRole !== 'owner') return alert('Khusus Owner!');
+    alert('⚡ [Owner Cheat] Instant Win diaktifkan!');
     handleMatchWin(true);
   }
 
@@ -588,16 +551,22 @@
       }
       
       if(inStoryMode) {
+        const stageData = STORY_STAGES[currentStoryIndex];
+        alert(stageData.dialogs.win);
         currentStoryIndex++;
         localStorage.setItem('axac_story_progress', currentStoryIndex);
         if(currentStoryIndex < STORY_STAGES.length) {
-          alert(`🎉 Stage ${currentStoryIndex} Selesai! Progress otomatis tersimpan.`);
           openStoryMode();
           return;
         } else {
-          alert('🏆 LUAR BIASA! Kamu menamatkan 20 Stage Story Mode!');
+          alert('🏆 LUAR BIASA! Kamu menamatkan seluruh 50 Stage dan menjadi Raja Catur Sejati!');
           inStoryMode = false;
         }
+      }
+    } else {
+      if(inStoryMode) {
+        const stageData = STORY_STAGES[currentStoryIndex];
+        alert(stageData.dialogs.lose);
       }
     }
     initGame();
@@ -620,7 +589,7 @@
       document.body.style.backgroundImage = `linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.96)), url('${bgUrl}')`;
     }
     if(musicUrl) {
-      TRACKS.unshift({ name: "Custom Track MP3", url: musicUrl });
+      TRACKS.push({ name: "Custom Track (" + (TRACKS.length + 1) + ")", url: musicUrl });
       localStorage.setItem('axac_custom_tracks', JSON.stringify(TRACKS));
       setupAudioPlayer();
     }
@@ -628,14 +597,35 @@
     closeModal('settingsModal');
   }
 
+  function setupAudioPlayer() {
+    const audio = document.getElementById('bgAudio');
+    const list = document.getElementById('trackList');
+    if (!list) return;
+    list.innerHTML = '';
+    TRACKS.forEach((track, idx) => {
+      const div = document.createElement('div');
+      div.className = `track-item ${idx === 0 ? 'active' : ''}`;
+      div.innerHTML = `<span>${track.name}</span>`;
+      div.onclick = () => {
+        currentTrackIdx = idx;
+        audio.src = track.url;
+        audio.play().catch(e => alert('Pastikan link audio MP3 valid.'));
+        document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+      };
+      list.appendChild(div);
+    });
+    if (TRACKS.length > 0) audio.src = TRACKS[0].url;
+  }
+
   function askMagnusAdvice() {
     if (!game) return;
-    if (magnusUsesLeft <= 0) {
-      alert('Jatah bantuan Magnus AI Anda sudah habis untuk sesi ini!');
+    if (currentRole !== 'owner' && magnusUsesLeft <= 0) {
+      alert('Jatah bantuan Magnus AI (3 kali) sudah habis!');
       openModal('magnusModal');
       return;
     }
-    if (!['owner', 'admin'].includes(currentRole)) {
+    if (currentRole !== 'owner') {
       magnusUsesLeft--;
       updateMagnusUI();
     }
@@ -649,7 +639,7 @@
 
   function showMagnusTutorial(topic) {
     const adviceEl = document.getElementById('magnusAdviceText');
-    adviceEl.innerHTML = `<b>Panduan Dasar:</b> Lindungi Raja, kuasai petak pusat, dan lakukan rokade secepatnya.`;
+    adviceEl.innerHTML = `<b>Panduan Pro:</b> Kendalikan petak tengah, lindungi Raja, dan antisipasi serangan balik musuh di stage tinggi.`;
   }
 
   function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
@@ -667,28 +657,20 @@
   }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-  function executeAdminAction(actionType) {
+  function executeOwnerAction(actionType) {
     const targetUser = document.getElementById('ownerTargetUser').value.trim();
     if (!targetUser) return alert('Masukkan Username Target.');
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     if (!users[targetUser]) return alert(`User "${targetUser}" tidak ditemukan.`);
 
-    if (actionType === 'warn') {
-      alert(`⚠️ Peringatan resmi dikirim ke ${targetUser}.`);
+    if (actionType === 'autowin') {
+      users[targetUser].wins = (users[targetUser].wins || 0) + 10;
+      localStorage.setItem('axac_users', JSON.stringify(users));
+      alert(`Berhasil menambahkan Auto Win untuk ${targetUser}!`);
     } else if (actionType === 'ban') {
-      if(!['owner', 'admin'].includes(currentRole)) return alert('Hanya Admin+ yang bisa ban!');
       users[targetUser].banned = !users[targetUser].banned;
       localStorage.setItem('axac_users', JSON.stringify(users));
       alert(`Status Ban ${targetUser}: ${users[targetUser].banned ? 'BANNED' : 'AKTIF'}`);
-    } else if (actionType === 'setrole-vip') {
-      users[targetUser].role = 'vip';
-      localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`Role ${targetUser} berhasil diubah jadi VIP!`);
-    } else if (actionType === 'autowin') {
-      if(currentRole !== 'owner') return alert('Fitur khusus Owner!');
-      users[targetUser].wins = (users[targetUser].wins || 0) + 10;
-      localStorage.setItem('axac_users', JSON.stringify(users));
-      alert(`Auto Win ditambahkan untuk ${targetUser}!`);
     }
   }
 
@@ -711,11 +693,7 @@
         localStorage.setItem('axac_active_user', currentUser);
         localStorage.setItem('axac_active_role', currentRole);
 
-        if (currentRole === 'vip') magnusUsesLeft = 20;
-        else if (currentRole === 'semi-vip') magnusUsesLeft = 10;
-        else if (currentRole === 'member') magnusUsesLeft = 3;
-        else magnusUsesLeft = 99;
-
+        magnusUsesLeft = (currentRole === 'owner') ? 99 : 3;
         updateMagnusUI();
 
         document.getElementById('authScreen').classList.add('hidden');
@@ -724,12 +702,9 @@
         updateProfileDisplay();
         initGame();
         initP2P();
-        
-        if (['owner', 'admin', 'semi-admin'].includes(currentRole)) {
+        if (currentRole === 'owner') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
-          if(currentRole === 'owner') {
-            document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
-          }
+          document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
         }
       } else {
         alert('Username atau password salah.');
@@ -767,40 +742,10 @@
     let data = users[currentUser] || { role: 'member', wins: 0 };
     document.getElementById('profileInfoContent').innerHTML = `
       <p><b>Username:</b> <span style="color:#60a5fa">${currentUser}</span></p>
-      <p><b>Role Anda:</b> <span class="role-badge role-${currentRole}">${currentRole}</span></p>
-      <hr style="border-color:rgba(255,255,255,0.1); margin:10px 0;">
-      <p><b>Daftar & Penjelasan Fitur Role:</b></p>
-      <ul style="font-size:0.8rem; margin-left:16px; color:#cbd5e1; margin-top:6px;">
-        <li><b>Member:</b> Akses standar, bantuan Magnus AI 3x.</li>
-        <li><b>Semi VIP:</b> Bantuan Magnus AI diperbanyak jadi 10x.</li>
-        <li><b>VIP:</b> Bantuan Magnus AI diperbanyak jadi 20x.</li>
-        <li><b>Semi Admin:</b> Bisa memberi peringatan (warning) kecurangan.</li>
-        <li><b>Admin:</b> Bisa mem-ban akun pemain curang & moderasi chat.</li>
-        <li><b>Owner:</b> Akses mutlak (Instant Win, Auto Win leaderboard, dll).</li>
-      </ul>
-      <p style="margin-top:10px;"><b>Progress Story Mode:</b> Stage ${currentStoryIndex + 1} / 20</p>
+      <p><b>Role:</b> <span class="role-badge role-${currentRole}">${currentRole}</span></p>
+      <p><b>Total Kemenangan:</b> ${data.wins || 0}</p>
+      <p><b>Progress Story Mode:</b> Stage ${currentStoryIndex + 1} / 50</p>
     `;
-  }
-
-  function setupAudioPlayer() {
-    const audio = document.getElementById('bgAudio');
-    const list = document.getElementById('trackList');
-    if (!list) return;
-    list.innerHTML = '';
-    TRACKS.forEach((track, idx) => {
-      const div = document.createElement('div');
-      div.className = `track-item ${idx === 0 ? 'active' : ''}`;
-      div.innerHTML = `<span>${track.name}</span>`;
-      div.onclick = () => {
-        currentTrackIdx = idx;
-        audio.src = track.url;
-        audio.play().catch(e => alert('Pastikan link audio MP3 valid.'));
-        document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
-        div.classList.add('active');
-      };
-      list.appendChild(div);
-    });
-    if (TRACKS.length > 0) audio.src = TRACKS[0].url;
   }
 
   function renderBoard() {
@@ -867,7 +812,7 @@
     const botEl = document.getElementById('playerInfoBottom');
     if(inStoryMode) {
       let stageData = STORY_STAGES[currentStoryIndex];
-      topEl.innerText = `Story Stage ${stageData.stage}/20: ${stageData.name}`;
+      topEl.innerText = `Stage ${stageData.stage}/50: ${stageData.name}`;
     } else {
       const mode = document.getElementById('modeSelect').value;
       topEl.innerText = mode.startsWith('ai') ? `Lawan (AI): ${mode.replace('ai-', '').toUpperCase()}` : `Lawan (Online)`;
@@ -896,7 +841,7 @@
         if (mode === 'online' && conn) {
           conn.send({ type: 'MOVE', move: move });
         } else if (mode.startsWith('ai') && !game.game_over()) {
-          aiTimeout = setTimeout(makeAIMove, 250);
+          aiTimeout = setTimeout(makeAIMove, 150);
         }
       } else {
         const piece = game.get(sq);
@@ -911,11 +856,51 @@
 
   function makeAIMove() {
     if (!game || game.game_over()) return;
+    const mode = document.getElementById('modeSelect').value;
     const moves = game.moves({ verbose: true });
     if (moves.length === 0) return;
-    let selectedMove = moves.find(m => m.captured || m.san.includes('+')) || moves[Math.floor(Math.random() * moves.length)];
+
+    let selectedMove = moves[0];
+    const pieceValues = { p: 10, n: 35, b: 35, r: 50, q: 90, k: 1000 };
+
+    if (mode === 'ai-easy') {
+      selectedMove = moves[Math.floor(Math.random() * moves.length)];
+    } else if (mode === 'ai-medium') {
+      let caps = moves.filter(m => m.captured);
+      selectedMove = caps.length > 0 ? caps[Math.floor(Math.random() * caps.length)] : moves[Math.floor(Math.random() * moves.length)];
+    } else {
+      let bestScore = -99999;
+      for (let m of moves) {
+        game.move(m);
+        let score = 0;
+        const b = game.board();
+        for (let r=0; r<8; r++) {
+          for (let c=0; c<8; c++) {
+            if (b[r][c]) {
+              let val = pieceValues[b[r][c].type];
+              score += (b[r][c].color === 'b' ? val : -val);
+            }
+          }
+        }
+        if (m.captured) score += pieceValues[m.captured] * 2.5;
+        if (m.san.includes('+')) score += 50;
+        if (m.san.includes('#')) score += 20000;
+        game.undo();
+
+        if (score > bestScore) {
+          bestScore = score;
+          selectedMove = m;
+        }
+      }
+    }
+
     game.move(selectedMove);
     renderBoard();
+
+    if(inStoryMode && Math.random() < 0.25) {
+      const stageData = STORY_STAGES[currentStoryIndex];
+      alert(`💬 ${stageData.name}: "${stageData.dialogs.mid}"`);
+    }
   }
 
   function stopAI() {
@@ -969,7 +954,7 @@
     closeModal('confirmModal');
     if (document.getElementById('modeSelect').value === 'online' && conn) conn.send({ type: 'RESIGN' });
     alert('Anda menyerah.');
-    initGame();
+    handleMatchWin(false);
   }
 
   function logout() {
