@@ -58,12 +58,16 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
     body { background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-    /* SPLASH FAST MAX 2.5s */
+    /* CRITICAL FIX: Guaranteed Non-Blocking Splash Screen */
     #splashScreen {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #04060a; z-index: 99999;
+      background: #04060a; z-index: 999999;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       transition: opacity 0.3s ease;
+      opacity: 1; pointer-events: auto;
+    }
+    #splashScreen.fade-out {
+      opacity: 0; pointer-events: none;
     }
     .loader-spinner {
       width: 44px; height: 44px; border: 4px solid rgba(37,99,235,0.2);
@@ -78,7 +82,6 @@
     .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
     .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    /* LIVE REAL-TIME CLOCK BADGE */
     .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 5px 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 8px; color: #60a5fa; font-weight: 600; box-shadow: var(--shading-3d); }
 
     .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px; box-shadow: var(--shading-3d); }
@@ -162,11 +165,11 @@
 </head>
 <body>
 
-  <!-- SPLASH FAST MAX 2.5s -->
+  <!-- SPLASH SCREEN FIXED (Guaranteed Non-Blocking & Fast Fade) -->
   <div id="splashScreen">
     <div class="loader-spinner"></div>
     <div style="font-weight: 700; font-size: 1.2rem; letter-spacing: 2px; color: #3b82f6;">AXAC CHESS APEX</div>
-    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Menginisialisasi Engine 3D & AI Guard...</div>
+    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Memuat Sistem...</div>
   </div>
 
   <header>
@@ -296,7 +299,7 @@
     </div>
   </div>
 
-  <!-- Modal Magnus Carlsen & Reward Ad Integration -->
+  <!-- Modal Magnus Carlsen -->
   <div id="magnusModal" class="modal-overlay">
     <div class="modal">
       <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: #a78bfa;">🎓 Pelatih Magnus Carlsen</h3>
@@ -376,10 +379,10 @@
     </div>
   </div>
 
-  <!-- Modal Leaderboard (Optimized) -->
+  <!-- Modal Leaderboard -->
   <div id="leaderboardModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🏆 Leaderboard Global (Optimized)</h3>
+      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🏆 Leaderboard Global</h3>
       <div id="leaderboardContent"></div>
       <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
         <button class="btn btn-sm" onclick="closeModal('leaderboardModal')">Tutup</button>
@@ -417,7 +420,7 @@
     </div>
   </div>
 
-  <!-- Modal Panel Owner Supreme (+10 Instan & Waktu) -->
+  <!-- Modal Panel Owner Supreme -->
   <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
       <h3 style="margin-bottom: 10px; font-size: 1.05rem; color: var(--warning);">👑 Panel Owner Supreme & AI Guard Sentinel</h3>
@@ -473,7 +476,6 @@
     { name: "Terranova (Bass Boosted)", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  // AI STORY PORTRAITS MATCHED TO CHARACTER / STAGE CLASSES
   function getCharacterPngUrl(seedOrName) {
     if(typeof seedOrName === 'string') {
       let lower = seedOrName.toLowerCase();
@@ -537,7 +539,6 @@
     localStorage.setItem('axac_theme', t);
   }
 
-  // REAL-TIME CLOCK UPDATER
   function updateRealTimeClock() {
     const now = new Date();
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -559,11 +560,9 @@
   }
   setInterval(updateRealTimeClock, 1000);
 
-  // ADVANCED AI GUARD SENTINEL (REAL-TIME ANOMALY NEUTRALIZATION)
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && currentUser && currentRole !== 'owner' && currentRole !== 'admin') {
       logAiGuardViolation(currentUser, "Anomali Tab-Switch: Keluar dari web saat pertandingan aktif");
-      alert("🚨 [AI GUARD APEX SENTINEL]: Anomali terdeteksi! Keluar dari tab permainan langsung dinutralisasi dan dilaporkan real-time ke Owner.");
     }
   });
 
@@ -578,6 +577,15 @@
     logs.unshift({ user: user, time: new Date().toLocaleTimeString(), reason: reason });
     if(logs.length > 50) logs.pop();
     localStorage.setItem('axac_ai_guard_logs', JSON.stringify(logs));
+  }
+
+  // CRITICAL FIX: Safe Splash Screen Dismissal with Absolute Fallback
+  function dismissSplash() {
+    const splash = document.getElementById('splashScreen');
+    if(splash && !splash.classList.contains('fade-out')) {
+      splash.classList.add('fade-out');
+      setTimeout(() => { if(splash.parentNode) splash.remove(); }, 350);
+    }
   }
 
   function initApp() {
@@ -616,16 +624,17 @@
           document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
         }
       }
-
-      // SPLASH FAST MAX 2.5s
-      setTimeout(() => {
-        let splash = document.getElementById('splashScreen');
-        if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 300); }
-      }, 1500);
-    } catch(e) { console.error(e); }
+    } catch(e) {
+      console.error("Init Error:", e);
+    } finally {
+      dismissSplash();
+    }
   }
 
-  // GLOBAL CHAT & REAL-TIME MATCH INVITE SYSTEM
+  window.addEventListener('DOMContentLoaded', initApp);
+  window.addEventListener('load', dismissSplash);
+  setTimeout(dismissSplash, 1200); // Absolute safety fallback timer
+
   function sendGlobalChat() {
     let input = document.getElementById('chatInputMsg');
     let text = input.value.trim();
@@ -674,7 +683,6 @@
     closeModal('globalChatModal');
   }
 
-  // REWARDED AD PROMOTION FOR MAGNUS USAGE (+1)
   function openRewardedAd() {
     closeModal('magnusModal');
     let adModal = document.getElementById('adModal');
@@ -734,7 +742,6 @@
   }
   function closeToast() { document.getElementById('inGameToast').style.display = 'none'; }
 
-  // OWNER INSTANT WIN (+10 KEMENANGAN & WAKTU / LEADERBOARD UPDATE INSTAN)
   function ownerInstantWin() {
     if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
@@ -770,7 +777,6 @@
     });
   }
 
-  // AUDIO BASS-BOOSTED SETUP (WITHOUT CHANGING TRACKS)
   function setupAudioPlayer() {
     let audio = document.getElementById('bgAudio');
     let list = document.getElementById('trackList');
@@ -800,7 +806,7 @@
         let bassFilter = audioCtx.createBiquadFilter();
         bassFilter.type = 'lowshelf';
         bassFilter.frequency.setValueAtTime(200, audioCtx.currentTime);
-        bassFilter.gain.setValueAtTime(12, audioCtx.currentTime); // Bass boost +12dB
+        bassFilter.gain.setValueAtTime(12, audioCtx.currentTime);
         audioSource.connect(bassFilter);
         bassFilter.connect(audioCtx.destination);
       }
@@ -889,7 +895,6 @@
     document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':d.wins}<br>Sisa Magnus: ${currentRole==='vip'||currentRole==='owner'?'∞':magnusUsesLeft}`;
   }
 
-  // OPTIMIZED LEADERBOARD GLOBAL
   function renderLeaderboard() {
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     let sorted = Object.keys(users).sort((a,b) => (users[b].wins || 0) - (users[a].wins || 0));
@@ -1004,8 +1009,6 @@
   function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
   function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
   function logout() { localStorage.removeItem('axac_active_user'); localStorage.removeItem('axac_active_role'); location.reload(); }
-
-  window.onload = initApp;
 </script>
 </body>
 </html>
