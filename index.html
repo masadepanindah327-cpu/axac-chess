@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex Sentinel Edition</title>
+  <title>AXAC Chess - Apex Ultimate Enterprise Edition</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFYQUMgQ2hlc3MgUGxhdGZvcm0iLAogICJzaG9ydF9uYW1lIjogIkFYQUMgQ2hlc3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNzBhMTIiLAogICJ0aGVtZV9jb2xvciI6ICIjMDcwYTEyIgp9">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFYQUMgQ2hlc3MgUGxhdGZvcm0iLAogICJzaG9ydF9uYW1lIjogIkFYQUMgQ2hlc3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNSAwNyAwYyIsCiAgInRoZW1lX2NvbG9yIjogIiMwNSAwNyAwYyIKfQ==">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -24,6 +24,7 @@
       --success: #16a34a;
       --warning: #d97706;
       --purple: #7c3aed;
+      --pink: #db2777;
       --text: #f8fafc;
       --text-muted: #64748b;
       --sq-light: #94a3b8;
@@ -42,6 +43,7 @@
       --success: #16a34a;
       --warning: #d97706;
       --purple: #7c3aed;
+      --pink: #db2777;
       --text: #0f172a;
       --text-muted: #64748b;
       --sq-light: #cbd5e1;
@@ -77,19 +79,21 @@
     .role-owner { background: rgba(217, 119, 6, 0.15); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); }
     .role-admin { background: rgba(37, 99, 235, 0.15); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.3); }
     .role-vip { background: rgba(219, 39, 119, 0.15); color: #db2777; border: 1px solid rgba(219, 39, 119, 0.3); }
+    .role-semivip { background: rgba(124, 58, 237, 0.15); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.3); }
     .role-member { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border: 1px solid var(--border-glass); }
 
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 14px; width: 280px; box-shadow: var(--shading-shadow); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 14px; width: 290px; box-shadow: var(--shading-shadow); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
-    .dropdown-item { padding: 12px 16px; font-size: 0.86rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.12s; }
+    .dropdown-item { padding: 12px 16px; font-size: 0.85rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.12s; }
     .dropdown-item:hover { background: rgba(37, 99, 235, 0.1); color: #3b82f6; }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.86rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
     .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-danger { background: var(--danger); }
     .btn-success { background: var(--success); }
     .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
     .btn-purple { background: var(--purple); color: white; }
+    .btn-pink { background: var(--pink); color: white; }
     .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
 
     .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 28px; border-radius: 20px; width: 90%; box-shadow: var(--shading-shadow); }
@@ -125,7 +129,7 @@
     .track-item { padding: 7px 10px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); transition: 0.1s; }
     .track-item.active { background: rgba(37,99,235,0.2); color: #3b82f6; font-weight: 600; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 20px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shading-shadow); }
     
     .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 14px; border: 1px solid var(--border-glass); }
@@ -140,7 +144,15 @@
     .leaderboard-table th, .leaderboard-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border-glass); }
     .leaderboard-table th { color: var(--text-muted); font-weight: 600; }
 
-    .owner-audit-box { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 10px; padding: 10px; font-size: 0.78rem; max-height: 140px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 8px; }
+    .global-chat-box { height: 180px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; padding: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .chat-msg { line-height: 1.3; }
+    .chat-msg b { color: #60a5fa; }
+
+    .owner-audit-box { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 10px; padding: 10px; font-size: 0.78rem; max-height: 120px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+
+    /* REWARDED AD OVERLAY */
+    #adModal { z-index: 9999; }
+    .ad-banner { background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px; }
 
     .hidden { display: none !important; }
     footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; }
@@ -150,8 +162,8 @@
 
   <div id="splashScreen">
     <div class="loader-spinner"></div>
-    <div style="font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; color: #3b82f6;">AXAC CHESS APEX</div>
-    <div style="font-size: 0.78rem; color: #64748b; margin-top: 6px;">Menyiapkan AI Guard & Real-Time Sentinel...</div>
+    <div style="font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; color: #3b82f6;">AXAC CHESS ENTERPRISE</div>
+    <div style="font-size: 0.78rem; color: #64748b; margin-top: 6px;">Menyiapkan Global Chat & Magnus AI Engine...</div>
   </div>
 
   <header>
@@ -159,7 +171,7 @@
       <button class="menu-btn" onclick="toggleMenu()" title="Menu">
         <span></span><span></span><span></span>
       </button>
-      <div class="brand">AXAC APEX</div>
+      <div class="brand">AXAC ENTERPRISE</div>
     </div>
     
     <div style="display: flex; align-items: center; gap: 8px;">
@@ -176,7 +188,9 @@
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
       <div class="dropdown-item" style="color: #a78bfa;" onclick="openStoryMode()">📖 Story Mode (50 Stages)</div>
-      <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus AI (<span id="magnusCount">3</span> Sisa)</div>
+      <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus Carlsen (<span id="magnusCount">3</span> Sisa)</div>
+      <div class="dropdown-item" style="color: #3b82f6;" onclick="openModal('globalChatModal')">💬 Global Chat & Ruang Diskusi</div>
+      <div class="dropdown-item" style="color: #db2777;" onclick="openModal('upgradeModal')">⭐ Upgrade Role (Semi-VIP / VIP)</div>
       <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media & Musik</div>
       <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil Akun</div>
       <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard Global</div>
@@ -187,7 +201,7 @@
 
   <!-- Auth Screen -->
   <div id="authScreen" class="auth-container">
-    <h2>Masuk AXAC Apex</h2>
+    <h2>Masuk AXAC Enterprise</h2>
     <div class="input-group">
       <label>Username</label>
       <input type="text" id="authUser" placeholder="Username" autocomplete="off">
@@ -258,7 +272,7 @@
     <button class="btn btn-sm btn-purple" onclick="closeToast()">Tutup</button>
   </div>
 
-  <footer>AXAC CHESS APEX • ULTRA SHIELD SENTINEL</footer>
+  <footer>AXAC CHESS ENTERPRISE • SECURE P2P SENTINEL</footer>
 
   <!-- Modal Story -->
   <div id="storyModal" class="modal-overlay">
@@ -278,18 +292,81 @@
     </div>
   </div>
 
-  <!-- Modal Magnus -->
+  <!-- Modal Magnus Carlsen & Reward Ad Integration -->
   <div id="magnusModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: #a78bfa;">🎓 Pelatih Magnus AI</h3>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: #a78bfa;">🎓 Pelatih Magnus Carlsen</h3>
+      <div class="chibi-container">
+        <div class="chibi-avatar" style="width: 60px; height: 60px;">
+          <img src="https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" alt="Magnus Carlsen">
+        </div>
+        <div class="dialog-box">
+          <b>Magnus Carlsen (Grandmaster)</b>
+          <div style="font-size: 0.76rem; color: #a78bfa;">Sisa Bantuan: <span id="magnusModalCount">3</span></div>
+        </div>
+      </div>
       <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 12px; font-size: 0.84rem; line-height: 1.4; margin-bottom: 12px;">
-        <p id="magnusAdviceText">"Halo! Klik tombol analisis untuk menerima instruksi langkah terbaik."</p>
+        <p id="magnusAdviceText">"Halo! Klik analisis untuk mendapatkan langkah terbaik."</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <button class="btn btn-purple btn-sm" onclick="askMagnusAdvice()">🔍 Analisis & Pelajaran Interaktif</button>
+        <button class="btn btn-pink btn-sm" onclick="openRewardedAd()">📺 Tonton Iklan (10 Detik) +1 Magnus</button>
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
         <button class="btn btn-sm" onclick="closeModal('magnusModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rewarded Ad Modal -->
+  <div id="adModal" class="modal-overlay">
+    <div class="modal" style="text-align: center;">
+      <h3 style="margin-bottom: 10px; color: var(--warning);">📺 Promosi & Iklan Berdurasi 10 Detik</h3>
+      <div class="ad-banner">
+        <h4 style="margin-bottom: 6px;">Ingin Akses Fitur Eksklusif & Bebas Limit?</h4>
+        <p style="font-size: 0.82rem; margin-bottom: 10px;">Upgrade akunmu ke Semi-VIP atau VIP sekarang untuk membuka fitur premium catur tanpa batas!</p>
+        <div id="adTimer" style="font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;">10</div>
+      </div>
+      <p id="adStatusText" style="font-size: 0.84rem; color: var(--text-muted);">Mohon tunggu iklan promosi selesai...</p>
+    </div>
+  </div>
+
+  <!-- Global Chat Modal -->
+  <div id="globalChatModal" class="modal-overlay">
+    <div class="modal">
+      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">💬 Global Chat & Diskusi</h3>
+      <div id="globalChatContainer" class="global-chat-box"></div>
+      <div style="display: flex; gap: 6px;">
+        <input type="text" id="chatInputMsg" placeholder="Tulis pesan..." style="flex: 1; padding: 9px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text); font-size: 0.85rem;" autocomplete="off">
+        <button class="btn btn-sm btn-success" onclick="sendGlobalChat()">Kirim</button>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+        <button class="btn btn-sm" onclick="closeModal('globalChatModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade Role Modal -->
+  <div id="upgradeModal" class="modal-overlay">
+    <div class="modal">
+      <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--pink);">⭐ Upgrade Role Akun</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Tingkatkan akunmu untuk mendapatkan keistimewaan dan batas Magnus tanpa batas!</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
+        <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 12px;">
+          <b>Semi-VIP (Rp 5.000)</b>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Batas Magnus 10x / sesi, Akses Custom Background & Prioritas Chat.</p>
+          <button class="btn btn-sm btn-purple" style="margin-top: 8px; width: 100%;" onclick="requestUpgrade('semivip')">Upgrade ke Semi-VIP (Rp 5k)</button>
+        </div>
+        <div style="background: rgba(219,39,119,0.1); border: 1px solid rgba(219,39,119,0.3); border-radius: 12px; padding: 12px;">
+          <b>VIP (Rp 10.000)</b>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Magnus Tanpa Batas (Infinite), Fitur Analisis Mendalam & Badge VIP Eksklusif.</p>
+          <button class="btn btn-sm btn-pink" style="margin-top: 8px; width: 100%;" onclick="requestUpgrade('vip')">Upgrade ke VIP (Rp 10k)</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-sm" onclick="closeModal('upgradeModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -346,7 +423,8 @@
       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
         <button class="btn btn-warning btn-sm" onclick="executeOwnerAction('autowin')">⚡ Berikan Auto Win (+10)</button>
         <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban / Unban Akun</button>
-        <button class="btn btn-purple btn-sm" onclick="executeOwnerAction('promote')">⭐ Jadikan Admin</button>
+        <button class="btn btn-purple btn-sm" onclick="executeOwnerAction('promote_admin')">⭐ Jadikan Admin</button>
+        <button class="btn btn-pink btn-sm" onclick="executeOwnerAction('promote_vip')">💎 Jadikan VIP</button>
       </div>
       <h4 style="font-size: 0.82rem; margin-bottom: 4px; color: var(--danger);">🚨 AI Guard Violation Log (Real-Time):</h4>
       <div id="ownerAuditLogBox" class="owner-audit-box">Memuat log pelanggaran...</div>
@@ -384,18 +462,20 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
+  // PLAYLIST MUSIK STABIL (TERRANOVA DIPERBAIKI KE LINK DIRECT VALID)
   let TRACKS = [
     { name: "Merry Christmas Please Dont Call", url: "https://files.catbox.moe/qaz1xd.mp3" },
     { name: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" },
-    { name: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" }
+    { name: "Terranova (Fixed)", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
+  // FOTO MAGNUS CARLSEN ASLI (CHESS.COM CDN) & AVATAR CHARACTER STORY
   function getCharacterPngUrl(seed) {
     const avatars = [
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png",
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80"
     ];
     return avatars[seed % avatars.length];
   }
@@ -406,7 +486,7 @@
       stage: i,
       name: `Grandmaster AI #${i}`,
       difficulty: i <= 15 ? 'ai-easy' : i <= 30 ? 'ai-medium' : i <= 42 ? 'ai-hard' : 'ai-god',
-      dialogs: { intro: `Stage ${i} dimulai. Buktikan keahlianmu!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol.` }
+      dialogs: { intro: `Stage ${i} dimulai. Hadapi Magnus & AI Guard kami!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol.` }
     });
   }
 
@@ -470,13 +550,14 @@
 
       game = new Chess();
       setupAudioPlayer();
+      loadGlobalChat();
 
       let savedUser = localStorage.getItem('axac_active_user');
       let savedRole = localStorage.getItem('axac_active_role');
       if (savedUser && savedRole) {
         currentUser = savedUser;
         currentRole = savedRole;
-        magnusUsesLeft = (currentRole === 'owner') ? 99 : 3;
+        magnusUsesLeft = (currentRole === 'owner' || currentRole === 'vip') ? 999 : (currentRole === 'semivip' ? 10 : 3);
         updateMagnusUI();
 
         document.getElementById('authScreen').classList.add('hidden');
@@ -497,6 +578,66 @@
         if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 400); }
       }, 500);
     } catch(e) { console.error(e); }
+  }
+
+  // GLOBAL CHAT SYSTEM
+  function sendGlobalChat() {
+    let input = document.getElementById('chatInputMsg');
+    let text = input.value.trim();
+    if(!text || !currentUser) return;
+    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
+    chats.push({ user: currentUser, role: currentRole, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+    if(chats.length > 100) chats.shift();
+    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
+    input.value = '';
+    loadGlobalChat();
+  }
+
+  function loadGlobalChat() {
+    let box = document.getElementById('globalChatContainer');
+    if(!box) return;
+    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
+    let html = '';
+    if(chats.length === 0) {
+      html = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi global!</div>';
+    } else {
+      chats.forEach(c => {
+        html += `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.user}</b> <span style="font-size:0.7rem; color:var(--text-muted);">${c.time}</span><br>${c.text}</div>`;
+      });
+    }
+    box.innerHTML = html;
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // REWARDED AD PROMOTION FOR MAGNUS USAGE (+1)
+  function openRewardedAd() {
+    closeModal('magnusModal');
+    let adModal = document.getElementById('adModal');
+    adModal.style.display = 'flex';
+    let timeLeft = 10;
+    document.getElementById('adTimer').innerText = timeLeft;
+    document.getElementById('adStatusText').innerText = "Menayangkan iklan promosi upgrade role...";
+    
+    let timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById('adTimer').innerText = timeLeft;
+      if(timeLeft <= 0) {
+        clearInterval(timer);
+        adModal.style.display = 'none';
+        magnusUsesLeft++;
+        updateMagnusUI();
+        alert('🎉 Selamat! Anda telah menonton iklan promosi dan mendapatkan +1 Batas Magnus Carlsen.');
+      }
+    }, 1000);
+  }
+
+  function requestUpgrade(tier) {
+    if(tier === 'semivip') {
+      alert('Silakan transfer Rp 5.000 ke QRIS/Dana AXAC Official. Hubungi Owner untuk konfirmasi instan.');
+    } else if(tier === 'vip') {
+      alert('Silakan transfer Rp 10.000 ke QRIS/Dana AXAC Official. Hubungi Owner untuk konfirmasi instan.');
+    }
+    closeModal('upgradeModal');
   }
 
   function openStoryMode() {
@@ -551,9 +692,9 @@
   }
 
   function updateMagnusUI() {
-    ['magnusCount', 'magnusBtnCount'].forEach(id => {
+    ['magnusCount', 'magnusModalCount', 'magnusBtnCount'].forEach(id => {
       let el = document.getElementById(id);
-      if(el) el.innerText = magnusUsesLeft;
+      if(el) el.innerText = (currentRole === 'vip' || currentRole === 'owner') ? '∞' : magnusUsesLeft;
     });
   }
 
@@ -582,13 +723,17 @@
 
   function askMagnusAdvice() {
     if(!game) return;
-    if(currentRole !== 'owner' && magnusUsesLeft <= 0) return alert('Jatah bantuan habis!');
-    if(currentRole !== 'owner') { magnusUsesLeft--; updateMagnusUI(); }
+    if(currentRole !== 'owner' && currentRole !== 'vip' && magnusUsesLeft <= 0) {
+      alert('Jatah bantuan habis! Tonton iklan 10 detik untuk menambah kuota Magnus.');
+      openModal('magnusModal');
+      return;
+    }
+    if(currentRole !== 'owner' && currentRole !== 'vip') { magnusUsesLeft--; updateMagnusUI(); }
     openModal('magnusModal');
     let moves = game.moves({ verbose: true });
     if(moves.length === 0) return;
     let m = moves[0];
-    document.getElementById('magnusAdviceText').innerHTML = `<b>Magnus AI:</b><br>Saran terbaik: Gerakkan dari <b style='color:#3b82f6'>${m.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${m.to.toUpperCase()}</b> (${m.san}).`;
+    document.getElementById('magnusAdviceText').innerHTML = `<b>Magnus Carlsen:</b><br>Saran terbaik: Gerakkan dari <b style='color:#3b82f6'>${m.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${m.to.toUpperCase()}</b> (${m.san}).`;
   }
 
   function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
@@ -598,8 +743,9 @@
     document.getElementById('dropdownMenu').classList.remove('show');
     document.getElementById(id).style.display = 'flex';
     if(id === 'leaderboardModal') renderLeaderboard();
-    if(id === 'profileModal') renderProfile();
+    if(id === 'profileModal') updateProfile();
     if(id === 'ownerControlModal') renderOwnerLogs();
+    if(id === 'globalChatModal') loadGlobalChat();
   }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -609,7 +755,8 @@
     if(!users[tUser]) return alert('User tidak ditemukan.');
     if(type === 'autowin') users[tUser].wins = (users[tUser].wins || 0) + 10;
     else if(type === 'ban') users[tUser].banned = !users[tUser].banned;
-    else if(type === 'promote') users[tUser].role = 'admin';
+    else if(type === 'promote_admin') users[tUser].role = 'admin';
+    else if(type === 'promote_vip') users[tUser].role = 'vip';
     localStorage.setItem('axac_users', JSON.stringify(users));
     alert('Aksi Owner Berhasil Dieksekusi.');
   }
@@ -645,7 +792,7 @@
   function updateProfile() {
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     let d = users[currentUser] || { wins: 0 };
-    document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':d.wins}`;
+    document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':d.wins}<br>Sisa Magnus: ${currentRole==='vip'||currentRole==='owner'?'∞':magnusUsesLeft}`;
   }
 
   function renderLeaderboard() {
