@@ -3,161 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex 3D Enterprise Edition</title>
+  <title>AXAC Chess - Apex 3D Enterprise Edition (Cloud)</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFYQUMgQ2hlc3MgUGxhdGZvcm0iLAogICJzaG9ydF9uYW1lIjogIkFYQUMgQ2hlc3MiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNSAwNyAwYyIsCiAgInRoZW1lX2NvbG9yIjogIiMwNSAwNyAwYyIKfQ==">
-
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
     :root[data-theme="dark"] {
-      --bg-dark: #04060a;
-      --bg-card: rgba(11, 17, 32, 0.95);
-      --border-glass: rgba(255, 255, 255, 0.12);
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --danger: #dc2626;
-      --success: #16a34a;
-      --warning: #d97706;
-      --purple: #7c3aed;
-      --pink: #db2777;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --sq-light: #94a3b8;
-      --sq-dark: #1e293b;
-      --sq-highlight: rgba(37, 99, 235, 0.8);
-      --sq-guide: rgba(22, 163, 74, 0.9);
+      --bg-dark: #04060a; --bg-card: rgba(11, 17, 32, 0.95); --border-glass: rgba(255, 255, 255, 0.12);
+      --accent: #2563eb; --danger: #dc2626; --success: #16a34a; --warning: #d97706; --purple: #7c3aed; --pink: #db2777;
+      --text: #f8fafc; --text-muted: #94a3b8; --sq-light: #94a3b8; --sq-dark: #1e293b;
+      --sq-highlight: rgba(37, 99, 235, 0.8); --sq-guide: rgba(22, 163, 74, 0.9);
       --shading-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
       --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.8), 0 0 1px 1px rgba(255,255,255,0.08);
     }
     :root[data-theme="light"] {
-      --bg-dark: #f1f5f9;
-      --bg-card: rgba(255, 255, 255, 0.95);
-      --border-glass: rgba(0, 0, 0, 0.12);
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --danger: #dc2626;
-      --success: #16a34a;
-      --warning: #d97706;
-      --purple: #7c3aed;
-      --pink: #db2777;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --sq-light: #cbd5e1;
-      --sq-dark: #475569;
-      --sq-highlight: rgba(37, 99, 235, 0.8);
-      --sq-guide: rgba(22, 163, 74, 0.9);
-      --shading-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      --bg-dark: #f1f5f9; --bg-card: rgba(255, 255, 255, 0.95); --border-glass: rgba(0, 0, 0, 0.12);
+      --text: #0f172a; --text-muted: #64748b; --sq-light: #cbd5e1; --sq-dark: #475569;
+      --shading-3d: 0 25px 50px -12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -2px 4px rgba(0,0,0,0.1);
       --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.15), 0 0 1px 1px rgba(0,0,0,0.08);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
     body { background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-
-    #splashScreen {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #04060a; z-index: 999999;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      transition: opacity 0.3s ease;
-      opacity: 1; pointer-events: auto;
-    }
+    #splashScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #04060a; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s ease; }
     #splashScreen.fade-out { opacity: 0; pointer-events: none; }
-    .loader-spinner {
-      width: 44px; height: 44px; border: 4px solid rgba(37,99,235,0.2);
-      border-top-color: #2563eb; border-radius: 50%;
-      animation: spin 0.6s linear infinite; margin-bottom: 14px;
-    }
+    .loader-spinner { width: 44px; height: 44px; border: 4px solid rgba(37,99,235,0.2); border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; margin-bottom: 14px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     header { background: var(--bg-card); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--card-shadow); }
     .header-left { display: flex; align-items: center; gap: 14px; }
-    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; box-shadow: var(--shading-3d); transition: 0.15s; }
+    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; }
     .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
     .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 5px 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 8px; color: #60a5fa; font-weight: 600; box-shadow: var(--shading-3d); }
-
-    .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px; box-shadow: var(--shading-3d); }
+    .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 5px 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 8px; color: #60a5fa; font-weight: 600; }
+    .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; }
     .role-owner { background: rgba(217, 119, 6, 0.2); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.4); }
     .role-admin { background: rgba(37, 99, 235, 0.2); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.4); }
     .role-vip { background: rgba(219, 39, 119, 0.2); color: #db2777; border: 1px solid rgba(219, 39, 119, 0.4); }
     .role-semivip { background: rgba(124, 58, 237, 0.2); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.4); }
     .role-member { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); border: 1px solid var(--border-glass); }
-
     .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(28px); border: 1px solid var(--border-glass); border-radius: 16px; width: 300px; box-shadow: var(--shading-3d); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
     .dropdown-item { padding: 12px 16px; font-size: 0.85rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.12s; }
     .dropdown-item:hover { background: rgba(37, 99, 235, 0.15); color: #3b82f6; }
-
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shading-3d); transition: 0.15s; }
-    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-danger { background: var(--danger); }
-    .btn-success { background: var(--success); }
-    .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
-    .btn-purple { background: var(--purple); color: white; }
-    .btn-pink { background: var(--pink); color: white; }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shading-3d); }
+    .btn-danger { background: var(--danger); } .btn-success { background: var(--success); } .btn-warning { background: var(--warning); color: #000; } .btn-purple { background: var(--purple); } .btn-pink { background: var(--pink); }
     .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 9px; }
-
     .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 24px; width: 90%; box-shadow: var(--shading-3d); }
     .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.35rem; font-weight: 700; }
     .input-group { margin-bottom: 14px; }
     .input-group label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-    .input-group input, .input-group select { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text); outline: none; font-size: 0.88rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-
+    .input-group input, .input-group select { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text); outline: none; font-size: 0.88rem; }
     .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1120px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
     @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
-
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
     .status-bar { width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: var(--shading-3d); }
-    
-    .board-wrapper { width: 100%; max-width: 460px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #0b1120; border-radius: 18px; overflow: hidden; background: #0b1120; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), var(--shading-3d); }
-    
+    .board-wrapper { width: 100%; max-width: 460px; aspect-ratio: 1; margin: 0 auto; }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #0b1120; border-radius: 18px; overflow: hidden; background: #0b1120; }
     .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; }
-    .square.light { background: var(--sq-light); box-shadow: inset 0 0 10px rgba(0,0,0,0.15); }
-    .square.dark { background: var(--sq-dark); box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+    .square.light { background: var(--sq-light); } .square.dark { background: var(--sq-dark); }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 10px var(--sq-guide); z-index: 10; }
+    .square.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; z-index: 10; }
     .square svg { width: 84%; height: 84%; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
-
     .coord-file, .coord-rank { position: absolute; font-size: 0.55rem; font-weight: 700; pointer-events: none; opacity: 0.6; z-index: 5; font-family: 'JetBrains Mono', monospace; }
-    .coord-file { bottom: 2px; right: 4px; }
-    .coord-rank { top: 2px; left: 4px; }
-
-    .panel { background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shading-3d); }
-    
-    .audio-player { background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); border-radius: 14px; padding: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
+    .coord-file { bottom: 2px; right: 4px; } .coord-rank { top: 2px; left: 4px; }
+    .panel { background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .audio-player { background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); border-radius: 14px; padding: 12px; }
     .track-list { max-height: 100px; overflow-y: auto; margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 7px 10px; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); transition: 0.1s; }
-    .track-item.active { background: rgba(37,99,235,0.25); color: #3b82f6; font-weight: 600; box-shadow: var(--shading-3d); }
-
+    .track-item { padding: 7px 10px; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); }
+    .track-item.active { background: rgba(37,99,235,0.25); color: #3b82f6; font-weight: 600; }
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shading-3d); }
-    
-    .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--border-glass); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0b1120; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #2563eb; overflow: hidden; box-shadow: 0 0 20px rgba(37,99,235,0.5), var(--shading-3d); }
+    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+    .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--border-glass); }
+    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0b1120; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #2563eb; overflow: hidden; }
     .chibi-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .dialog-box { font-size: 0.86rem; line-height: 1.4; color: var(--text); }
     .dialog-speaker { font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
-
-    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--purple); padding: 12px 18px; border-radius: 16px; box-shadow: var(--shading-3d); z-index: 500; display: none; max-width: 440px; width: 90%; align-items: center; gap: 12px; }
-    
+    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--purple); padding: 12px 18px; border-radius: 16px; z-index: 500; display: none; max-width: 440px; width: 90%; align-items: center; gap: 12px; }
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.82rem; }
     .leaderboard-table th, .leaderboard-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border-glass); }
     .leaderboard-table th { color: var(--text-muted); font-weight: 600; }
-
-    .global-chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
+    .global-chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .chat-msg { line-height: 1.4; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-glass); }
     .chat-msg b { color: #60a5fa; }
-
-    .owner-audit-box { background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(220, 38, 38, 0.35); border-radius: 12px; padding: 12px; font-size: 0.78rem; max-height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-
+    .owner-audit-box { background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(220, 38, 38, 0.35); border-radius: 12px; padding: 12px; font-size: 0.78rem; max-height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; box-shadow: var(--card-shadow); }
+    footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; }
   </style>
 </head>
 <body>
@@ -165,7 +100,7 @@
   <div id="splashScreen">
     <div class="loader-spinner"></div>
     <div style="font-weight: 700; font-size: 1.2rem; letter-spacing: 2px; color: #3b82f6;">AXAC CHESS APEX</div>
-    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Memuat Engine AI & Audio Pipeline...</div>
+    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Menghubungkan ke Server...</div>
   </div>
 
   <header>
@@ -202,7 +137,7 @@
     </div>
   </header>
 
-  <div id="authScreen" class="auth-container">
+  <div id="authScreen" class="auth-container hidden">
     <h2>Masuk AXAC 3D Apex</h2>
     <div class="input-group">
       <label>Username</label>
@@ -274,7 +209,7 @@
     <button class="btn btn-sm btn-purple" onclick="closeToast()">Tutup</button>
   </div>
 
-  <footer>AXAC CHESS APEX 3D • ULTRA GUARD SENTINEL</footer>
+  <footer>AXAC CHESS APEX 3D • CLOUD GUARD SENTINEL</footer>
 
   <!-- Modal Story -->
   <div id="storyModal" class="modal-overlay">
@@ -324,7 +259,7 @@
   <div id="adModal" class="modal-overlay">
     <div class="modal" style="text-align: center;">
       <h3 style="margin-bottom: 10px; color: var(--warning);">📺 Promosi & Iklan Berdurasi 10 Detik</h3>
-      <div style="background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px; box-shadow: var(--shading-3d);">
+      <div style="background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px;">
         <h4 style="margin-bottom: 6px;">Ingin Akses Fitur Eksklusif & Bebas Limit?</h4>
         <p style="font-size: 0.82rem; margin-bottom: 10px;">Upgrade akunmu ke Semi-VIP atau VIP sekarang untuk membuka fitur premium catur tanpa batas!</p>
         <div id="adTimer" style="font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;">10</div>
@@ -450,6 +385,14 @@
   </div>
 
 <script>
+  // =====================================================================
+  // KONFIGURASI SUPABASE (GANTI BAGIAN INI)
+  // =====================================================================
+  const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
+  
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const PIECE_SVGS = {
     p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#000"/></svg>',
     r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#000"/></svg>',
@@ -471,24 +414,13 @@
     { name: "Terranova (Bass Boosted)", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  // SMART AI IMAGE GENERATOR MAPPING FOR STORY CHARACTERS
   function getCharacterPngUrl(nameOrTitle) {
     let lower = (nameOrTitle || '').toLowerCase();
-    if(lower.includes('knight') || lower.includes('paladin') || lower.includes('kuda') || lower.includes('scout')) {
-      return "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=200&auto=format&fit=crop&q=80";
-    }
-    if(lower.includes('hacker') || lower.includes('cyber') || lower.includes('anon') || lower.includes('neural') || lower.includes('titan')) {
-      return "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80";
-    }
-    if(lower.includes('queen') || lower.includes('empress') || lower.includes('dewi')) {
-      return "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80";
-    }
-    if(lower.includes('king') || lower.includes('grandmaster') || lower.includes('magnus') || lower.includes('legend') || lower.includes('broto')) {
-      return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
-    }
-    if(lower.includes('budi') || lower.includes('joko') || lower.includes('beni') || lower.includes('deni') || lower.includes('hendra')) {
-      return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80";
-    }
+    if(lower.includes('knight') || lower.includes('paladin') || lower.includes('kuda') || lower.includes('scout')) return "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=200&auto=format&fit=crop&q=80";
+    if(lower.includes('hacker') || lower.includes('cyber') || lower.includes('anon') || lower.includes('neural') || lower.includes('titan')) return "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80";
+    if(lower.includes('queen') || lower.includes('empress') || lower.includes('dewi')) return "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80";
+    if(lower.includes('king') || lower.includes('grandmaster') || lower.includes('magnus') || lower.includes('legend') || lower.includes('broto')) return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+    if(lower.includes('budi') || lower.includes('joko') || lower.includes('beni') || lower.includes('deni') || lower.includes('hendra')) return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80";
     return "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80";
   }
 
@@ -503,8 +435,7 @@
   for(let i=1; i<=50; i++) {
     let name = customStageNames[i-1] || `Grandmaster Cyber Knight #${i}`;
     STORY_STAGES.push({
-      stage: i,
-      name: name,
+      stage: i, name: name,
       difficulty: i <= 15 ? 'ai-easy' : i <= 30 ? 'ai-medium' : i <= 42 ? 'ai-hard' : 'ai-god',
       dialogs: { intro: `Stage ${i} (${name}) dimulai. Buktikan kemampuan strategimu!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol oleh ${name}.` }
     });
@@ -523,6 +454,7 @@
   let aiTimeout = null;
   let deferredPrompt = null;
   let audioCtx = null, audioSource = null;
+  let sessionUser = null; // Nyimpen user ID dari Supabase Auth
 
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
   function triggerPwaInstall() {
@@ -534,178 +466,132 @@
     const html = document.documentElement;
     const t = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', t);
-    localStorage.setItem('axac_theme', t);
+    localStorage.setItem('axac_theme', t); // Tema masih lokal, aman.
   }
 
   function updateRealTimeClock() {
     const now = new Date();
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    
-    let dayName = days[now.getDay()];
-    let dateNum = now.getDate();
-    let monthName = months[now.getMonth()];
-    let yearNum = now.getFullYear();
-    
-    let hours = String(now.getHours()).padStart(2, '0');
-    let mins = String(now.getMinutes()).padStart(2, '0');
-    let secs = String(now.getSeconds()).padStart(2, '0');
-
     let badge = document.getElementById('liveClockBadge');
-    if(badge) badge.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} | ${hours}:${mins}:${secs}`;
+    if(badge) badge.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
   }
   setInterval(updateRealTimeClock, 1000);
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden && currentUser && currentRole !== 'owner' && currentRole !== 'admin') {
-      logAiGuardViolation(currentUser, "Anomali Tab-Switch: Keluar dari web saat pertandingan aktif");
-    }
-  });
+  // LOGIKA AUTH KE SUPABASE
+  async function handleAuth(isReg) {
+    let u = document.getElementById('authUser').value.trim();
+    let p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert('Isi username dan password!');
+    
+    // Supabase butuh format email, jadi kita akalin pakai username@axac.local
+    let email = `${u}@axac.local`;
 
-  window.addEventListener("blur", () => {
-    if (currentUser && currentRole !== 'owner' && currentRole !== 'admin') {
-      logAiGuardViolation(currentUser, "Anomali Fokus: Minimasi atau kehilangan fokus jendela aktif");
-    }
-  });
-
-  function logAiGuardViolation(user, reason) {
-    let logs = JSON.parse(localStorage.getItem('axac_ai_guard_logs') || '[]');
-    logs.unshift({ user: user, time: new Date().toLocaleTimeString(), reason: reason });
-    if(logs.length > 50) logs.pop();
-    localStorage.setItem('axac_ai_guard_logs', JSON.stringify(logs));
-  }
-
-  function dismissSplash() {
-    const splash = document.getElementById('splashScreen');
-    if(splash && !splash.classList.contains('fade-out')) {
-      splash.classList.add('fade-out');
-      setTimeout(() => { if(splash.parentNode) splash.remove(); }, 300);
+    if(isReg) {
+      let { data, error } = await db.auth.signUp({ email: email, password: p });
+      if(error) return alert('Gagal daftar: ' + error.message);
+      alert('Daftar sukses! Silakan login.');
+    } else {
+      let { data, error } = await db.auth.signInWithPassword({ email: email, password: p });
+      if(error) return alert('Login gagal: ' + error.message);
     }
   }
 
-  function checkDailyQuotaReset(userData) {
-    let todayStr = new Date().toDateString();
-    if(userData.lastQuotaDate !== todayStr) {
-      userData.lastQuotaDate = todayStr;
-      let role = userData.role;
-      if(role === 'owner') userData.magnusQuota = 99999;
-      else if(role === 'vip') userData.magnusQuota = 100;
-      else if(role === 'admin') userData.magnusQuota = 100;
-      else if(role === 'semivip') userData.magnusQuota = 50;
-      else userData.magnusQuota = 3;
-    }
-    return userData.magnusQuota;
+  async function logout() {
+    await db.auth.signOut();
+    location.reload();
   }
 
-  function initApp() {
-    try {
-      document.documentElement.setAttribute('data-theme', localStorage.getItem('axac_theme') || 'dark');
-      let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-      if (!users['axac']) users['axac'] = { pass: 'axacintop', role: 'owner', wins: 99999, banned: false, magnusQuota: 99999, lastQuotaDate: '' };
-      if (!users['Magnus_Bot']) users['Magnus_Bot'] = { pass: 'bot', role: 'admin', wins: 150, banned: false, magnusQuota: 100, lastQuotaDate: '' };
+  // DETEKSI STATUS LOGIN (Otomatis jalan tiap buka web)
+  db.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+      sessionUser = session.user;
+      let { data: profile, error } = await db.from('profiles').select('*').eq('id', session.user.id).single();
       
-      let savedUser = localStorage.getItem('axac_active_user');
-      let savedRole = localStorage.getItem('axac_active_role');
-      if (savedUser && users[savedUser]) {
-        currentUser = savedUser;
-        currentRole = users[savedUser].role || savedRole;
-        magnusUsesLeft = checkDailyQuotaReset(users[savedUser]);
-        users[savedUser].role = currentRole;
-        users[savedUser].magnusQuota = magnusUsesLeft;
-        localStorage.setItem('axac_users', JSON.stringify(users));
-      }
-
-      let savedStory = localStorage.getItem('axac_story_progress');
-      if(savedStory !== null) currentStoryIndex = parseInt(savedStory);
-
-      game = new Chess();
-      setupAudioPlayer();
-      loadGlobalChat();
-      updateRealTimeClock();
-
-      if (currentUser && currentRole) {
+      if(profile) {
+        if(profile.banned) { await db.auth.signOut(); return alert('Akun lo dibanned oleh Owner!'); }
+        
+        currentUser = profile.username;
+        currentRole = profile.role;
+        magnusUsesLeft = profile.magnus_quota;
+        
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('gameScreen').classList.remove('hidden');
         document.getElementById('userHeaderControls').classList.remove('hidden');
+        
         updateProfileDisplay();
         initGame();
         initP2P();
+        listenChatRealtime();
+        updateMagnusUI();
 
         if (currentRole === 'owner' || currentRole === 'admin') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
           document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
         }
+        dismissSplash();
       }
-    } catch(e) {
-      console.error("Init Error:", e);
-    } finally {
+    } else {
+      // Belum login
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('userHeaderControls').classList.add('hidden');
       dismissSplash();
     }
-  }
+  });
 
-  window.addEventListener('DOMContentLoaded', initApp);
-  window.addEventListener('load', dismissSplash);
-  setTimeout(dismissSplash, 1200);
-
-  function enableAudioEngine() {
-    let audio = document.getElementById('bgAudio');
-    if(audio) {
-      audio.play().then(() => {
-        initBassBoost(audio);
-        alert('🔊 Audio Musik Diaktifkan!');
-      }).catch(err => {
-        alert('Gagal memutar audio. Pastikan browser mengizinkan pemutaran.');
-      });
+  function dismissSplash() {
+    const splash = document.getElementById('splashScreen');
+    if(splash && !splash.classList.contains('fade-out')) {
+      splash.classList.add('fade-out');
+      setTimeout(() => { if(splash.parentNode) splash.parentNode.removeChild(splash); }, 300);
     }
   }
 
-  function sendGlobalChat() {
+  function updateProfileDisplay() {
+    document.getElementById('usernameDisplay').innerText = currentUser;
+    const badge = document.getElementById('roleTag');
+    badge.innerText = currentRole.toUpperCase();
+    badge.className = `role-badge role-${currentRole}`;
+  }
+
+  // GLOBAL CHAT REALTIME
+  async function sendGlobalChat() {
     let input = document.getElementById('chatInputMsg');
     let text = input.value.trim();
-    if(!text || !currentUser) return;
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    chats.push({ user: currentUser, role: currentRole, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-    if(chats.length > 100) chats.shift();
-    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
-    input.value = '';
-    loadGlobalChat();
+    if(!text || !sessionUser) return;
+    
+    let { error } = await db.from('global_chats').insert([{
+      user_id: sessionUser.id, username: currentUser, role: currentRole, message: text
+    }]);
+    if(error) alert('Gagal kirim chat: ' + error.message);
+    else input.value = '';
   }
 
-  function sendMatchChallenge() {
-    if(!currentUser) return;
-    let challengeText = `⚔️ ${currentUser} Mengajak tanding catur secara real-time! Klik untuk terima tantangan.`;
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    chats.push({ user: currentUser, role: currentRole, text: challengeText, isChallenge: true, peerId: (peer ? peer.id : ''), time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
-    loadGlobalChat();
-    alert('Undangan tanding berhasil dibroadcast ke Global Chat!');
-  }
-
-  function loadGlobalChat() {
+  async function loadGlobalChat() {
     let box = document.getElementById('globalChatContainer');
     if(!box) return;
-    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
-    let html = '';
+    let { data: chats, error } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+    if(error) return console.error(error);
+    
     if(chats.length === 0) {
-      html = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi atau undang tanding!</div>';
+      box.innerHTML = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi!</div>';
     } else {
-      chats.forEach(c => {
-        let actionBtn = c.isChallenge && c.user !== currentUser ? `<br><button class="btn btn-sm btn-success" style="margin-top:4px;" onclick="acceptChallenge('${c.peerId}')">Terima Tanding</button>` : '';
-        html += `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.user}</b> <span style="font-size:0.7rem; color:var(--text-muted);">${c.time}</span><br>${c.text} ${actionBtn}</div>`;
-      });
+      box.innerHTML = chats.map(c => `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.username}</b><br>${c.message}</div>`).join('');
     }
-    box.innerHTML = html;
     box.scrollTop = box.scrollHeight;
   }
 
-  function acceptChallenge(targetPeerId) {
-    if(!targetPeerId) return alert('ID Peer lawan tidak valid.');
-    document.getElementById('modeSelect').value = 'online';
-    changeMode();
-    document.getElementById('targetPeerId').value = targetPeerId;
-    connectToPeer();
-    closeModal('globalChatModal');
+  function listenChatRealtime() {
+    db.channel('custom-all-channel')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chats' }, payload => {
+        loadGlobalChat();
+      })
+      .subscribe();
+    loadGlobalChat();
   }
+
+  function sendMatchChallenge() { alert('Fitur undangan tanding real-time via chat sedang dalam pengembangan.'); }
 
   function openRewardedAd() {
     closeModal('magnusModal');
@@ -713,37 +599,81 @@
     adModal.style.display = 'flex';
     let timeLeft = 10;
     document.getElementById('adTimer').innerText = timeLeft;
-    document.getElementById('adStatusText').innerText = "Menayangkan iklan promosi kuota Magnus...";
     
-    let timer = setInterval(() => {
+    let timer = setInterval(async () => {
       timeLeft--;
       document.getElementById('adTimer').innerText = timeLeft;
       if(timeLeft <= 0) {
         clearInterval(timer);
         adModal.style.display = 'none';
-        magnusUsesLeft += 5; // Reward 5 kuota tambahan per iklan
-        updateUserQuotaStorage();
+        magnusUsesLeft += 5;
+        // Update kuota ke server
+        await db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id);
         updateMagnusUI();
-        alert('🎉 Selamat! Anda telah menonton iklan promosi dan mendapatkan +5 Kuota Magnus Carlsen.');
+        alert('🎉 +5 Kuota Magnus Carlsen berhasil ditambahkan!');
       }
     }, 1000);
   }
 
-  function updateUserQuotaStorage() {
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    if(users[currentUser]) {
-      users[currentUser].magnusQuota = magnusUsesLeft;
-      localStorage.setItem('axac_users', JSON.stringify(users));
+  function requestUpgrade(tier) {
+    if(tier === 'semivip') alert('Silakan transfer Rp 5.000 ke QRIS/Dana AXAC Official. Hubungi Admin untuk aktivasi.');
+    else if(tier === 'vip') alert('Silakan transfer Rp 10.000 ke QRIS/Dana AXAC Official. Hubungi Admin untuk aktivasi.');
+    closeModal('upgradeModal');
+  }
+
+  // OWNER ACTIONS
+  async function ownerInstantWin() {
+    if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
+    let { data: currentProfile } = await db.from('profiles').select('wins').eq('id', sessionUser.id).single();
+    let newWins = (currentProfile.wins || 0) + 10;
+    
+    let { error } = await db.from('profiles').update({ wins: newWins }).eq('id', sessionUser.id);
+    if(error) alert('Server menolak: ' + error.message);
+    else {
+      alert('⚡ +10 Kemenangan instan ditambahkan ke database server!');
+      initGame();
     }
   }
 
-  function requestUpgrade(tier) {
-    if(tier === 'semivip') {
-      alert('Silakan transfer Rp 5.000 ke QRIS/Dana AXAC Official. Kuota Magnus harian akan di-set ke 50 + 20 iklan.');
-    } else if(tier === 'vip') {
-      alert('Silakan transfer Rp 10.000 ke QRIS/Dana AXAC Official. Kuota Magnus harian akan di-set ke 100 + 50 iklan.');
+  async function executeOwnerAction(type) {
+    let tUser = document.getElementById('ownerTargetUser').value.trim();
+    if(!tUser) return alert('Isi username target!');
+
+    if(type === 'ban') {
+      let { error } = await db.from('profiles').update({ banned: true }).eq('username', tUser);
+      if(error) alert('Gagal ban: ' + error.message);
+      else alert('User ' + tUser + ' berhasil dibanned.');
+    } else {
+      let newRole = type === 'promote_admin' ? 'admin' : 'vip';
+      // Panggil RPC server-side buat ubah role
+      let { error } = await db.rpc('owner_update_role', { target_username: tUser, new_role: newRole });
+      if(error) alert('Akses ditolak atau gagal: ' + error.message);
+      else alert('Role ' + tUser + ' berhasil diubah jadi ' + newRole);
     }
-    closeModal('upgradeModal');
+  }
+
+  async function renderOwnerLogs() {
+    let { data: logs } = await db.from('ai_guard_logs').select('*').order('created_at', { ascending: false }).limit(20);
+    let box = document.getElementById('ownerAuditLogBox');
+    if(!logs || logs.length === 0) {
+      box.innerHTML = 'AI Guard aktif. Tidak ada anomali terdeteksi.';
+    } else {
+      box.innerHTML = logs.map(l => `[${new Date(l.created_at).toLocaleTimeString()}] User: ${l.username} -> ${l.reason}`).join('<br>');
+    }
+  }
+
+  // AI GUARD
+  async function logAiGuardViolation(reason) {
+    if(!currentUser || currentRole === 'owner' || currentRole === 'admin') return;
+    await db.from('ai_guard_logs').insert([{ user_id: sessionUser.id, username: currentUser, reason: reason }]);
+  }
+
+  document.addEventListener("visibilitychange", () => { if (document.hidden) logAiGuardViolation("Anomali Tab-Switch"); });
+  window.addEventListener("blur", () => { logAiGuardViolation("Kehilangan fokus jendela"); });
+
+  function enableAudioEngine() {
+    let audio = document.getElementById('bgAudio');
+    if(audio) audio.play().then(() => { initBassBoost(audio); alert('🔊 Audio Musik Diaktifkan!'); }).catch(() => alert('Gagal memutar audio.'));
   }
 
   function openStoryMode() {
@@ -775,27 +705,14 @@
   }
   function closeToast() { document.getElementById('inGameToast').style.display = 'none'; }
 
-  function ownerInstantWin() {
-    if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    if(users[currentUser]) {
-      users[currentUser].wins = (users[currentUser].wins || 0) + 10;
-      localStorage.setItem('axac_users', JSON.stringify(users));
-    }
-    alert('⚡ [OWNER SUPREME]: +10 Kemenangan instan dan pencatatan waktu leaderboard diperbarui secara real-time!');
-    initGame();
-  }
-
-  function handleMatchWin(isWin) {
-    if(isWin) {
-      let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-      if(users[currentUser]) {
-        users[currentUser].wins = (users[currentUser].wins || 0) + 1;
-        localStorage.setItem('axac_users', JSON.stringify(users));
-      }
+  async function handleMatchWin(isWin) {
+    if(isWin && sessionUser) {
+      let { data: p } = await db.from('profiles').select('wins').eq('id', sessionUser.id).single();
+      if(p) await db.from('profiles').update({ wins: (p.wins || 0) + 1 }).eq('id', sessionUser.id);
+      
       if(inStoryMode) {
         currentStoryIndex++;
-        localStorage.setItem('axac_story_progress', currentStoryIndex);
+        localStorage.setItem('axac_story_progress', currentStoryIndex); // Progress story lokal gapapa
         setTimeout(() => { if(currentStoryIndex < STORY_STAGES.length) openStoryMode(); else { alert('🏆 Selesai 50 Stage!'); inStoryMode = false; } }, 1500);
         return;
       }
@@ -838,7 +755,7 @@
         let bassFilter = audioCtx.createBiquadFilter();
         bassFilter.type = 'lowshelf';
         bassFilter.frequency.setValueAtTime(200, audioCtx.currentTime);
-        bassFilter.gain.setValueAtTime(14, audioCtx.currentTime); // Enhanced bass boost +14dB
+        bassFilter.gain.setValueAtTime(14, audioCtx.currentTime);
         audioSource.connect(bassFilter);
         bassFilter.connect(audioCtx.destination);
       }
@@ -850,21 +767,21 @@
     let bg = document.getElementById('bgUrlInput').value.trim();
     let music = document.getElementById('musicUrlInput').value.trim();
     if(bg) { localStorage.setItem('axac_custom_bg', bg); document.body.style.backgroundImage = `url('${bg}')`; document.body.style.backgroundSize = 'cover'; }
-    if(music) { TRACKS.push({ name: "Custom Track (Bass Boosted)", url: music }); setupAudioPlayer(); }
+    if(music) { TRACKS.push({ name: "Custom Track", url: music }); setupAudioPlayer(); }
     alert('Disimpan!'); closeModal('settingsModal');
   }
 
-  // MAGNUS AI ADVANCED HEURISTIC ENGINE (MINIMAX DEPTH-4 POSITION SCORING)
   function askMagnusAdvice() {
     if(!game) return;
     if(currentRole !== 'owner' && magnusUsesLeft <= 0) {
-      alert('Kuota Magnus hari ini sudah habis! Tonton iklan 10 detik untuk menambah kuota.');
+      alert('Kuota Magnus hari ini habis! Tonton iklan 10 detik untuk menambah kuota.');
       openModal('magnusModal');
       return;
     }
+    
     if(currentRole !== 'owner') {
       magnusUsesLeft--;
-      updateUserQuotaStorage();
+      db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id).then();
       updateMagnusUI();
     }
     openModal('magnusModal');
@@ -873,38 +790,26 @@
     let moves = game.moves({ verbose: true });
     if(moves.length === 0) return;
 
-    let bestMove = moves[0];
-    let bestScore = -99999;
-
+    let bestMove = moves[0], bestScore = -99999;
     for (let m of moves) {
       game.move(m);
       let score = 0;
       const b = game.board();
-      for (let r=0; r<8; r++) {
-        for (let c=0; c<8; c++) {
-          if (b[r][c]) {
-            let val = pieceValues[b[r][c].type];
-            score += (b[r][c].color === game.turn() ? val : -val);
-          }
-        }
-      }
+      for (let r=0; r<8; r++) for (let c=0; c<8; c++) if (b[r][c]) score += (b[r][c].color === game.turn() ? pieceValues[b[r][c].type] : -pieceValues[b[r][c].type]);
       if (m.captured) score += pieceValues[m.captured] * 3;
       if (m.san.includes('+')) score += 60;
       if (m.san.includes('#')) score += 25000;
       game.undo();
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestMove = m;
-      }
+      if (score > bestScore) { bestScore = score; bestMove = m; }
     }
 
-    document.getElementById('magnusAdviceText').innerHTML = `<b>Magnus Carlsen (Advanced Engine):</b><br>Analisis mendalam mendeteksi posisi terbaik. Gerakkan bidak dari <b style='color:#3b82f6'>${bestMove.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${bestMove.to.toUpperCase()}</b> (${bestMove.san}).`;
+    document.getElementById('magnusAdviceText').innerHTML = `<b>Magnus Carlsen:</b><br>Gerakkan bidak dari <b style='color:#3b82f6'>${bestMove.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${bestMove.to.toUpperCase()}</b> (${bestMove.san}).`;
   }
 
   function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
   window.onclick = (e) => { if(!e.target.closest('.menu-btn') && !e.target.closest('.dropdown-menu')) document.getElementById('dropdownMenu').classList.remove('show'); };
   function switchView(v) { document.getElementById('dropdownMenu').classList.remove('show'); }
+  
   function openModal(id) {
     document.getElementById('dropdownMenu').classList.remove('show');
     document.getElementById(id).style.display = 'flex';
@@ -915,77 +820,20 @@
   }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-  function executeOwnerAction(type) {
-    let tUser = document.getElementById('ownerTargetUser').value.trim();
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    if(!users[tUser]) return alert('User tidak ditemukan.');
-    if(type === 'ban') users[tUser].banned = !users[tUser].banned;
-    else if(type === 'promote_admin') {
-      users[tUser].role = 'admin';
-      users[tUser].magnusQuota = 100;
-    }
-    else if(type === 'promote_vip') {
-      users[tUser].role = 'vip';
-      users[tUser].magnusQuota = 100;
-    }
-    localStorage.setItem('axac_users', JSON.stringify(users));
-    alert('Aksi Owner Berhasil Dieksekusi.');
+  async function updateProfile() {
+    let { data: p } = await db.from('profiles').select('*').eq('id', sessionUser.id).single();
+    document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':(p ? p.wins : 0)}<br>Sisa Kuota Magnus: ${currentRole==='owner'?'∞':magnusUsesLeft}`;
   }
 
-  function renderOwnerLogs() {
-    let logs = JSON.parse(localStorage.getItem('axac_ai_guard_logs') || '[]');
-    let html = logs.length === 0 ? 'AI Guard aktif. Tidak ada anomali terdeteksi.' : '';
-    logs.forEach(l => { html += `[${l.time}] User: ${l.user} -> ${l.reason} (Neutralized)<br>`; });
-    document.getElementById('ownerAuditLogBox').innerHTML = html;
-  }
-
-  function handleAuth(isReg) {
-    let u = document.getElementById('authUser').value.trim();
-    let p = document.getElementById('authPass').value.trim();
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    if(!u || !p) return alert('Isi data dengan lengkap.');
-    if(isReg) {
-      if(users[u]) return alert('Sudah terdaftar.');
-      users[u] = { pass: p, role: 'member', wins: 0, banned: false, magnusQuota: 3, lastQuotaDate: new Date().toDateString() };
-      localStorage.setItem('axac_users', JSON.stringify(users));
-      alert('Registrasi sukses!');
-    } else {
-      if(users[u] && users[u].pass === p) {
-        if(users[u].banned) return alert('Akun dibanned.');
-        currentUser = u;
-        currentRole = users[u].role || 'member';
-        magnusUsesLeft = checkDailyQuotaReset(users[u]);
-        users[u].magnusQuota = magnusUsesLeft;
-        localStorage.setItem('axac_users', JSON.stringify(users));
-        localStorage.setItem('axac_active_user', u);
-        localStorage.setItem('axac_active_role', currentRole);
-        location.reload();
-      } else alert('Login gagal.');
-    }
-  }
-
-  function updateProfileDisplay() {
-    document.getElementById('usernameDisplay').innerText = currentUser;
-    const badge = document.getElementById('roleTag');
-    badge.innerText = currentRole.toUpperCase();
-    badge.className = `role-badge role-${currentRole}`;
-  }
-
-  function updateProfile() {
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    let d = users[currentUser] || { wins: 0 };
-    document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':d.wins}<br>Sisa Kuota Magnus Hari Ini: ${currentRole==='owner'?'∞':magnusUsesLeft}`;
-  }
-
-  function renderLeaderboard() {
-    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    let sorted = Object.keys(users).sort((a,b) => (users[b].wins || 0) - (users[a].wins || 0));
+  async function renderLeaderboard() {
+    let { data: users } = await db.from('profiles').select('*').order('wins', { ascending: false });
     let html = `<table class="leaderboard-table"><tr><th>Rank</th><th>User</th><th>Role</th><th>Wins</th></tr>`;
-    sorted.forEach((u, idx) => {
-      let data = users[u];
-      if(data.banned) return;
-      html += `<tr><td>#${idx+1}</td><td><b>${u}</b></td><td><span class="role-badge role-${data.role}">${data.role}</span></td><td style="color:#3b82f6">${data.role==='owner'?'∞':(data.wins||0)}</td></tr>`;
-    });
+    if(users) {
+      users.forEach((u, idx) => {
+        if(u.banned) return;
+        html += `<tr><td>#${idx+1}</td><td><b>${u.username}</b></td><td><span class="role-badge role-${u.role}">${u.role}</span></td><td style="color:#3b82f6">${u.role==='owner'?'∞':(u.wins||0)}</td></tr>`;
+      });
+    }
     html += `</table>`;
     document.getElementById('leaderboardContent').innerHTML = html;
   }
@@ -1090,7 +938,6 @@
 
   function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
   function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
-  function logout() { localStorage.removeItem('axac_active_user'); localStorage.removeItem('axac_active_role'); location.reload(); }
 </script>
 </body>
 </html>
