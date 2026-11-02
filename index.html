@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex Ultimate Enterprise Edition</title>
+  <title>AXAC Chess - Apex 3D Enterprise Edition</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,9 +15,9 @@
   
   <style>
     :root[data-theme="dark"] {
-      --bg-dark: #05070c;
-      --bg-card: rgba(10, 15, 28, 0.98);
-      --border-glass: rgba(255, 255, 255, 0.08);
+      --bg-dark: #04060a;
+      --bg-card: rgba(11, 17, 32, 0.95);
+      --border-glass: rgba(255, 255, 255, 0.12);
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
       --danger: #dc2626;
@@ -26,17 +26,18 @@
       --purple: #7c3aed;
       --pink: #db2777;
       --text: #f8fafc;
-      --text-muted: #64748b;
+      --text-muted: #94a3b8;
       --sq-light: #94a3b8;
       --sq-dark: #1e293b;
-      --sq-highlight: rgba(37, 99, 235, 0.7);
+      --sq-highlight: rgba(37, 99, 235, 0.8);
       --sq-guide: rgba(22, 163, 74, 0.9);
-      --shading-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+      --shading-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+      --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.8), 0 0 1px 1px rgba(255,255,255,0.08);
     }
     :root[data-theme="light"] {
-      --bg-dark: #f8fafc;
-      --bg-card: rgba(255, 255, 255, 0.98);
-      --border-glass: rgba(0, 0, 0, 0.08);
+      --bg-dark: #f1f5f9;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --border-glass: rgba(0, 0, 0, 0.12);
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
       --danger: #dc2626;
@@ -48,122 +49,124 @@
       --text-muted: #64748b;
       --sq-light: #cbd5e1;
       --sq-dark: #475569;
-      --sq-highlight: rgba(37, 99, 235, 0.7);
+      --sq-highlight: rgba(37, 99, 235, 0.8);
       --sq-guide: rgba(22, 163, 74, 0.9);
-      --shading-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      --shading-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.15), 0 0 1px 1px rgba(0,0,0,0.08);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
     body { background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+    /* SPLASH FAST MAX 2.5s */
     #splashScreen {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #05070c; z-index: 99999;
+      background: #04060a; z-index: 99999;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
     }
     .loader-spinner {
-      width: 48px; height: 48px; border: 4px solid rgba(37,99,235,0.2);
+      width: 44px; height: 44px; border: 4px solid rgba(37,99,235,0.2);
       border-top-color: #2563eb; border-radius: 50%;
-      animation: spin 0.7s linear infinite; margin-bottom: 16px;
+      animation: spin 0.6s linear infinite; margin-bottom: 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    header { background: var(--bg-card); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shading-shadow); }
+    header { background: var(--bg-card); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--card-shadow); }
     .header-left { display: flex; align-items: center; gap: 14px; }
-    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; }
+    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; box-shadow: var(--shading-3d); transition: 0.15s; }
     .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
     .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px; }
-    .role-owner { background: rgba(217, 119, 6, 0.15); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); }
-    .role-admin { background: rgba(37, 99, 235, 0.15); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.3); }
-    .role-vip { background: rgba(219, 39, 119, 0.15); color: #db2777; border: 1px solid rgba(219, 39, 119, 0.3); }
-    .role-semivip { background: rgba(124, 58, 237, 0.15); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.3); }
-    .role-member { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border: 1px solid var(--border-glass); }
+    /* LIVE REAL-TIME CLOCK BADGE */
+    .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 5px 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 8px; color: #60a5fa; font-weight: 600; box-shadow: var(--shading-3d); }
 
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 14px; width: 290px; box-shadow: var(--shading-shadow); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px; box-shadow: var(--shading-3d); }
+    .role-owner { background: rgba(217, 119, 6, 0.2); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.4); }
+    .role-admin { background: rgba(37, 99, 235, 0.2); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.4); }
+    .role-vip { background: rgba(219, 39, 119, 0.2); color: #db2777; border: 1px solid rgba(219, 39, 119, 0.4); }
+    .role-semivip { background: rgba(124, 58, 237, 0.2); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.4); }
+    .role-member { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); border: 1px solid var(--border-glass); }
+
+    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(28px); border: 1px solid var(--border-glass); border-radius: 16px; width: 300px; box-shadow: var(--shading-3d); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
     .dropdown-menu.show { display: flex; }
     .dropdown-item { padding: 12px 16px; font-size: 0.85rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.12s; }
-    .dropdown-item:hover { background: rgba(37, 99, 235, 0.1); color: #3b82f6; }
+    .dropdown-item:hover { background: rgba(37, 99, 235, 0.15); color: #3b82f6; }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shading-3d); transition: 0.15s; }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
     .btn-danger { background: var(--danger); }
     .btn-success { background: var(--success); }
     .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
     .btn-purple { background: var(--purple); color: white; }
     .btn-pink { background: var(--pink); color: white; }
-    .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
+    .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 9px; }
 
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); padding: 28px; border-radius: 20px; width: 90%; box-shadow: var(--shading-shadow); }
+    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 24px; width: 90%; box-shadow: var(--shading-3d); }
     .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.35rem; font-weight: 700; }
     .input-group { margin-bottom: 14px; }
     .input-group label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-    .input-group input, .input-group select { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text); outline: none; font-size: 0.88rem; }
+    .input-group input, .input-group select { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text); outline: none; font-size: 0.88rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
 
     .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1120px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
     @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
 
     .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-    .status-bar { width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-glass); box-shadow: var(--shading-shadow); }
+    .status-bar { width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: var(--shading-3d); }
     
-    .board-wrapper { width: 100%; max-width: 460px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.4)); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 4px solid #0f172a; border-radius: 14px; overflow: hidden; background: #0f172a; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+    .board-wrapper { width: 100%; max-width: 460px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #0b1120; border-radius: 18px; overflow: hidden; background: #0b1120; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), var(--shading-3d); }
     
     .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; }
-    .square.light { background: var(--sq-light); }
-    .square.dark { background: var(--sq-dark); }
+    .square.light { background: var(--sq-light); box-shadow: inset 0 0 10px rgba(0,0,0,0.15); }
+    .square.dark { background: var(--sq-dark); box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
     .square.highlight { background: var(--sq-highlight) !important; }
-    .square.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 8px var(--sq-guide); z-index: 10; }
-    .square svg { width: 82%; height: 82%; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4)); }
+    .square.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 10px var(--sq-guide); z-index: 10; }
+    .square svg { width: 84%; height: 84%; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
 
-    .coord-file, .coord-rank { position: absolute; font-size: 0.55rem; font-weight: 700; pointer-events: none; opacity: 0.5; z-index: 5; font-family: 'JetBrains Mono', monospace; }
+    .coord-file, .coord-rank { position: absolute; font-size: 0.55rem; font-weight: 700; pointer-events: none; opacity: 0.6; z-index: 5; font-family: 'JetBrains Mono', monospace; }
     .coord-file { bottom: 2px; right: 4px; }
     .coord-rank { top: 2px; left: 4px; }
 
-    .panel { background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shading-shadow); }
+    .panel { background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shading-3d); }
     
-    .audio-player { background: rgba(0,0,0,0.1); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; }
+    .audio-player { background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); border-radius: 14px; padding: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
     .track-list { max-height: 100px; overflow-y: auto; margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 7px 10px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); transition: 0.1s; }
-    .track-item.active { background: rgba(37,99,235,0.2); color: #3b82f6; font-weight: 600; }
+    .track-item { padding: 7px 10px; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); transition: 0.1s; }
+    .track-item.active { background: rgba(37,99,235,0.25); color: #3b82f6; font-weight: 600; box-shadow: var(--shading-3d); }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 20px; padding: 22px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shading-shadow); }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shading-3d); }
     
-    .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 14px; border: 1px solid var(--border-glass); }
-    .chibi-avatar { width: 75px; height: 75px; border-radius: 50%; background: #0f172a; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #2563eb; overflow: hidden; box-shadow: 0 0 15px rgba(37,99,235,0.4); }
+    .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--border-glass); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0b1120; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #2563eb; overflow: hidden; box-shadow: 0 0 20px rgba(37,99,235,0.5), var(--shading-3d); }
     .chibi-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .dialog-box { font-size: 0.86rem; line-height: 1.4; color: var(--text); }
     .dialog-speaker { font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
 
-    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--purple); padding: 12px 18px; border-radius: 14px; box-shadow: var(--shading-shadow); z-index: 500; display: none; max-width: 440px; width: 90%; align-items: center; gap: 12px; }
+    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--purple); padding: 12px 18px; border-radius: 16px; box-shadow: var(--shading-3d); z-index: 500; display: none; max-width: 440px; width: 90%; align-items: center; gap: 12px; }
     
     .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.82rem; }
-    .leaderboard-table th, .leaderboard-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border-glass); }
+    .leaderboard-table th, .leaderboard-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border-glass); }
     .leaderboard-table th { color: var(--text-muted); font-weight: 600; }
 
-    .global-chat-box { height: 180px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; padding: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-    .chat-msg { line-height: 1.3; }
+    .global-chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
+    .chat-msg { line-height: 1.4; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-glass); }
     .chat-msg b { color: #60a5fa; }
 
-    .owner-audit-box { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 10px; padding: 10px; font-size: 0.78rem; max-height: 120px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
-
-    /* REWARDED AD OVERLAY */
-    #adModal { z-index: 9999; }
-    .ad-banner { background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px; }
+    .owner-audit-box { background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(220, 38, 38, 0.35); border-radius: 12px; padding: 12px; font-size: 0.78rem; max-height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
 
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; }
+    footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; box-shadow: var(--card-shadow); }
   </style>
 </head>
 <body>
 
+  <!-- SPLASH FAST MAX 2.5s -->
   <div id="splashScreen">
     <div class="loader-spinner"></div>
-    <div style="font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; color: #3b82f6;">AXAC CHESS ENTERPRISE</div>
-    <div style="font-size: 0.78rem; color: #64748b; margin-top: 6px;">Menyiapkan Global Chat & Magnus AI Engine...</div>
+    <div style="font-weight: 700; font-size: 1.2rem; letter-spacing: 2px; color: #3b82f6;">AXAC CHESS APEX</div>
+    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Menginisialisasi Engine 3D & AI Guard...</div>
   </div>
 
   <header>
@@ -171,10 +174,11 @@
       <button class="menu-btn" onclick="toggleMenu()" title="Menu">
         <span></span><span></span><span></span>
       </button>
-      <div class="brand">AXAC ENTERPRISE</div>
+      <div class="brand">AXAC 3D</div>
     </div>
     
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="liveClockBadge" class="live-clock-badge">--/--/---- --:--:--</div>
       <button class="btn btn-sm" style="background: var(--border-glass); color: var(--text);" onclick="toggleTheme()" title="Tema">🌓</button>
       <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 8px;">
         <span style="font-weight: 600; font-size: 0.82rem;">
@@ -189,7 +193,7 @@
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
       <div class="dropdown-item" style="color: #a78bfa;" onclick="openStoryMode()">📖 Story Mode (50 Stages)</div>
       <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus Carlsen (<span id="magnusCount">3</span> Sisa)</div>
-      <div class="dropdown-item" style="color: #3b82f6;" onclick="openModal('globalChatModal')">💬 Global Chat & Ruang Diskusi</div>
+      <div class="dropdown-item" style="color: #3b82f6;" onclick="openModal('globalChatModal')">💬 Global Chat & Undangan Tanding</div>
       <div class="dropdown-item" style="color: #db2777;" onclick="openModal('upgradeModal')">⭐ Upgrade Role (Semi-VIP / VIP)</div>
       <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media & Musik</div>
       <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil Akun</div>
@@ -201,7 +205,7 @@
 
   <!-- Auth Screen -->
   <div id="authScreen" class="auth-container">
-    <h2>Masuk AXAC Enterprise</h2>
+    <h2>Masuk AXAC 3D Apex</h2>
     <div class="input-group">
       <label>Username</label>
       <input type="text" id="authUser" placeholder="Username" autocomplete="off">
@@ -228,7 +232,7 @@
       <div style="display: flex; gap: 8px; width: 100%; max-width: 460px; margin-top: 4px; flex-wrap: wrap;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
         <button class="btn btn-purple" style="flex: 1;" onclick="askMagnusAdvice()">💡 Tanya (<span id="magnusBtnCount">3</span>)</button>
-        <button id="ownerInstantWinBtn" class="btn btn-warning hidden" style="flex: 1;" onclick="ownerInstantWin()">⚡ Instant Win</button>
+        <button id="ownerInstantWinBtn" class="btn btn-warning hidden" style="flex: 1;" onclick="ownerInstantWin()">⚡ Instant Win (+10)</button>
         <button class="btn" id="stopAiBtn" style="flex: 1; background: var(--border-glass); color: var(--text);" onclick="stopAI()">Hentikan AI</button>
       </div>
     </div>
@@ -256,7 +260,7 @@
       </div>
 
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.82rem;">Playlist Musik Pilihan</h4>
+        <h4 style="margin-bottom: 6px; font-size: 0.82rem;">Playlist Musik (Bass-Boosted)</h4>
         <audio id="bgAudio" controls style="width: 100%; height: 32px; border-radius: 8px; margin-bottom: 6px;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
@@ -272,7 +276,7 @@
     <button class="btn btn-sm btn-purple" onclick="closeToast()">Tutup</button>
   </div>
 
-  <footer>AXAC CHESS ENTERPRISE • SECURE P2P SENTINEL</footer>
+  <footer>AXAC CHESS APEX 3D • ULTRA GUARD SENTINEL</footer>
 
   <!-- Modal Story -->
   <div id="storyModal" class="modal-overlay">
@@ -322,7 +326,7 @@
   <div id="adModal" class="modal-overlay">
     <div class="modal" style="text-align: center;">
       <h3 style="margin-bottom: 10px; color: var(--warning);">📺 Promosi & Iklan Berdurasi 10 Detik</h3>
-      <div class="ad-banner">
+      <div style="background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px; box-shadow: var(--shading-3d);">
         <h4 style="margin-bottom: 6px;">Ingin Akses Fitur Eksklusif & Bebas Limit?</h4>
         <p style="font-size: 0.82rem; margin-bottom: 10px;">Upgrade akunmu ke Semi-VIP atau VIP sekarang untuk membuka fitur premium catur tanpa batas!</p>
         <div id="adTimer" style="font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;">10</div>
@@ -334,12 +338,13 @@
   <!-- Global Chat Modal -->
   <div id="globalChatModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">💬 Global Chat & Diskusi</h3>
+      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">💬 Global Chat & Undangan Tanding Real-Time</h3>
       <div id="globalChatContainer" class="global-chat-box"></div>
-      <div style="display: flex; gap: 6px;">
-        <input type="text" id="chatInputMsg" placeholder="Tulis pesan..." style="flex: 1; padding: 9px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text); font-size: 0.85rem;" autocomplete="off">
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <input type="text" id="chatInputMsg" placeholder="Tulis pesan..." style="flex: 1; padding: 9px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text); font-size: 0.85rem;" autocomplete="off">
         <button class="btn btn-sm btn-success" onclick="sendGlobalChat()">Kirim</button>
       </div>
+      <button class="btn btn-sm btn-purple" style="width: 100%;" onclick="sendMatchChallenge()">⚔️ Broadcast Undangan Tanding Real-Time</button>
       <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
         <button class="btn btn-sm" onclick="closeModal('globalChatModal')">Tutup</button>
       </div>
@@ -371,10 +376,10 @@
     </div>
   </div>
 
-  <!-- Modal Leaderboard -->
+  <!-- Modal Leaderboard (Optimized) -->
   <div id="leaderboardModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🏆 Leaderboard Global</h3>
+      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🏆 Leaderboard Global (Optimized)</h3>
       <div id="leaderboardContent"></div>
       <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
         <button class="btn btn-sm" onclick="closeModal('leaderboardModal')">Tutup</button>
@@ -412,22 +417,22 @@
     </div>
   </div>
 
-  <!-- Modal Panel Owner Supreme -->
+  <!-- Modal Panel Owner Supreme (+10 Instan & Waktu) -->
   <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem; color: var(--warning);">👑 Panel Owner Supreme & AI Guard Audit</h3>
+      <h3 style="margin-bottom: 10px; font-size: 1.05rem; color: var(--warning);">👑 Panel Owner Supreme & AI Guard Sentinel</h3>
       <div class="input-group">
         <label>Username Target</label>
         <input type="text" id="ownerTargetUser" placeholder="Masukkan username">
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-        <button class="btn btn-warning btn-sm" onclick="executeOwnerAction('autowin')">⚡ Berikan Auto Win (+10)</button>
+        <button class="btn btn-warning btn-sm" onclick="ownerInstantWin()">⚡ Instant Win (+10 Kemenangan & Waktu Instan)</button>
         <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban / Unban Akun</button>
         <button class="btn btn-purple btn-sm" onclick="executeOwnerAction('promote_admin')">⭐ Jadikan Admin</button>
         <button class="btn btn-pink btn-sm" onclick="executeOwnerAction('promote_vip')">💎 Jadikan VIP</button>
       </div>
-      <h4 style="font-size: 0.82rem; margin-bottom: 4px; color: var(--danger);">🚨 AI Guard Violation Log (Real-Time):</h4>
-      <div id="ownerAuditLogBox" class="owner-audit-box">Memuat log pelanggaran...</div>
+      <h4 style="font-size: 0.82rem; margin-bottom: 4px; color: var(--danger);">🚨 AI Guard Real-Time Neutralization Log:</h4>
+      <div id="ownerAuditLogBox" class="owner-audit-box">AI Guard aktif. Tidak ada anomali terdeteksi.</div>
       <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
         <button class="btn btn-sm" onclick="closeModal('ownerControlModal')">Tutup</button>
       </div>
@@ -462,31 +467,46 @@
     K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>'
   };
 
-  // PLAYLIST MUSIK STABIL (TERRANOVA DIPERBAIKI KE LINK DIRECT VALID)
   let TRACKS = [
-    { name: "Merry Christmas Please Dont Call", url: "https://files.catbox.moe/qaz1xd.mp3" },
-    { name: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" },
-    { name: "Terranova (Fixed)", url: "https://files.catbox.moe/f01dyl.mp3" }
+    { name: "Merry Christmas Please Dont Call (Bass)", url: "https://files.catbox.moe/qaz1xd.mp3" },
+    { name: "Medusa (Bass Enhanced)", url: "https://files.catbox.moe/h9cyas.mp3" },
+    { name: "Terranova (Bass Boosted)", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  // FOTO MAGNUS CARLSEN ASLI (CHESS.COM CDN) & AVATAR CHARACTER STORY
-  function getCharacterPngUrl(seed) {
+  // AI STORY PORTRAITS MATCHED TO CHARACTER / STAGE CLASSES
+  function getCharacterPngUrl(seedOrName) {
+    if(typeof seedOrName === 'string') {
+      let lower = seedOrName.toLowerCase();
+      if(lower.includes('knight') || lower.includes('kuda') || lower.includes('paladin')) return "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=150&auto=format&fit=crop&q=80";
+      if(lower.includes('hacker') || lower.includes('cyber') || lower.includes('anon')) return "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150&auto=format&fit=crop&q=80";
+      if(lower.includes('king') || lower.includes('lord') || lower.includes('grandmaster')) return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
+      if(lower.includes('queen') || lower.includes('empress')) return "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80";
+    }
     const avatars = [
-      "https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=150&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150&auto=format&fit=crop&q=80"
     ];
-    return avatars[seed % avatars.length];
+    let idx = typeof seedOrName === 'number' ? seedOrName : 0;
+    return avatars[idx % avatars.length];
   }
 
   const STORY_STAGES = [];
+  const customStageNames = [
+    "Budi (Rook Recruit)", "Joko (Pawn Guardian)", "Siska (Knight Scout)", "Rian (Cyber Hacker)", "Coach Hendra",
+    "Beni (Street Tactician)", "Deni (King's Gambit Master)", "Kiki (Paladin Guard)", "Alex (Grandmaster AI)", "Pak Broto (Grandmaster Legend)",
+    "Vino (Neural Hacker)", "Dewi (Tactical Queen)", "Guntur (Cyber Titan)", "Reza (Shadow Knight)", "GM Aris",
+    "IM Leo", "Super GM Viktor", "The Challenger X", "Cyber Paladin", "Grandmaster Magnus"
+  ];
+
   for(let i=1; i<=50; i++) {
+    let name = customStageNames[i-1] || `Grandmaster Cyber Knight #${i}`;
     STORY_STAGES.push({
       stage: i,
-      name: `Grandmaster AI #${i}`,
+      name: name,
       difficulty: i <= 15 ? 'ai-easy' : i <= 30 ? 'ai-medium' : i <= 42 ? 'ai-hard' : 'ai-god',
-      dialogs: { intro: `Stage ${i} dimulai. Hadapi Magnus & AI Guard kami!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol.` }
+      dialogs: { intro: `Stage ${i} (${name}) dimulai. Buktikan kemampuan strategimu!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol oleh ${name}.` }
     });
   }
 
@@ -502,6 +522,7 @@
   let playerColor = 'w';
   let aiTimeout = null;
   let deferredPrompt = null;
+  let audioCtx = null, audioSource = null;
 
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
   function triggerPwaInstall() {
@@ -516,25 +537,47 @@
     localStorage.setItem('axac_theme', t);
   }
 
-  // AI GUARD REAL-TIME TAB-SWITCH DETECTOR
+  // REAL-TIME CLOCK UPDATER
+  function updateRealTimeClock() {
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    
+    let dayName = days[now.getDay()];
+    let dateNum = now.getDate();
+    let monthName = months[now.getMonth()];
+    let yearNum = now.getFullYear();
+    
+    let hours = String(now.getHours()).padStart(2, '0');
+    let mins = String(now.getMinutes()).padStart(2, '0');
+    let secs = String(now.getSeconds()).padStart(2, '0');
+
+    let badge = document.getElementById('liveClockBadge');
+    if(badge) {
+      badge.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} | ${hours}:${mins}:${secs}`;
+    }
+  }
+  setInterval(updateRealTimeClock, 1000);
+
+  // ADVANCED AI GUARD SENTINEL (REAL-TIME ANOMALY NEUTRALIZATION)
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && currentUser && currentRole !== 'owner' && currentRole !== 'admin') {
-      logViolation(currentUser, "Keluar dari web / Pindah Tab saat pertandingan aktif");
-      alert("🚨 [AI GUARD APEX]: Peringatan! Anda terdeteksi keluar dari web/tab pertandingan! Pelanggaran dicatat dan dilaporkan otomatis ke Owner.");
+      logAiGuardViolation(currentUser, "Anomali Tab-Switch: Keluar dari web saat pertandingan aktif");
+      alert("🚨 [AI GUARD APEX SENTINEL]: Anomali terdeteksi! Keluar dari tab permainan langsung dinutralisasi dan dilaporkan real-time ke Owner.");
     }
   });
 
   window.addEventListener("blur", () => {
     if (currentUser && currentRole !== 'owner' && currentRole !== 'admin') {
-      logViolation(currentUser, "Kehilangan fokus jendela / Minimasi browser");
+      logAiGuardViolation(currentUser, "Anomali Fokus: Minimasi atau kehilangan fokus jendela aktif");
     }
   });
 
-  function logViolation(user, reason) {
-    let logs = JSON.parse(localStorage.getItem('axac_violations') || '[]');
+  function logAiGuardViolation(user, reason) {
+    let logs = JSON.parse(localStorage.getItem('axac_ai_guard_logs') || '[]');
     logs.unshift({ user: user, time: new Date().toLocaleTimeString(), reason: reason });
     if(logs.length > 50) logs.pop();
-    localStorage.setItem('axac_violations', JSON.stringify(logs));
+    localStorage.setItem('axac_ai_guard_logs', JSON.stringify(logs));
   }
 
   function initApp() {
@@ -551,6 +594,7 @@
       game = new Chess();
       setupAudioPlayer();
       loadGlobalChat();
+      updateRealTimeClock();
 
       let savedUser = localStorage.getItem('axac_active_user');
       let savedRole = localStorage.getItem('axac_active_role');
@@ -573,14 +617,15 @@
         }
       }
 
+      // SPLASH FAST MAX 2.5s
       setTimeout(() => {
         let splash = document.getElementById('splashScreen');
-        if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 400); }
-      }, 500);
+        if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 300); }
+      }, 1500);
     } catch(e) { console.error(e); }
   }
 
-  // GLOBAL CHAT SYSTEM
+  // GLOBAL CHAT & REAL-TIME MATCH INVITE SYSTEM
   function sendGlobalChat() {
     let input = document.getElementById('chatInputMsg');
     let text = input.value.trim();
@@ -593,20 +638,40 @@
     loadGlobalChat();
   }
 
+  function sendMatchChallenge() {
+    if(!currentUser) return;
+    let challengeText = `⚔️ ${currentUser} Mengajak tanding catur secara real-time! Klik untuk terima tantangan.`;
+    let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
+    chats.push({ user: currentUser, role: currentRole, text: challengeText, isChallenge: true, peerId: (peer ? peer.id : ''), time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+    localStorage.setItem('axac_global_chats', JSON.stringify(chats));
+    loadGlobalChat();
+    alert('Undangan tanding berhasil dibroadcast ke Global Chat!');
+  }
+
   function loadGlobalChat() {
     let box = document.getElementById('globalChatContainer');
     if(!box) return;
     let chats = JSON.parse(localStorage.getItem('axac_global_chats') || '[]');
     let html = '';
     if(chats.length === 0) {
-      html = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi global!</div>';
+      html = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi atau undang tanding!</div>';
     } else {
       chats.forEach(c => {
-        html += `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.user}</b> <span style="font-size:0.7rem; color:var(--text-muted);">${c.time}</span><br>${c.text}</div>`;
+        let actionBtn = c.isChallenge && c.user !== currentUser ? `<br><button class="btn btn-sm btn-success" style="margin-top:4px;" onclick="acceptChallenge('${c.peerId}')">Terima Tanding</button>` : '';
+        html += `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.user}</b> <span style="font-size:0.7rem; color:var(--text-muted);">${c.time}</span><br>${c.text} ${actionBtn}</div>`;
       });
     }
     box.innerHTML = html;
     box.scrollTop = box.scrollHeight;
+  }
+
+  function acceptChallenge(targetPeerId) {
+    if(!targetPeerId) return alert('ID Peer lawan tidak valid.');
+    document.getElementById('modeSelect').value = 'online';
+    changeMode();
+    document.getElementById('targetPeerId').value = targetPeerId;
+    connectToPeer();
+    closeModal('globalChatModal');
   }
 
   // REWARDED AD PROMOTION FOR MAGNUS USAGE (+1)
@@ -645,7 +710,7 @@
     if(currentStoryIndex >= STORY_STAGES.length) currentStoryIndex = 0;
     let stage = STORY_STAGES[currentStoryIndex];
     document.getElementById('storyStageTitle').innerText = `📖 Story Stage ${stage.stage}/50`;
-    document.getElementById('storyAvatarContainer').innerHTML = `<img src="${getCharacterPngUrl(stage.stage)}">`;
+    document.getElementById('storyAvatarContainer').innerHTML = `<img src="${getCharacterPngUrl(stage.name)}">`;
     document.getElementById('storySpeaker').innerText = stage.name;
     document.getElementById('storyDialogText').innerText = stage.dialogs.intro;
     document.getElementById('storyModal').style.display = 'flex';
@@ -664,14 +729,21 @@
     let t = document.getElementById('inGameToast');
     document.getElementById('toastSpeaker').innerText = speaker;
     document.getElementById('toastText').innerText = text;
-    document.getElementById('toastAvatar').innerHTML = `<img src="${getCharacterPngUrl(seed || 1)}">`;
+    document.getElementById('toastAvatar').innerHTML = `<img src="${getCharacterPngUrl(speaker)}">`;
     t.style.display = 'flex';
   }
   function closeToast() { document.getElementById('inGameToast').style.display = 'none'; }
 
+  // OWNER INSTANT WIN (+10 KEMENANGAN & WAKTU / LEADERBOARD UPDATE INSTAN)
   function ownerInstantWin() {
     if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
-    handleMatchWin(true);
+    let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
+    if(users[currentUser]) {
+      users[currentUser].wins = (users[currentUser].wins || 0) + 10;
+      localStorage.setItem('axac_users', JSON.stringify(users));
+    }
+    alert('⚡ [OWNER SUPREME]: +10 Kemenangan instan dan pencatatan waktu leaderboard diperbarui secara real-time!');
+    initGame();
   }
 
   function handleMatchWin(isWin) {
@@ -698,6 +770,7 @@
     });
   }
 
+  // AUDIO BASS-BOOSTED SETUP (WITHOUT CHANGING TRACKS)
   function setupAudioPlayer() {
     let audio = document.getElementById('bgAudio');
     let list = document.getElementById('trackList');
@@ -707,17 +780,39 @@
       let div = document.createElement('div');
       div.className = `track-item ${idx===0?'active':''}`;
       div.innerHTML = `<span>🎵 ${tr.name}</span>`;
-      div.onclick = () => { audio.src = tr.url; audio.play().catch(()=>{}); document.querySelectorAll('.track-item').forEach(el=>el.classList.remove('active')); div.classList.add('active'); };
+      div.onclick = () => {
+        audio.src = tr.url;
+        audio.play().catch(()=>{});
+        document.querySelectorAll('.track-item').forEach(el=>el.classList.remove('active'));
+        div.classList.add('active');
+        initBassBoost(audio);
+      };
       list.appendChild(div);
     });
     if(TRACKS.length > 0) audio.src = TRACKS[0].url;
+  }
+
+  function initBassBoost(audioElement) {
+    try {
+      if(!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioSource = audioCtx.createMediaElementSource(audioElement);
+        let bassFilter = audioCtx.createBiquadFilter();
+        bassFilter.type = 'lowshelf';
+        bassFilter.frequency.setValueAtTime(200, audioCtx.currentTime);
+        bassFilter.gain.setValueAtTime(12, audioCtx.currentTime); // Bass boost +12dB
+        audioSource.connect(bassFilter);
+        bassFilter.connect(audioCtx.destination);
+      }
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(e) {}
   }
 
   function saveCustomMedia() {
     let bg = document.getElementById('bgUrlInput').value.trim();
     let music = document.getElementById('musicUrlInput').value.trim();
     if(bg) { localStorage.setItem('axac_custom_bg', bg); document.body.style.backgroundImage = `url('${bg}')`; document.body.style.backgroundSize = 'cover'; }
-    if(music) { TRACKS.push({ name: "Custom Track", url: music }); setupAudioPlayer(); }
+    if(music) { TRACKS.push({ name: "Custom Track (Bass Boosted)", url: music }); setupAudioPlayer(); }
     alert('Disimpan!'); closeModal('settingsModal');
   }
 
@@ -753,8 +848,7 @@
     let tUser = document.getElementById('ownerTargetUser').value.trim();
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
     if(!users[tUser]) return alert('User tidak ditemukan.');
-    if(type === 'autowin') users[tUser].wins = (users[tUser].wins || 0) + 10;
-    else if(type === 'ban') users[tUser].banned = !users[tUser].banned;
+    if(type === 'ban') users[tUser].banned = !users[tUser].banned;
     else if(type === 'promote_admin') users[tUser].role = 'admin';
     else if(type === 'promote_vip') users[tUser].role = 'vip';
     localStorage.setItem('axac_users', JSON.stringify(users));
@@ -762,9 +856,9 @@
   }
 
   function renderOwnerLogs() {
-    let logs = JSON.parse(localStorage.getItem('axac_violations') || '[]');
-    let html = logs.length === 0 ? 'Tidak ada pelanggaran tercatat.' : '';
-    logs.forEach(l => { html += `[${l.time}] User: ${l.user} -> ${l.reason}<br>`; });
+    let logs = JSON.parse(localStorage.getItem('axac_ai_guard_logs') || '[]');
+    let html = logs.length === 0 ? 'AI Guard aktif. Tidak ada anomali terdeteksi.' : '';
+    logs.forEach(l => { html += `[${l.time}] User: ${l.user} -> ${l.reason} (Neutralized)<br>`; });
     document.getElementById('ownerAuditLogBox').innerHTML = html;
   }
 
@@ -795,12 +889,15 @@
     document.getElementById('profileInfoContent').innerHTML = `Username: <b style="color:#3b82f6">${currentUser}</b><br>Role: <span class="role-badge role-${currentRole}">${currentRole}</span><br>Menang: ${currentRole==='owner'?'∞':d.wins}<br>Sisa Magnus: ${currentRole==='vip'||currentRole==='owner'?'∞':magnusUsesLeft}`;
   }
 
+  // OPTIMIZED LEADERBOARD GLOBAL
   function renderLeaderboard() {
     let users = JSON.parse(localStorage.getItem('axac_users') || '{}');
-    let html = `<table class="leaderboard-table"><tr><th>User</th><th>Role</th><th>Wins</th></tr>`;
-    Object.keys(users).forEach(u => {
-      if(users[u].banned) return;
-      html += `<tr><td><b>${u}</b></td><td><span class="role-badge role-${users[u].role}">${users[u].role}</span></td><td style="color:#3b82f6">${users[u].role==='owner'?'∞':(users[u].wins||0)}</td></tr>`;
+    let sorted = Object.keys(users).sort((a,b) => (users[b].wins || 0) - (users[a].wins || 0));
+    let html = `<table class="leaderboard-table"><tr><th>Rank</th><th>User</th><th>Role</th><th>Wins</th></tr>`;
+    sorted.forEach((u, idx) => {
+      let data = users[u];
+      if(data.banned) return;
+      html += `<tr><td>#${idx+1}</td><td><b>${u}</b></td><td><span class="role-badge role-${data.role}">${data.role}</span></td><td style="color:#3b82f6">${data.role==='owner'?'∞':(data.wins||0)}</td></tr>`;
     });
     html += `</table>`;
     document.getElementById('leaderboardContent').innerHTML = html;
@@ -861,7 +958,7 @@
       renderBoard();
       if(move) {
         if(mode === 'online' && conn) conn.send({ type: 'MOVE', move: move });
-        else if(mode.startsWith('ai') && !game.game_over()) aiTimeout = setTimeout(makeAIMove, 20);
+        else if(mode.startsWith('ai') && !game.game_over()) aiTimeout = setTimeout(makeAIMove, 15);
       } else {
         let p = game.get(sq);
         if(p && p.color === game.turn()) {
