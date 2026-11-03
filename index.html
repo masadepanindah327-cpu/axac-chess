@@ -927,12 +927,48 @@
   }
   function setupConn() {
     if(!conn) return;
-    conn.on('open', () => { alert('Terhubung!'); initGame(); });
-    conn.on('data', d => { if(d.type === 'MOVE') { game.move(d.move); renderBoard(); } });
+    conn.on('data', d => { 
+  if(d.type === 'MOVE') { 
+    game.move(d.move); 
+    renderBoard(); 
+  } 
+  else if (d.type === 'FORCE_RESIGN') {
+    alert('🔥 Lawan menggunakan Owner God Mode! Kamu otomatis kalah.');
+    handleMatchWin(false);
+  }
+    }); 
+  }
+    } 
+} // <-- Ini penutup function setupConn() (Baris 941 lo)
+
+// FITUR INSTANT WIN (GOD MODE OWNER)
+function ownerInstantGameWin() {
+  if(currentRole !== 'owner' && currentRole !== 'admin') {
+    return alert('Akses ditolak! Fitur ini khusus Owner/Admin.');
   }
 
-  function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
-  function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
+  let mode = document.getElementById('modeSelect').value;
+  
+  if (mode === 'online') {
+    if (conn && conn.open) {
+      conn.send({ type: 'FORCE_RESIGN' });
+      alert('⚡ [OWNER GOD MODE]: Sinyal kemenangan instan dikirim ke lawan!');
+      handleMatchWin(true); 
+    } else {
+      alert('Belum terhubung ke lawan (P2P).');
+    }
+  } 
+  else if (mode.startsWith('ai')) {
+    game = new Chess();
+    game.load('rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3'); 
+    alert('⚡ [OWNER GOD MODE]: Papan di-reset ke posisi Skakmat Instan!');
+    renderBoard();
+    handleMatchWin(true);
+  }
+}
+
+function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
+function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
 </script>
 </body>
 </html>
