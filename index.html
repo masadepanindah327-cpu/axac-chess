@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex 3D Enterprise Edition (Cloud)</title>
+  <title>AXAC Chess - Apex 3D Enterprise Edition</title>
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,98 +12,137 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
     :root[data-theme="dark"] {
-      --bg-dark: #04060a; --bg-card: rgba(11, 17, 32, 0.95); --border-glass: rgba(255, 255, 255, 0.12);
-      --accent: #2563eb; --danger: #dc2626; --success: #16a34a; --warning: #d97706; --purple: #7c3aed; --pink: #db2777;
-      --text: #f8fafc; --text-muted: #94a3b8; --sq-light: #94a3b8; --sq-dark: #1e293b;
-      --sq-highlight: rgba(37, 99, 235, 0.8); --sq-guide: rgba(22, 163, 74, 0.9);
-      --shading-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
-      --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.8), 0 0 1px 1px rgba(255,255,255,0.08);
+      --bg-dark: #04060a; --bg-card: rgba(11, 17, 32, 0.85); --bg-card-hover: rgba(17, 25, 45, 0.95);
+      --border-glass: rgba(255, 255, 255, 0.08); --border-glass-highlight: rgba(255, 255, 255, 0.2);
+      --accent: #2563eb; --accent-hover: #1d4ed8; --accent-glow: rgba(37, 99, 235, 0.4);
+      --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --purple: #8b5cf6; --pink: #ec4899;
+      --text: #f8fafc; --text-muted: #94a3b8; --sq-light: #cbd5e1; --sq-dark: #334155;
+      --sq-highlight: rgba(37, 99, 235, 0.7); --sq-guide: rgba(16, 185, 129, 0.8);
+      --shadow-drop: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+      --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
     }
     :root[data-theme="light"] {
-      --bg-dark: #f1f5f9; --bg-card: rgba(255, 255, 255, 0.95); --border-glass: rgba(0, 0, 0, 0.12);
-      --text: #0f172a; --text-muted: #64748b; --sq-light: #cbd5e1; --sq-dark: #475569;
-      --shading-3d: 0 25px 50px -12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -2px 4px rgba(0,0,0,0.1);
-      --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.15), 0 0 1px 1px rgba(0,0,0,0.08);
+      --bg-dark: #e2e8f0; --bg-card: rgba(255, 255, 255, 0.85); --bg-card-hover: rgba(255, 255, 255, 0.95);
+      --border-glass: rgba(0, 0, 0, 0.08); --border-glass-highlight: rgba(0, 0, 0, 0.2);
+      --text: #0f172a; --text-muted: #64748b; --sq-light: #f1f5f9; --sq-dark: #94a3b8;
+      --shadow-drop: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+      --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 4px rgba(0, 0, 0, 0.1);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
-    body { background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-    #splashScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #04060a; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s ease; }
+    body { background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%); background-attachment: fixed; }
+
+    #splashScreen { position: fixed; inset: 0; background: #04060a; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
     #splashScreen.fade-out { opacity: 0; pointer-events: none; }
-    .loader-spinner { width: 44px; height: 44px; border: 4px solid rgba(37,99,235,0.2); border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; margin-bottom: 14px; }
+    .loader-spinner { width: 50px; height: 50px; border: 4px solid rgba(37,99,235,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 20px; box-shadow: 0 0 15px var(--accent-glow); }
     @keyframes spin { to { transform: rotate(360deg); } }
-    header { background: var(--bg-card); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--card-shadow); }
-    .header-left { display: flex; align-items: center; gap: 14px; }
-    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass); color: var(--text); width: 38px; height: 38px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; box-shadow: var(--shading-3d); }
-    .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
-    .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 5px 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 8px; color: #60a5fa; font-weight: 600; box-shadow: var(--shading-3d); }
-    .role-badge { padding: 3px 8px; border-radius: 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-left: 6px; box-shadow: var(--shading-3d); }
-    .role-owner { background: rgba(217, 119, 6, 0.2); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.4); }
-    .role-admin { background: rgba(37, 99, 235, 0.2); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.4); }
-    .role-vip { background: rgba(219, 39, 119, 0.2); color: #db2777; border: 1px solid rgba(219, 39, 119, 0.4); }
-    .role-semivip { background: rgba(124, 58, 237, 0.2); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.4); }
-    .role-member { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); border: 1px solid var(--border-glass); }
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: var(--bg-card); backdrop-filter: blur(28px); border: 1px solid var(--border-glass); border-radius: 16px; width: 300px; box-shadow: var(--shading-3d); display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+
+    header { background: var(--bg-card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-drop); }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .menu-btn { background: var(--border-glass); border: 1px solid var(--border-glass-highlight); color: var(--text); width: 40px; height: 40px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-inner); }
+    .menu-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+    .menu-btn span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
+    .brand { font-weight: 800; font-size: 1.3rem; letter-spacing: 1.5px; background: linear-gradient(135deg, #60a5fa, #2563eb, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+    .live-clock-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 10px; color: #93c5fd; font-weight: 600; box-shadow: var(--shadow-inner); }
+
+    .role-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-left: 8px; letter-spacing: 0.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .role-owner { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: 1px solid #fbbf24; }
+    .role-admin { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: 1px solid #60a5fa; }
+    .role-vip { background: linear-gradient(135deg, #ec4899, #be185d); color: #fff; border: 1px solid #f472b6; }
+    .role-semivip { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; border: 1px solid #a78bfa; }
+    .role-member { background: rgba(100, 116, 139, 0.3); color: var(--text); border: 1px solid var(--text-muted); }
+
+    .dropdown-menu { position: absolute; top: 70px; left: 20px; background: var(--bg-card); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-glass-highlight); border-radius: 18px; width: 320px; box-shadow: var(--shadow-drop); display: none; flex-direction: column; overflow: hidden; z-index: 200; transform-origin: top left; animation: scaleIn 0.2s ease-out; }
+    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .dropdown-menu.show { display: flex; }
-    .dropdown-item { padding: 12px 16px; font-size: 0.85rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.12s; }
-    .dropdown-item:hover { background: rgba(37, 99, 235, 0.15); color: #3b82f6; }
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shading-3d); transition: 0.15s; }
-    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-danger { background: var(--danger); } .btn-success { background: var(--success); } .btn-warning { background: var(--warning); color: #000; font-weight: 700; } .btn-purple { background: var(--purple); } .btn-pink { background: var(--pink); }
-    .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 9px; }
-    .auth-container { max-width: 400px; margin: 60px auto; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); padding: 30px; border-radius: 24px; width: 90%; box-shadow: var(--shading-3d); }
-    .auth-container h2 { text-align: center; margin-bottom: 20px; font-size: 1.35rem; font-weight: 700; }
-    .input-group { margin-bottom: 14px; }
-    .input-group label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-    .input-group input, .input-group select { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text); outline: none; font-size: 0.88rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-    .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1120px; margin: 20px auto; padding: 0 16px; width: 100%; flex: 1; }
+    .dropdown-item { padding: 14px 20px; font-size: 0.9rem; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border-glass); transition: 0.15s; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .dropdown-item:hover { background: var(--bg-card-hover); color: var(--accent); padding-left: 24px; }
+
+    .btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px var(--accent-glow), var(--shadow-inner); transition: 0.2s; letter-spacing: 0.3px; }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+    .btn:active { transform: translateY(0); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4), var(--shadow-inner); }
+    .btn-success { background: var(--success); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4), var(--shadow-inner); }
+    .btn-warning { background: var(--warning); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4), var(--shadow-inner); }
+    .btn-purple { background: var(--purple); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4), var(--shadow-inner); }
+    .btn-pink { background: var(--pink); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4), var(--shadow-inner); }
+    .btn-sm { padding: 8px 14px; font-size: 0.8rem; border-radius: 10px; }
+
+    .auth-container { max-width: 420px; margin: 80px auto; background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass-highlight); padding: 40px; border-radius: 28px; width: 90%; box-shadow: var(--shadow-drop); }
+    .auth-container h2 { text-align: center; margin-bottom: 28px; font-size: 1.5rem; font-weight: 800; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .input-group { margin-bottom: 18px; }
+    .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .input-group input, .input-group select { width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass-highlight); border-radius: 14px; color: var(--text); outline: none; font-size: 0.95rem; box-shadow: var(--shadow-inner); transition: 0.2s; }
+    .input-group input:focus, .input-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    .main-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
     @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
-    .board-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-    .status-bar { width: 100%; max-width: 460px; display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text); background: var(--bg-card); padding: 10px 16px; border-radius: 14px; border: 1px solid var(--border-glass); box-shadow: var(--shading-3d); }
-    .board-wrapper { width: 100%; max-width: 460px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 5px solid #0b1120; border-radius: 18px; overflow: hidden; background: #0b1120; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), var(--shading-3d); }
-    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; }
-    .square.light { background: var(--sq-light); box-shadow: inset 0 0 10px rgba(0,0,0,0.15); }
-    .square.dark { background: var(--sq-dark); box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
-    .square.highlight { background: var(--sq-highlight) !important; }
-    .square.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 10px var(--sq-guide); z-index: 10; }
-    .square svg { width: 84%; height: 84%; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
-    .coord-file, .coord-rank { position: absolute; font-size: 0.55rem; font-weight: 700; pointer-events: none; opacity: 0.6; z-index: 5; font-family: 'JetBrains Mono', monospace; }
-    .coord-file { bottom: 2px; right: 4px; } .coord-rank { top: 2px; left: 4px; }
-    .panel { background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shading-3d); }
-    .audio-player { background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); border-radius: 14px; padding: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
-    .track-list { max-height: 100px; overflow-y: auto; margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
-    .track-item { padding: 7px 10px; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); }
-    .track-item.active { background: rgba(37,99,235,0.25); color: #3b82f6; font-weight: 600; box-shadow: var(--shading-3d); }
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shading-3d); }
-    .chibi-container { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--border-glass); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0b1120; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 2px solid #2563eb; overflow: hidden; box-shadow: 0 0 20px rgba(37,99,235,0.5), var(--shading-3d); }
+
+    .board-container { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+    .status-bar { width: 100%; max-width: 500px; display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; color: var(--text); background: var(--bg-card); padding: 14px 20px; border-radius: 16px; border: 1px solid var(--border-glass); box-shadow: var(--shadow-drop), var(--shadow-inner); }
+    
+    .board-wrapper { width: 100%; max-width: 500px; aspect-ratio: 1; margin: 0 auto; filter: drop-shadow(0 25px 40px rgba(0,0,0,0.5)); }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 6px solid #0f172a; border-radius: 20px; overflow: hidden; background: #0f172a; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), var(--shadow-inner); }
+    
+    .square { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; width: 100%; height: 100%; transition: background 0.1s; }
+    .square.light { background: var(--sq-light); }
+    .square.dark { background: var(--sq-dark); }
+    .square.highlight { background: var(--sq-highlight) !important; box-shadow: inset 0 0 20px rgba(255,255,255,0.3); }
+    .square.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 15px var(--sq-guide); z-index: 10; }
+    .square svg { width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5)); transition: transform 0.1s; }
+    .square:hover svg { transform: scale(1.05); }
+
+    .coord-file, .coord-rank { position: absolute; font-size: 0.6rem; font-weight: 800; pointer-events: none; opacity: 0.5; z-index: 5; font-family: 'JetBrains Mono', monospace; }
+    .coord-file { bottom: 3px; right: 5px; }
+    .coord-rank { top: 3px; left: 5px; }
+
+    .panel { background: var(--bg-card); backdrop-filter: blur(24px); border: 1px solid var(--border-glass-highlight); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: var(--shadow-drop); }
+    
+    .audio-player { background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-inner); }
+    .track-list { max-height: 120px; overflow-y: auto; margin-top: 12px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
+    .track-list::-webkit-scrollbar { width: 4px; }
+    .track-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .track-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); background: var(--border-glass); transition: 0.2s; }
+    .track-item:hover { background: var(--bg-card-hover); color: var(--text); }
+    .track-item.active { background: rgba(37,99,235,0.2); color: #60a5fa; font-weight: 700; box-shadow: inset 0 0 10px rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border-glass-highlight); border-radius: 28px; padding: 30px; width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-drop); animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    
+    .chibi-container { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 20px; border: 1px solid var(--border-glass); box-shadow: var(--shadow-inner); }
+    .chibi-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0f172a; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 3px solid var(--accent); overflow: hidden; box-shadow: 0 0 25px var(--accent-glow); }
     .chibi-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .dialog-box { font-size: 0.86rem; line-height: 1.4; color: var(--text); }
-    .dialog-speaker { font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
-    .in-game-dialog { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--purple); padding: 12px 18px; border-radius: 16px; box-shadow: var(--shading-3d); z-index: 500; display: none; max-width: 440px; width: 90%; align-items: center; gap: 12px; }
-    .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.82rem; }
-    .leaderboard-table th, .leaderboard-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border-glass); }
-    .leaderboard-table th { color: var(--text-muted); font-weight: 600; }
-    .global-chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 12px; padding: 12px; font-size: 0.82rem; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
-    .chat-msg { line-height: 1.4; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-glass); }
+    .dialog-box { font-size: 0.9rem; line-height: 1.5; color: var(--text); }
+    .dialog-speaker { font-weight: 800; color: var(--purple); margin-bottom: 4px; font-size: 1.05rem; }
+
+    .in-game-dialog { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--purple); padding: 16px 24px; border-radius: 20px; box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3); z-index: 500; display: none; max-width: 460px; width: 90%; align-items: center; gap: 16px; animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    
+    .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+    .leaderboard-table th, .leaderboard-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-glass); }
+    .leaderboard-table th { color: var(--text-muted); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    .leaderboard-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .global-chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 16px; padding: 16px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; box-shadow: var(--shadow-inner); }
+    .chat-msg { line-height: 1.5; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border-glass); }
     .chat-msg b { color: #60a5fa; }
-    .owner-audit-box { background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(220, 38, 38, 0.35); border-radius: 12px; padding: 12px; font-size: 0.78rem; max-height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+
+    .owner-audit-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 14px; padding: 14px; font-size: 0.8rem; max-height: 160px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; margin-top: 10px; box-shadow: var(--shadow-inner); color: #fca5a5; }
     .hidden { display: none !important; }
-    footer { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; box-shadow: var(--card-shadow); }
+    footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-glass); margin-top: auto; background: var(--bg-card); font-family: 'JetBrains Mono', monospace; }
   </style>
 </head>
 <body>
 
   <div id="splashScreen">
     <div class="loader-spinner"></div>
-    <div style="font-weight: 700; font-size: 1.2rem; letter-spacing: 2px; color: #3b82f6;">AXAC CHESS APEX</div>
-    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">Menghubungkan ke Server...</div>
+    <div style="font-weight: 800; font-size: 1.4rem; letter-spacing: 2px; color: #3b82f6; text-shadow: 0 0 20px rgba(37,99,235,0.5);">AXAC CHESS APEX</div>
+    <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 8px;">Menghubungkan ke Server Cloud...</div>
   </div>
 
   <header>
@@ -114,29 +153,29 @@
       <div class="brand">AXAC 3D</div>
     </div>
     
-    <div style="display: flex; align-items: center; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
       <div id="liveClockBadge" class="live-clock-badge">--/--/---- --:--:--</div>
-      <button class="btn btn-sm" style="background: var(--border-glass); color: var(--text);" onclick="toggleTheme()" title="Tema">🌓</button>
-      <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-weight: 600; font-size: 0.82rem;">
+      <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow: none;" onclick="toggleTheme()" title="Tema">🌓</button>
+      <div id="userHeaderControls" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-weight: 700; font-size: 0.9rem; display: flex; align-items: center;">
           <span id="usernameDisplay"></span>
           <span id="roleTag" class="role-badge"></span>
         </span>
-        <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+        <button class="btn btn-sm btn-danger" style="padding: 6px 10px;" onclick="logout()">Logout</button>
       </div>
     </div>
 
     <div id="dropdownMenu" class="dropdown-menu">
       <div class="dropdown-item" onclick="switchView('game')">🎮 Main / Beranda</div>
       <div class="dropdown-item" style="color: #a78bfa;" onclick="openStoryMode()">📖 Story Mode (50 Stages)</div>
-      <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus Carlsen (<span id="magnusCount">3</span> Sisa Hari Ini)</div>
-      <div class="dropdown-item" style="color: #3b82f6;" onclick="openModal('globalChatModal')">💬 Global Chat & Undangan Tanding</div>
-      <div class="dropdown-item" style="color: #db2777;" onclick="openModal('upgradeModal')">⭐ Upgrade Role (Semi-VIP / VIP)</div>
-      <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media & Musik</div>
+      <div class="dropdown-item" style="color: #a78bfa;" onclick="openModal('magnusModal')">🎓 Pelatih Magnus (<span id="magnusCount">3</span> Sisa)</div>
+      <div class="dropdown-item" style="color: #3b82f6;" onclick="openModal('globalChatModal')">💬 Global Chat & Tanding</div>
+      <div class="dropdown-item" style="color: #ec4899;" onclick="openModal('upgradeModal')">⭐ Upgrade Role (VIP)</div>
+      <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Pengaturan Media</div>
       <div class="dropdown-item" onclick="openModal('profileModal')">👤 Profil Akun</div>
       <div class="dropdown-item" onclick="openModal('leaderboardModal')">🏆 Leaderboard Global</div>
-      <div class="dropdown-item" style="color: #16a34a;" onclick="triggerPwaInstall()">📥 Install Aplikasi (APK)</div>
-      <div id="ownerMenuOption" class="dropdown-item hidden" style="color: #d97706;" onclick="openModal('ownerControlModal')">👑 Panel Owner Supreme</div>
+      <div class="dropdown-item" style="color: #10b981;" onclick="triggerPwaInstall()">📥 Install Aplikasi (PWA)</div>
+      <div id="ownerMenuOption" class="dropdown-item hidden" style="color: #f59e0b; font-weight: bold;" onclick="openModal('ownerControlModal')">👑 Panel Owner Supreme</div>
     </div>
   </header>
 
@@ -144,38 +183,36 @@
     <h2>Masuk AXAC 3D Apex</h2>
     <div class="input-group">
       <label>Username</label>
-      <input type="text" id="authUser" placeholder="Username" autocomplete="off">
+      <input type="text" id="authUser" placeholder="Masukkan username" autocomplete="off">
     </div>
     <div class="input-group">
       <label>Password</label>
-      <input type="password" id="authPass" placeholder="Password" autocomplete="new-password">
+      <input type="password" id="authPass" placeholder="Masukkan password" autocomplete="new-password">
     </div>
-    <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="handleAuth(false)">Login</button>
-    <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass); color: var(--text);" onclick="handleAuth(true)">Daftar Akun Member Baru</button>
+    <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="handleAuth(false)">Login ke Sistem</button>
+    <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-glass-highlight); color: var(--text); box-shadow: none;" onclick="handleAuth(true)">Daftar Akun Baru</button>
   </div>
 
   <div id="gameScreen" class="main-layout hidden">
     <div class="board-container">
       <div class="status-bar" id="playerInfoTop">Lawan: -</div>
-      
       <div class="board-wrapper">
         <div id="chessboard" class="board"></div>
       </div>
-
       <div class="status-bar" id="playerInfoBottom">Kamu: -</div>
       
-      <div style="display: flex; gap: 8px; width: 100%; max-width: 460px; margin-top: 4px; flex-wrap: wrap;">
+      <div style="display: flex; gap: 10px; width: 100%; max-width: 500px; margin-top: 8px; flex-wrap: wrap;">
         <button class="btn btn-danger" style="flex: 1;" onclick="confirmResign()">Nyerah</button>
         <button class="btn btn-purple" style="flex: 1;" onclick="askMagnusAdvice()">💡 Tanya (<span id="magnusBtnCount">3</span>)</button>
-        <button id="ownerInstantWinBtn" class="btn btn-warning hidden" style="flex: 1;" onclick="ownerInstantWin()">⚡ Instant Win (+10)</button>
-        <button class="btn" id="stopAiBtn" style="flex: 1; background: var(--border-glass); color: var(--text);" onclick="stopAI()">Hentikan AI</button>
+        <button id="ownerInstantWinBtn" class="btn btn-warning hidden" style="flex: 1; font-weight:800;" onclick="ownerInstantGameWin()">⚡ Instant Win</button>
+        <button class="btn" id="stopAiBtn" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--text); box-shadow: none;" onclick="stopAI()">Stop AI</button>
       </div>
     </div>
 
     <div class="panel">
       <div>
-        <h3 style="margin-bottom: 6px; font-size: 0.9rem; font-weight: 600;">Mode Permainan</h3>
-        <select id="modeSelect" onchange="changeMode()" class="input-group" style="margin-bottom: 0;">
+        <h3 style="margin-bottom: 10px; font-size: 0.95rem; font-weight: 700; color: var(--text-muted);">MODE PERMAINAN</h3>
+        <select id="modeSelect" onchange="changeMode()" class="input-group" style="margin-bottom: 0; font-weight: 600;">
           <option value="ai-easy">VS AI (Mudah)</option>
           <option value="ai-medium">VS AI (Sedang)</option>
           <option value="ai-hard">VS AI (Sulit)</option>
@@ -185,29 +222,29 @@
         </select>
       </div>
 
-      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 10px;">
-        <h4 style="margin-bottom: 6px; font-size: 0.82rem;">Mabar Online (P2P)</h4>
-        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">ID Kamu: <span id="myPeerId" style="color: #3b82f6; font-family: 'JetBrains Mono', monospace;">Menghubungkan...</span></div>
-        <div class="input-group" style="margin-bottom: 8px;">
+      <div id="p2pPanel" class="hidden" style="border-top: 1px solid var(--border-glass); padding-top: 16px;">
+        <h4 style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 700;">Koneksi P2P</h4>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">ID Kamu: <br><span id="myPeerId" style="color: #60a5fa; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; word-break: break-all;">Menghubungkan...</span></div>
+        <div class="input-group" style="margin-bottom: 12px;">
           <input type="text" id="targetPeerId" placeholder="Masukkan ID Lawan">
         </div>
-        <button class="btn btn-sm" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
+        <button class="btn btn-sm btn-success" style="width: 100%;" onclick="connectToPeer()">Tantang Lawan</button>
       </div>
 
       <div class="audio-player">
-        <h4 style="margin-bottom: 6px; font-size: 0.82rem;">Playlist Musik (Aktifkan Audio)</h4>
-        <button class="btn btn-sm btn-purple" style="width:100%; margin-bottom:6px;" onclick="enableAudioEngine()">🔊 Aktifkan Audio Musik</button>
-        <audio id="bgAudio" controls style="width: 100%; height: 32px; border-radius: 8px; margin-bottom: 6px;"></audio>
+        <h4 style="margin-bottom: 12px; font-size: 0.9rem; font-weight: 700;">🎵 Playlist Musik</h4>
+        <button class="btn btn-sm btn-purple" style="width:100%; margin-bottom:12px;" onclick="enableAudioEngine()">🔊 Nyalakan Audio</button>
+        <audio id="bgAudio" controls style="width: 100%; height: 36px; border-radius: 10px; margin-bottom: 12px; outline: none;"></audio>
         <div class="track-list" id="trackList"></div>
       </div>
     </div>
   </div>
 
   <div id="inGameToast" class="in-game-dialog">
-    <div id="toastAvatar" class="chibi-avatar" style="width: 42px; height: 42px;"></div>
-    <div style="flex: 1; font-size: 0.82rem; line-height: 1.4;">
-      <b id="toastSpeaker" style="color: #a78bfa;">Lawan</b>
-      <p id="toastText" style="color: var(--text-muted); margin-top: 2px;"></p>
+    <div id="toastAvatar" class="chibi-avatar" style="width: 50px; height: 50px; border-width: 2px;"></div>
+    <div style="flex: 1; font-size: 0.88rem; line-height: 1.4;">
+      <b id="toastSpeaker" style="color: #a78bfa; font-size: 1rem;">Lawan</b>
+      <p id="toastText" style="color: var(--text-muted); margin-top: 4px;"></p>
     </div>
     <button class="btn btn-sm btn-purple" onclick="closeToast()">Tutup</button>
   </div>
@@ -217,7 +254,7 @@
   <!-- Modal Story -->
   <div id="storyModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: #a78bfa;" id="storyStageTitle">📖 Story Mode</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; color: #a78bfa; font-weight: 800;" id="storyStageTitle">📖 Story Mode</h3>
       <div class="chibi-container">
         <div class="chibi-avatar" id="storyAvatarContainer"></div>
         <div class="dialog-box">
@@ -225,89 +262,88 @@
           <p id="storyDialogText">Teks cerita...</p>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass); color: var(--text);" onclick="closeModal('storyModal')">Pause</button>
-        <button class="btn btn-sm btn-success" onclick="startStoryBattle()">Mulai Pertandingan!</button>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass); color: var(--text); box-shadow: none;" onclick="closeModal('storyModal')">Tutup</button>
+        <button class="btn btn-sm btn-success" onclick="startStoryBattle()">Mulai Tanding!</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Magnus Carlsen -->
+  <!-- Modal Magnus -->
   <div id="magnusModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: #a78bfa;">🎓 Pelatih Magnus Carlsen</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; color: #a78bfa; font-weight: 800;">🎓 Pelatih Magnus</h3>
       <div class="chibi-container">
-        <div class="chibi-avatar" style="width: 60px; height: 60px;">
-          <img src="https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" alt="Magnus Carlsen">
+        <div class="chibi-avatar" style="width: 70px; height: 70px;">
+          <img src="https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" alt="Magnus">
         </div>
         <div class="dialog-box">
-          <b>Magnus Carlsen (Grandmaster AI Engine)</b>
-          <div style="font-size: 0.76rem; color: #a78bfa;">Sisa Kuota Hari Ini: <span id="magnusModalCount">3</span></div>
+          <b style="color:#fff;">Grandmaster AI</b>
+          <div style="font-size: 0.8rem; color: #a78bfa; margin-top:4px;">Sisa Kuota: <span id="magnusModalCount">3</span></div>
         </div>
       </div>
-      <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 12px; font-size: 0.84rem; line-height: 1.4; margin-bottom: 12px;">
-        <p id="magnusAdviceText">"Halo! Klik analisis untuk mendapatkan langkah terbaik."</p>
+      <div style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); border-radius: 14px; padding: 16px; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px; box-shadow: var(--shadow-inner);">
+        <p id="magnusAdviceText" style="color:#e2e8f0;">"Halo! Klik analisis untuk mendapatkan langkah terbaik."</p>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="btn btn-purple btn-sm" onclick="askMagnusAdvice()">🔍 Analisis & Pelajaran Interaktif</button>
-        <button class="btn btn-pink btn-sm" onclick="openRewardedAd()">📺 Tonton Iklan (10 Detik) + Kuota Tambahan</button>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-purple btn-sm" onclick="askMagnusAdvice()">🔍 Analisis Langkah</button>
+        <button class="btn btn-pink btn-sm" onclick="openRewardedAd()">📺 Tonton Iklan (30 Detik) + Kuota</button>
       </div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
-        <button class="btn btn-sm" onclick="closeModal('magnusModal')">Tutup</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('magnusModal')">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- Rewarded Ad Modal -->
+  <!-- Rewarded Ad Modal (30 Detik) -->
   <div id="adModal" class="modal-overlay">
     <div class="modal" style="text-align: center;">
-      <h3 style="margin-bottom: 10px; color: var(--warning);">📺 Promosi & Iklan Berdurasi 10 Detik</h3>
-      <div style="background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 14px; padding: 20px; text-align: center; color: #fff; margin-bottom: 15px;">
-        <h4 style="margin-bottom: 6px;">Ingin Akses Fitur Eksklusif & Bebas Limit?</h4>
-        <p style="font-size: 0.82rem; margin-bottom: 10px;">Upgrade akunmu ke Semi-VIP atau VIP sekarang untuk membuka fitur premium catur tanpa batas!</p>
-        <div id="adTimer" style="font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;">10</div>
+      <h3 style="margin-bottom: 16px; color: var(--warning); font-weight: 800;">📺 Iklan Promosi (30 Detik)</h3>
+      <div style="background: linear-gradient(135deg, #7c3aed, #2563eb); border-radius: 20px; padding: 30px; text-align: center; color: #fff; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(37,99,235,0.4);">
+        <h4 style="margin-bottom: 10px; font-size: 1.1rem;">Upgrade ke VIP!</h4>
+        <p style="font-size: 0.9rem; margin-bottom: 20px; opacity: 0.9;">Bebas limit, buka semua fitur eksklusif, dan nikmati pengalaman tanpa hambatan.</p>
+        <div id="adTimer" style="font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">30</div>
       </div>
-      <p id="adStatusText" style="font-size: 0.84rem; color: var(--text-muted);">Mohon tunggu iklan promosi selesai...</p>
+      <p id="adStatusText" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Mohon tunggu iklan selesai...</p>
     </div>
   </div>
 
   <!-- Global Chat Modal -->
   <div id="globalChatModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">💬 Global Chat & Undangan Tanding Real-Time</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; font-weight: 800;">💬 Global Chat</h3>
       <div id="globalChatContainer" class="global-chat-box"></div>
-      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-        <input type="text" id="chatInputMsg" placeholder="Tulis pesan..." style="flex: 1; padding: 9px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: var(--text); font-size: 0.85rem;" autocomplete="off">
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="chatInputMsg" placeholder="Tulis pesan..." style="flex: 1; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 12px; color: var(--text); font-size: 0.9rem; outline:none;" autocomplete="off">
         <button class="btn btn-sm btn-success" onclick="sendGlobalChat()">Kirim</button>
       </div>
-      <button class="btn btn-sm btn-purple" style="width: 100%;" onclick="sendMatchChallenge()">⚔️ Broadcast Undangan Tanding Real-Time</button>
-      <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-        <button class="btn btn-sm" onclick="closeModal('globalChatModal')">Tutup</button>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('globalChatModal')">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- Upgrade Role Modal -->
+  <!-- Upgrade Modal -->
   <div id="upgradeModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--pink);">⭐ Upgrade Role Akun</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Tingkatkan akunmu untuk mendapatkan kuota Magnus harian dan fitur eksklusif!</p>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; color: var(--pink); font-weight: 800;">⭐ Upgrade Akun</h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Dapatkan akses tanpa batas ke semua fitur premium.</p>
       
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
-        <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 12px;">
-          <b>Semi-VIP (Rp 5.000)</b>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Kuota Magnus 50x / hari + 20 Kuota Iklan Gratis, Custom Background & Prioritas Chat.</p>
-          <button class="btn btn-sm btn-purple" style="margin-top: 8px; width: 100%;" onclick="requestUpgrade('semivip')">Upgrade ke Semi-VIP (Rp 5k)</button>
+      <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px;">
+        <div style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-inner);">
+          <b style="font-size: 1.1rem;">Semi-VIP (Rp 5.000)</b>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; margin-bottom: 12px;">Kuota Magnus 50x/hari, bebas iklan, dan badge eksklusif.</p>
+          <button class="btn btn-sm btn-purple" style="width: 100%;" onclick="requestUpgrade('semivip')">Beli Semi-VIP</button>
         </div>
-        <div style="background: rgba(219,39,119,0.1); border: 1px solid rgba(219,39,119,0.3); border-radius: 12px; padding: 12px;">
-          <b>VIP (Rp 10.000)</b>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Kuota Magnus 100x / hari + 50 Kuota Iklan Gratis, Analisis Mendalam & Badge VIP.</p>
-          <button class="btn btn-sm btn-pink" style="margin-top: 8px; width: 100%;" onclick="requestUpgrade('vip')">Upgrade ke VIP (Rp 10k)</button>
+        <div style="background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.3); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-inner);">
+          <b style="font-size: 1.1rem;">VIP (Rp 10.000)</b>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; margin-bottom: 12px;">Kuota Magnus 100x/hari, prioritas chat, dan akses semua fitur.</p>
+          <button class="btn btn-sm btn-pink" style="width: 100%;" onclick="requestUpgrade('vip')">Beli VIP</button>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end;">
-        <button class="btn btn-sm" onclick="closeModal('upgradeModal')">Tutup</button>
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('upgradeModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -315,10 +351,10 @@
   <!-- Modal Leaderboard -->
   <div id="leaderboardModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🏆 Leaderboard Global</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; font-weight: 800;">🏆 Leaderboard Global</h3>
       <div id="leaderboardContent"></div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
-        <button class="btn btn-sm" onclick="closeModal('leaderboardModal')">Tutup</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('leaderboardModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -326,18 +362,18 @@
   <!-- Modal Settings -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.05rem;">⚙️ Pengaturan Media & Musik</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; font-weight: 800;">⚙️ Pengaturan Media</h3>
       <div class="input-group">
         <label>URL Gambar Background (HTTPS)</label>
-        <input type="text" id="bgUrlInput" placeholder="URL Wallpaper">
+        <input type="text" id="bgUrlInput" placeholder="https://...">
       </div>
       <div class="input-group">
-        <label>URL Musik MP3 Direct</label>
-        <input type="text" id="musicUrlInput" placeholder="URL Audio MP3">
+        <label>URL Musik MP3</label>
+        <input type="text" id="musicUrlInput" placeholder="https://...">
       </div>
-      <button class="btn btn-sm btn-success" style="width: 100%; margin-bottom: 14px;" onclick="saveCustomMedia()">💾 Simpan</button>
+      <button class="btn btn-sm btn-success" style="width: 100%; margin-bottom: 20px;" onclick="saveCustomMedia()">💾 Simpan Pengaturan</button>
       <div style="display: flex; justify-content: flex-end;">
-        <button class="btn btn-sm" onclick="closeModal('settingsModal')">Tutup</button>
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('settingsModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -345,10 +381,10 @@
   <!-- Modal Profile -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 12px; font-size: 1.05rem;">👤 Profil Akun</h3>
-      <div id="profileInfoContent" style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;"></div>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; font-weight: 800;">👤 Profil Akun</h3>
+      <div id="profileInfoContent" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;"></div>
       <div style="display: flex; justify-content: flex-end;">
-        <button class="btn btn-sm" onclick="closeModal('profileModal')">Tutup</button>
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('profileModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -356,21 +392,21 @@
   <!-- Modal Panel Owner Supreme -->
   <div id="ownerControlModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1.05rem; color: var(--warning);">👑 Panel Owner Supreme & AI Guard Sentinel</h3>
+      <h3 style="margin-bottom: 16px; font-size: 1.2rem; color: var(--warning); font-weight: 800;">👑 Panel Owner Supreme</h3>
       <div class="input-group">
         <label>Username Target</label>
         <input type="text" id="ownerTargetUser" placeholder="Masukkan username">
       </div>
-      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-        <button class="btn btn-warning btn-sm" onclick="ownerInstantWin()">⚡ Instant Win (+10 Kemenangan & Waktu Instan)</button>
-        <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban / Unban Akun</button>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-warning btn-sm" onclick="ownerInstantWin()">⚡ Instant Win (+10)</button>
+        <button class="btn btn-danger btn-sm" onclick="executeOwnerAction('ban')">🚫 Ban Akun</button>
         <button class="btn btn-purple btn-sm" onclick="executeOwnerAction('promote_admin')">⭐ Jadikan Admin</button>
         <button class="btn btn-pink btn-sm" onclick="executeOwnerAction('promote_vip')">💎 Jadikan VIP</button>
       </div>
-      <h4 style="font-size: 0.82rem; margin-bottom: 4px; color: var(--danger);">🚨 AI Guard Real-Time Neutralization Log:</h4>
-      <div id="ownerAuditLogBox" class="owner-audit-box">AI Guard aktif. Tidak ada anomali terdeteksi.</div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
-        <button class="btn btn-sm" onclick="closeModal('ownerControlModal')">Tutup</button>
+      <h4 style="font-size: 0.9rem; margin-bottom: 6px; color: var(--danger); font-weight: 700;">🚨 AI Guard Logs:</h4>
+      <div id="ownerAuditLogBox" class="owner-audit-box">AI Guard aktif. Tidak ada anomali.</div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('ownerControlModal')">Tutup</button>
       </div>
     </div>
   </div>
@@ -378,22 +414,19 @@
   <!-- Modal Resign -->
   <div id="confirmModal" class="modal-overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 10px; font-size: 1rem;">Konfirmasi Nyerah</h3>
-      <p style="color: var(--text-muted); margin-bottom: 14px; font-size: 0.84rem;">Yakin ingin menyerah?</p>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-glass); color: var(--text);" onclick="closeModal('confirmModal')">Batal</button>
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem; font-weight: 800;">Konfirmasi Nyerah</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Yakin ingin menyerah dari pertandingan ini?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text); box-shadow:none;" onclick="closeModal('confirmModal')">Batal</button>
         <button class="btn btn-sm btn-danger" onclick="executeResign()">Ya, Nyerah</button>
       </div>
     </div>
   </div>
 
 <script>
-  // =====================================================================
-  // KONFIGURASI SUPABASE (JANGAN UBAH KECUALI URL/KEY BERUBAH)
-  // =====================================================================
+  // KONFIGURASI SUPABASE
   const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
-  
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const PIECE_SVGS = {
@@ -417,15 +450,24 @@
     { name: "Terranova (Bass Boosted)", url: "https://files.catbox.moe/f01dyl.mp3" }
   ];
 
-  function getCharacterPngUrl(nameOrTitle) {
-    let lower = (nameOrTitle || '').toLowerCase();
-    if(lower.includes('knight') || lower.includes('paladin') || lower.includes('kuda') || lower.includes('scout')) return "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=200&auto=format&fit=crop&q=80";
-    if(lower.includes('hacker') || lower.includes('cyber') || lower.includes('anon') || lower.includes('neural') || lower.includes('titan')) return "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80";
-    if(lower.includes('queen') || lower.includes('empress') || lower.includes('dewi')) return "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80";
-    if(lower.includes('king') || lower.includes('grandmaster') || lower.includes('magnus') || lower.includes('legend') || lower.includes('broto')) return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
-    if(lower.includes('budi') || lower.includes('joko') || lower.includes('beni') || lower.includes('deni') || lower.includes('hendra')) return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80";
-    return "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80";
-  }
+  // MAPPING GAMBAR & DIALOG STORY MODE
+  const STORY_MAP = {
+    "Budi": { img: "https://images.unsplash.com/photo-1542385151-efd9000785a0?w=200&fit=crop", taunt: ["Ayo main bersih!", "Saya prajurit benteng, pertahanan saya kuat!", "Jangan salahkan saya kalau kalah."], win: "Kerja bagus, kamu lebih kuat dariku.", lose: "Hahaha, ternyata kamu cuma segitu!" },
+    "Joko": { img: "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=200&fit=crop", taunt: ["Saya penjaga pion!", "Langkah kecil itu penting.", "Jangan remehkan saya!"], win: "Kamu pantas menang.", lose: "Pion aja kamu kalah!" },
+    "Siska": { img: "https://images.unsplash.com/photo-1563237023-b1e970526dcb?w=200&fit=crop", taunt: ["Kuda saya lincah!", "Satu langkah salah, tamat!", "Siap untuk kalah?"], win: "Kudamu lebih lincah.", lose: "Kalah oleh kuda buta!" },
+    "Rian": { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=200&fit=crop", taunt: ["System hack initiated!", "Saya baca semua langkahmu.", "Lemah sekali."], win: "Firewall saya jebol.", lose: "Kamu di-hack!" },
+    "Hendra": { img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&fit=crop", taunt: ["Disiplin adalah kunci!", "Fokus ke papan!", "Jangan panik!"], win: "Disiplinmu luar biasa.", lose: "Kamu kurang latihan!" },
+    "Beni": { img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&fit=crop", taunt: ["Gue jalanan, lo? Haha.", "Catur mah gampang.", "Sikat terus!"], win: "Lo hebat juga ya.", lose: "Kalah lo sama gue!" },
+    "Deni": { img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&fit=crop", taunt: ["Gambit raja adalah hidupku.", "Berani terima tantangan?", "Ayo serang!"], win: "Gambitmu berhasil.", lose: "Skakmat! Belajar lagi sana." },
+    "Kiki": { img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&fit=crop", taunt: ["Cahaya akan mengalahkan kegelapan.", "Bentengku tak tertembus.", "Maju!"], win: "Cahayamu menang.", lose: "Kalah oleh cahaya!" },
+    "Alex": { img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200&fit=crop", taunt: ["Kalkulasi selesai. Kamu kalah.", "Probabilitas kemenanganmu 0%.", "AI tidak bisa dikalahkan."], win: "Error 404: Defeat not found.", lose: "Kamu kalah oleh mesin!" },
+    "Broto": { img: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&fit=crop", taunt: ["Pengalaman mengalahkan segalanya.", "Duduk manis, lihat langkahku.", "Ini pelajaran mahal."], win: "Kamu murid yang baik.", lose: "Masih jauh, anak muda." },
+    "Vino": { img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&fit=crop", taunt: ["Neural link terhubung!", "Aku memprediksi 10 langkah ke depan.", "Kamu usang."], win: "Neural link putus.", lose: "Kamu kalah dari masa depan." },
+    "Dewi": { img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&fit=crop", taunt: ["Ratu tidak pernah kalah.", "Tunduk pada taktikku.", "Kamu berani lawan ratu?"], win: "Ratu telah tumbang.", lose: "Tunduk pada ratu!" },
+    "Guntur": { img: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=200&fit=crop", taunt: ["Gebrak! Papan ini milikku.", "Titan tidak bisa dijatuhkan.", "Hancurkan!"], win: "Titan bisa dihancurkan.", lose: "Kamu hancur!" },
+    "Reza": { img: "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?w=200&fit=crop", taunt: ["Kegelapan adalah kawan saya.", "Kamu takkan lihat seranganku.", "Akhir sudah dekat."], win: "Cahaya menembus kegelapan.", lose: "Kamu tersesat dalam kegelapan." },
+    "Magnus": { img: "https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png", taunt: ["Aku juara dunia, kamu siapa?", "Coba kalahkan aku.", "Ini akan cepat."], win: "Menarik, kamu punya bakat.", lose: "Kamu terlalu mudah ditebak." }
+  };
 
   const STORY_STAGES = [];
   const customStageNames = [
@@ -436,29 +478,26 @@
   ];
 
   for(let i=1; i<=50; i++) {
-    let name = customStageNames[i-1] || `Grandmaster Cyber Knight #${i}`;
+    let name = customStageNames[i-1] || `Cyber Knight #${i}`;
+    let baseName = name.split(' ')[0];
+    let characterData = STORY_MAP[baseName] || STORY_MAP["Budi"]; 
+    
     STORY_STAGES.push({
       stage: i,
       name: name,
+      img: characterData.img,
+      taunts: characterData.taunts,
+      winMsg: characterData.win,
+      loseMsg: characterData.lose,
       difficulty: i <= 15 ? 'ai-easy' : i <= 30 ? 'ai-medium' : i <= 42 ? 'ai-hard' : 'ai-god',
-      dialogs: { intro: `Stage ${i} (${name}) dimulai. Buktikan kemampuan strategimu!`, win: `Luar biasa, kamu melewati stage ${i}!`, lose: `Kalah! Pertahananmu jebol oleh ${name}.` }
     });
   }
 
-  let game = null;
-  let selectedSquare = null;
-  let possibleMoves = [];
-  let currentUser = null;
-  let currentRole = 'member';
-  let magnusUsesLeft = 3;
-  let currentStoryIndex = 0;
-  let inStoryMode = false;
-  let peer = null, conn = null;
-  let playerColor = 'w';
-  let aiTimeout = null;
-  let deferredPrompt = null;
-  let audioCtx = null, audioSource = null;
-  let sessionUser = null;
+  let game = null, selectedSquare = null, possibleMoves = [];
+  let currentUser = null, currentRole = 'member', magnusUsesLeft = 3;
+  let currentStoryIndex = 0, inStoryMode = false;
+  let peer = null, conn = null, playerColor = 'w', aiTimeout = null;
+  let deferredPrompt = null, sessionUser = null;
 
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
   function triggerPwaInstall() {
@@ -486,7 +525,6 @@
     let u = document.getElementById('authUser').value.trim();
     let p = document.getElementById('authPass').value.trim();
     if(!u || !p) return alert('Isi username dan password!');
-    
     let email = `${u}@axac.local`;
 
     if(isReg) {
@@ -499,10 +537,7 @@
     }
   }
 
-  async function logout() {
-    await db.auth.signOut();
-    location.reload();
-  }
+  async function logout() { await db.auth.signOut(); location.reload(); }
 
   db.auth.onAuthStateChange(async (event, session) => {
     if (session) {
@@ -511,40 +546,32 @@
       
       if(profile) {
         if(profile.banned) { await db.auth.signOut(); return alert('Akun lo dibanned oleh Owner!'); }
-        
-        currentUser = profile.username;
-        currentRole = profile.role;
-        magnusUsesLeft = profile.magnus_quota;
+        currentUser = profile.username; currentRole = profile.role; magnusUsesLeft = profile.magnus_quota;
         
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('gameScreen').classList.remove('hidden');
         document.getElementById('userHeaderControls').classList.remove('hidden');
         
-        updateProfileDisplay();
-        initGame();
-        initP2P();
-        listenChatRealtime();
-        updateMagnusUI();
+        updateProfileDisplay(); initGame(); initP2P(); listenChatRealtime(); updateMagnusUI();
 
         if (currentRole === 'owner' || currentRole === 'admin') {
           document.getElementById('ownerMenuOption').classList.remove('hidden');
           document.getElementById('ownerInstantWinBtn').classList.remove('hidden');
         }
-        dismissSplash();
       }
     } else {
       document.getElementById('authScreen').classList.remove('hidden');
       document.getElementById('gameScreen').classList.add('hidden');
       document.getElementById('userHeaderControls').classList.add('hidden');
-      dismissSplash();
     }
+    dismissSplash();
   });
 
   function dismissSplash() {
     const splash = document.getElementById('splashScreen');
     if(splash && !splash.classList.contains('fade-out')) {
       splash.classList.add('fade-out');
-      setTimeout(() => { if(splash.parentNode) splash.parentNode.removeChild(splash); }, 300);
+      setTimeout(() => { if(splash.parentNode) splash.parentNode.removeChild(splash); }, 400);
     }
   }
 
@@ -555,130 +582,39 @@
     badge.className = `role-badge role-${currentRole}`;
   }
 
+  // GLOBAL CHAT
   async function sendGlobalChat() {
     let input = document.getElementById('chatInputMsg');
     let text = input.value.trim();
     if(!text || !sessionUser) return;
-    
-    let { error } = await db.from('global_chats').insert([{
-      user_id: sessionUser.id, username: currentUser, role: currentRole, message: text
-    }]);
-    if(error) alert('Gagal kirim chat: ' + error.message);
-    else input.value = '';
+    await db.from('global_chats').insert([{ user_id: sessionUser.id, username: currentUser, role: currentRole, message: text }]);
+    input.value = '';
   }
 
   async function loadGlobalChat() {
     let box = document.getElementById('globalChatContainer');
     if(!box) return;
-    let { data: chats, error } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
-    if(error) return console.error(error);
-    
-    if(chats.length === 0) {
-      box.innerHTML = '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan. Mulai diskusi atau undang tanding!</div>';
-    } else {
-      box.innerHTML = chats.map(c => `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.username}</b><br>${c.message}</div>`).join('');
-    }
+    let { data: chats } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+    if(!chats) return;
+    box.innerHTML = chats.length === 0 ? '<div style="color:var(--text-muted); text-align:center; margin-top:20px;">Belum ada pesan.</div>' 
+      : chats.map(c => `<div class="chat-msg"><b>[${c.role.toUpperCase()}] ${c.username}</b><br>${c.message}</div>`).join('');
     box.scrollTop = box.scrollHeight;
   }
 
   function listenChatRealtime() {
-    db.channel('custom-all-channel')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chats' }, payload => {
-        loadGlobalChat();
-      })
-      .subscribe();
+    db.channel('custom-all-channel').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chats' }, () => loadGlobalChat()).subscribe();
     loadGlobalChat();
   }
 
-  function sendMatchChallenge() { alert('Fitur undangan tanding real-time via chat sedang dalam pengembangan.'); }
-
-  function openRewardedAd() {
-    closeModal('magnusModal');
-    let adModal = document.getElementById('adModal');
-    adModal.style.display = 'flex';
-    let timeLeft = 10;
-    document.getElementById('adTimer').innerText = timeLeft;
-    
-    let timer = setInterval(async () => {
-      timeLeft--;
-      document.getElementById('adTimer').innerText = timeLeft;
-      if(timeLeft <= 0) {
-        clearInterval(timer);
-        adModal.style.display = 'none';
-        magnusUsesLeft += 5;
-        await db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id);
-        updateMagnusUI();
-        alert('🎉 +5 Kuota Magnus Carlsen berhasil ditambahkan!');
-      }
-    }, 1000);
-  }
-
-  function requestUpgrade(tier) {
-    if(tier === 'semivip') alert('Silakan transfer Rp 5.000 ke QRIS/Dana AXAC Official. Hubungi Admin untuk aktivasi.');
-    else if(tier === 'vip') alert('Silakan transfer Rp 10.000 ke QRIS/Dana AXAC Official. Hubungi Admin untuk aktivasi.');
-    closeModal('upgradeModal');
-  }
-
-  async function ownerInstantWin() {
-    if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
-    let { data: currentProfile } = await db.from('profiles').select('wins').eq('id', sessionUser.id).single();
-    let newWins = (currentProfile.wins || 0) + 10;
-    
-    let { error } = await db.from('profiles').update({ wins: newWins }).eq('id', sessionUser.id);
-    if(error) alert('Server menolak: ' + error.message);
-    else {
-      alert('⚡ +10 Kemenangan instan ditambahkan ke database server!');
-      initGame();
-    }
-  }
-
-  async function executeOwnerAction(type) {
-    let tUser = document.getElementById('ownerTargetUser').value.trim();
-    if(!tUser) return alert('Isi username target!');
-
-    if(type === 'ban') {
-      let { error } = await db.from('profiles').update({ banned: true }).eq('username', tUser);
-      if(error) alert('Gagal ban: ' + error.message);
-      else alert('User ' + tUser + ' berhasil dibanned.');
-    } else {
-      let newRole = type === 'promote_admin' ? 'admin' : 'vip';
-      let { error } = await db.rpc('owner_update_role', { target_username: tUser, new_role: newRole });
-      if(error) alert('Akses ditolak atau gagal: ' + error.message);
-      else alert('Role ' + tUser + ' berhasil diubah jadi ' + newRole);
-    }
-  }
-
-  async function renderOwnerLogs() {
-    let { data: logs } = await db.from('ai_guard_logs').select('*').order('created_at', { ascending: false }).limit(20);
-    let box = document.getElementById('ownerAuditLogBox');
-    if(!logs || logs.length === 0) {
-      box.innerHTML = 'AI Guard aktif. Tidak ada anomali terdeteksi.';
-    } else {
-      box.innerHTML = logs.map(l => `[${new Date(l.created_at).toLocaleTimeString()}] User: ${l.username} -> ${l.reason}`).join('<br>');
-    }
-  }
-
-  async function logAiGuardViolation(reason) {
-    if(!currentUser || currentRole === 'owner' || currentRole === 'admin') return;
-    await db.from('ai_guard_logs').insert([{ user_id: sessionUser.id, username: currentUser, reason: reason }]);
-  }
-
-  document.addEventListener("visibilitychange", () => { if (document.hidden) logAiGuardViolation("Anomali Tab-Switch"); });
-  window.addEventListener("blur", () => { logAiGuardViolation("Kehilangan fokus jendela"); });
-
-  function enableAudioEngine() {
-    let audio = document.getElementById('bgAudio');
-    if(audio) audio.play().then(() => { initBassBoost(audio); alert('🔊 Audio Musik Diaktifkan!'); }).catch(() => alert('Gagal memutar audio.'));
-  }
-
+  // STORY MODE
   function openStoryMode() {
     document.getElementById('dropdownMenu').classList.remove('show');
     if(currentStoryIndex >= STORY_STAGES.length) currentStoryIndex = 0;
     let stage = STORY_STAGES[currentStoryIndex];
     document.getElementById('storyStageTitle').innerText = `📖 Story Stage ${stage.stage}/50`;
-    document.getElementById('storyAvatarContainer').innerHTML = `<img src="${getCharacterPngUrl(stage.name)}" alt="${stage.name}">`;
+    document.getElementById('storyAvatarContainer').innerHTML = `<img src="${stage.img}" alt="${stage.name}">`;
     document.getElementById('storySpeaker').innerText = stage.name;
-    document.getElementById('storyDialogText').innerText = stage.dialogs.intro;
+    document.getElementById('storyDialogText').innerText = stage.taunts[Math.floor(Math.random() * stage.taunts.length)];
     document.getElementById('storyModal').style.display = 'flex';
   }
 
@@ -688,15 +624,16 @@
     let stage = STORY_STAGES[currentStoryIndex];
     document.getElementById('modeSelect').value = stage.difficulty;
     changeMode();
-    showToast(stage.name, `Stage ${stage.stage} dimulai!`, stage.name);
+    showToast(stage.name, `Pertarungan dimulai!`, stage.img);
   }
 
-  function showToast(speaker, text, characterName) {
+  function showToast(speaker, text, imgUrl) {
     let t = document.getElementById('inGameToast');
     document.getElementById('toastSpeaker').innerText = speaker;
     document.getElementById('toastText').innerText = text;
-    document.getElementById('toastAvatar').innerHTML = `<img src="${getCharacterPngUrl(characterName)}" alt="Avatar">`;
+    document.getElementById('toastAvatar').innerHTML = `<img src="${imgUrl}" alt="Avatar">`;
     t.style.display = 'flex';
+    setTimeout(closeToast, 4000);
   }
   function closeToast() { document.getElementById('inGameToast').style.display = 'none'; }
 
@@ -706,78 +643,32 @@
       if(p) await db.from('profiles').update({ wins: (p.wins || 0) + 1 }).eq('id', sessionUser.id);
       
       if(inStoryMode) {
+        let stage = STORY_STAGES[currentStoryIndex];
+        showToast(stage.name, stage.winMsg, stage.img); // Dialog kemenangan
         currentStoryIndex++;
         localStorage.setItem('axac_story_progress', currentStoryIndex);
-        setTimeout(() => { if(currentStoryIndex < STORY_STAGES.length) openStoryMode(); else { alert('🏆 Selesai 50 Stage!'); inStoryMode = false; } }, 1500);
+        setTimeout(() => { if(currentStoryIndex < STORY_STAGES.length) openStoryMode(); else { alert('🏆 Selamat! Kamu menamatkan 50 Stage!'); inStoryMode = false; } }, 4000);
         return;
       }
+    } else if (!isWin && inStoryMode) {
+        let stage = STORY_STAGES[currentStoryIndex];
+        showToast(stage.name, stage.loseMsg, stage.img); // Dialog kekalahan
+        inStoryMode = false;
+        setTimeout(initGame, 4000);
+        return;
     }
     initGame();
   }
 
-  function updateMagnusUI() {
-    ['magnusCount', 'magnusModalCount', 'magnusBtnCount'].forEach(id => {
-      let el = document.getElementById(id);
-      if(el) el.innerText = (currentRole === 'owner') ? '∞' : magnusUsesLeft;
-    });
-  }
-
-  function setupAudioPlayer() {
-    let audio = document.getElementById('bgAudio');
-    let list = document.getElementById('trackList');
-    if(!list) return;
-    list.innerHTML = '';
-    TRACKS.forEach((tr, idx) => {
-      let div = document.createElement('div');
-      div.className = `track-item ${idx===0?'active':''}`;
-      div.innerHTML = `<span>🎵 ${tr.name}</span>`;
-      div.onclick = () => {
-        audio.src = tr.url;
-        audio.play().then(() => initBassBoost(audio)).catch(()=>{});
-        document.querySelectorAll('.track-item').forEach(el=>el.classList.remove('active'));
-        div.classList.add('active');
-      };
-      list.appendChild(div);
-    });
-    if(TRACKS.length > 0) audio.src = TRACKS[0].url;
-  }
-
-  function initBassBoost(audioElement) {
-    try {
-      if(!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        audioSource = audioCtx.createMediaElementSource(audioElement);
-        let bassFilter = audioCtx.createBiquadFilter();
-        bassFilter.type = 'lowshelf';
-        bassFilter.frequency.setValueAtTime(200, audioCtx.currentTime);
-        bassFilter.gain.setValueAtTime(14, audioCtx.currentTime);
-        audioSource.connect(bassFilter);
-        bassFilter.connect(audioCtx.destination);
-      }
-      if(audioCtx.state === 'suspended') audioCtx.resume();
-    } catch(e) {}
-  }
-
-  function saveCustomMedia() {
-    let bg = document.getElementById('bgUrlInput').value.trim();
-    let music = document.getElementById('musicUrlInput').value.trim();
-    if(bg) { localStorage.setItem('axac_custom_bg', bg); document.body.style.backgroundImage = `url('${bg}')`; document.body.style.backgroundSize = 'cover'; }
-    if(music) { TRACKS.push({ name: "Custom Track", url: music }); setupAudioPlayer(); }
-    alert('Disimpan!'); closeModal('settingsModal');
-  }
-
+  // MAGNUS AI ADVANCED DIALOG
   function askMagnusAdvice() {
     if(!game) return;
     if(currentRole !== 'owner' && magnusUsesLeft <= 0) {
-      alert('Kuota Magnus hari ini habis! Tonton iklan 10 detik untuk menambah kuota.');
-      openModal('magnusModal');
-      return;
+      alert('Kuota Magnus hari ini habis! Tonton iklan 30 detik untuk menambah kuota.');
+      openModal('magnusModal'); return;
     }
-    
     if(currentRole !== 'owner') {
-      magnusUsesLeft--;
-      db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id).then();
-      updateMagnusUI();
+      magnusUsesLeft--; db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id).then(); updateMagnusUI();
     }
     openModal('magnusModal');
 
@@ -787,8 +678,7 @@
 
     let bestMove = moves[0], bestScore = -99999;
     for (let m of moves) {
-      game.move(m);
-      let score = 0;
+      game.move(m); let score = 0;
       const b = game.board();
       for (let r=0; r<8; r++) for (let c=0; c<8; c++) if (b[r][c]) score += (b[r][c].color === game.turn() ? pieceValues[b[r][c].type] : -pieceValues[b[r][c].type]);
       if (m.captured) score += pieceValues[m.captured] * 3;
@@ -798,7 +688,106 @@
       if (score > bestScore) { bestScore = score; bestMove = m; }
     }
 
-    document.getElementById('magnusAdviceText').innerHTML = `<b>Magnus Carlsen:</b><br>Gerakkan bidak dari <b style='color:#3b82f6'>${bestMove.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${bestMove.to.toUpperCase()}</b> (${bestMove.san}).`;
+    // Dialog Magnus yang arogan tapi jenius
+    let magnusQuotes = [
+      `"Langkah ${bestMove.san} itu sudah jelas. Kamu tidak melihatnya?"`,
+      `"Bahkan anak SD tahu harus gerak ke ${bestMove.to.toUpperCase()}."`,
+      `"Coba pindahkan ke ${bestMove.to.toUpperCase()}. Kalau kalah, itu salahmu."`,
+      `"Aku sudah kalkulasi 20 langkah ke depan. Kamu? Tidak."`
+    ];
+    let randomQuote = magnusQuotes[Math.floor(Math.random() * magnusQuotes.length)];
+    document.getElementById('magnusAdviceText').innerHTML = `<b style='color:#a78bfa;'>Magnus Carlsen:</b><br>${randomQuote}<br><br>Gerakkan bidak: <b style='color:#3b82f6'>${bestMove.from.toUpperCase()}</b> ke <b style='color:#16a34a'>${bestMove.to.toUpperCase()}</b>.`;
+  }
+
+  // REWARDED AD 30 DETIK
+  function openRewardedAd() {
+    closeModal('magnusModal');
+    let adModal = document.getElementById('adModal');
+    adModal.style.display = 'flex';
+    let timeLeft = 30;
+    document.getElementById('adTimer').innerText = timeLeft;
+    
+    let timer = setInterval(async () => {
+      timeLeft--;
+      document.getElementById('adTimer').innerText = timeLeft;
+      if(timeLeft <= 0) {
+        clearInterval(timer); adModal.style.display = 'none';
+        magnusUsesLeft += 5;
+        await db.from('profiles').update({ magnus_quota: magnusUsesLeft }).eq('id', sessionUser.id);
+        updateMagnusUI(); alert('🎉 +5 Kuota Magnus ditambahkan!');
+      }
+    }, 1000);
+  }
+
+  // OWNER ACTIONS
+  async function ownerInstantGameWin() {
+    if(currentRole !== 'owner' && currentRole !== 'admin') return alert('Khusus Owner/Admin!');
+    let mode = document.getElementById('modeSelect').value;
+    if (mode === 'online') {
+      if (conn && conn.open) { conn.send({ type: 'FORCE_RESIGN' }); handleMatchWin(true); alert('Sinyal kemenangan dikirim!'); }
+      else alert('Belum terhubung ke lawan (P2P).');
+    } else if (mode.startsWith('ai')) {
+      game = new Chess(); game.load('rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3'); 
+      renderBoard(); handleMatchWin(true); alert('Skakmat instan dieksekusi!');
+    }
+  }
+
+  async function executeOwnerAction(type) {
+    let tUser = document.getElementById('ownerTargetUser').value.trim();
+    if(!tUser) return alert('Isi username target!');
+    if(type === 'ban') {
+      let { error } = await db.from('profiles').update({ banned: true }).eq('username', tUser);
+      if(error) alert('Gagal ban: ' + error.message); else alert('User dibanned!');
+    } else {
+      let newRole = type === 'promote_admin' ? 'admin' : 'vip';
+      let { error } = await db.rpc('owner_update_role', { target_username: tUser, new_role: newRole });
+      if(error) alert('Gagal ubah role: ' + error.message); else alert('Role diubah jadi ' + newRole);
+    }
+  }
+
+  async function renderOwnerLogs() {
+    let { data: logs } = await db.from('ai_guard_logs').select('*').order('created_at', { ascending: false }).limit(20);
+    let box = document.getElementById('ownerAuditLogBox');
+    box.innerHTML = (!logs || logs.length === 0) ? 'AI Guard aktif. Tidak ada anomali.' 
+      : logs.map(l => `[${new Date(l.created_at).toLocaleTimeString()}] User: ${l.username} -> ${l.reason}`).join('<br>');
+  }
+
+  async function logAiGuardViolation(reason) {
+    if(!currentUser || currentRole === 'owner' || currentRole === 'admin') return;
+    await db.from('ai_guard_logs').insert([{ user_id: sessionUser.id, username: currentUser, reason: reason }]);
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) logAiGuardViolation("Tab-Switch"); });
+  window.addEventListener("blur", () => { logAiGuardViolation("Kehilangan fokus jendela"); });
+
+  // UI & GAME LOGIC
+  function enableAudioEngine() {
+    let audio = document.getElementById('bgAudio');
+    if(audio) audio.play().then(() => { alert('🔊 Audio Musik Diaktifkan!'); }).catch(() => alert('Gagal memutar audio.'));
+  }
+
+  function setupAudioPlayer() {
+    let audio = document.getElementById('bgAudio'), list = document.getElementById('trackList');
+    if(!list) return; list.innerHTML = '';
+    TRACKS.forEach((tr, idx) => {
+      let div = document.createElement('div');
+      div.className = `track-item ${idx===0?'active':''}`;
+      div.innerHTML = `<span>🎵 ${tr.name}</span>`;
+      div.onclick = () => {
+        audio.src = tr.url; audio.play().catch(()=>{});
+        document.querySelectorAll('.track-item').forEach(el=>el.classList.remove('active'));
+        div.classList.add('active');
+      };
+      list.appendChild(div);
+    });
+    if(TRACKS.length > 0) audio.src = TRACKS[0].url;
+  }
+
+  function saveCustomMedia() {
+    let bg = document.getElementById('bgUrlInput').value.trim();
+    let music = document.getElementById('musicUrlInput').value.trim();
+    if(bg) { localStorage.setItem('axac_custom_bg', bg); document.body.style.backgroundImage = `url('${bg}')`; document.body.style.backgroundSize = 'cover'; }
+    if(music) { TRACKS.push({ name: "Custom Track", url: music }); setupAudioPlayer(); }
+    alert('Disimpan!'); closeModal('settingsModal');
   }
 
   function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
@@ -927,48 +916,22 @@
   }
   function setupConn() {
     if(!conn) return;
+    conn.on('open', () => { alert('Terhubung!'); initGame(); });
     conn.on('data', d => { 
-  if(d.type === 'MOVE') { 
-    game.move(d.move); 
-    renderBoard(); 
-  } 
-  else if (d.type === 'FORCE_RESIGN') {
-    alert('🔥 Lawan menggunakan Owner God Mode! Kamu otomatis kalah.');
-    handleMatchWin(false);
-  }
-    }); 
-  }
-    } 
-} // <-- Ini penutup function setupConn() (Baris 941 lo)
-
-// FITUR INSTANT WIN (GOD MODE OWNER)
-function ownerInstantGameWin() {
-  if(currentRole !== 'owner' && currentRole !== 'admin') {
-    return alert('Akses ditolak! Fitur ini khusus Owner/Admin.');
+      if(d.type === 'MOVE') { game.move(d.move); renderBoard(); } 
+      else if (d.type === 'FORCE_RESIGN') { alert('🔥 Lawan menggunakan Owner God Mode! Kamu otomatis kalah.'); handleMatchWin(false); }
+    });
   }
 
-  let mode = document.getElementById('modeSelect').value;
-  
-  if (mode === 'online') {
-    if (conn && conn.open) {
-      conn.send({ type: 'FORCE_RESIGN' });
-      alert('⚡ [OWNER GOD MODE]: Sinyal kemenangan instan dikirim ke lawan!');
-      handleMatchWin(true); 
-    } else {
-      alert('Belum terhubung ke lawan (P2P).');
-    }
-  } 
-  else if (mode.startsWith('ai')) {
-    game = new Chess();
-    game.load('rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3'); 
-    alert('⚡ [OWNER GOD MODE]: Papan di-reset ke posisi Skakmat Instan!');
-    renderBoard();
-    handleMatchWin(true);
-  }
-}
+  function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
+  function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
 
-function confirmResign() { document.getElementById('confirmModal').style.display = 'flex'; }
-function executeResign() { closeModal('confirmModal'); handleMatchWin(false); }
+  // INIT
+  window.addEventListener('DOMContentLoaded', () => {
+    setupAudioPlayer();
+    updateRealTimeClock();
+    setTimeout(dismissSplash, 1500);
+  });
 </script>
 </body>
 </html>
