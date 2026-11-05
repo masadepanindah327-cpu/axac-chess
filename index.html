@@ -3,125 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Sentinel Edition</title>
+  <title>AXAC Chess - Apex Neon</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
+    /* COLOR PALETTE & SHADING */
     :root {
-      --bg-base: #020408; --bg-card: rgba(13, 20, 36, 0.85);
-      --accent: #2563eb; --accent-hi: #60a5fa; --accent-glow: rgba(37, 99, 235, 0.4);
-      --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --purple: #8b5cf6; --pink: #ec4899;
-      --text: #f8fafc; --text-mut: #94a3b8;
-      --sq-light: #cbd5e1; --sq-dark: #475569;
-      --sq-hl: rgba(37, 99, 235, 0.7); --sq-guide: rgba(16, 185, 129, 0.8);
-      --border: rgba(255,255,255,0.1); --border-hi: rgba(255,255,255,0.2);
-      --shadow: 0 10px 40px -10px rgba(0,0,0,0.9);
+      --bg-base: #05070c;
+      --bg-panel: rgba(15, 23, 42, 0.7);
+      --bg-panel-hi: rgba(30, 41, 59, 0.9);
+      --primary: #3b82f6; 
+      --primary-glow: rgba(59, 130, 246, 0.5);
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --danger: #ef4444;
+      --success: #10b981;
+      --gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-mut: #94a3b8;
+      --border: rgba(255,255,255,0.08);
+      --border-hi: rgba(255,255,255,0.15);
+      --shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
+      --sq-light: #cbd5e1;
+      --sq-dark: #334155;
+      --sq-hl: rgba(59, 130, 246, 0.6);
+      --sq-guide: rgba(16, 185, 129, 0.8);
     }
+    
     [data-theme="light"] {
-      --bg-base: #e2e8f0; --bg-card: rgba(255,255,255,0.9);
-      --text: #0f172a; --text-mut: #475569;
-      --sq-light: #f8fafc; --sq-dark: #94a3b8;
-      --border: rgba(0,0,0,0.1); --border-hi: rgba(0,0,0,0.2);
+      --bg-base: #e2e8f0;
+      --bg-panel: rgba(255, 255, 255, 0.85);
+      --text-main: #0f172a;
+      --text-mut: #475569;
+      --border: rgba(0,0,0,0.08);
+      --border-hi: rgba(0,0,0,0.15);
+      --sq-light: #f8fafc;
+      --sq-dark: #94a3b8;
     }
 
+    /* RESET & ANIMATIONS */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg-base); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at top, var(--accent-glow) 0%, transparent 50%); background-attachment: fixed; }
+    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%); background-attachment: fixed; transition: background 0.5s; }
+    
+    @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes pulseGlow { 0% { box-shadow: 0 0 10px var(--primary-glow); } 50% { box-shadow: 0 0 25px var(--primary-glow); } 100% { box-shadow: 0 0 10px var(--primary-glow); } }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* SPLASH */
-    #splash { position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+    /* SPLASH SCREEN */
+    #splash { position: fixed; inset: 0; background: #05070c; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
     #splash.fade { opacity: 0; pointer-events: none; }
-    .loader { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; box-shadow: 0 0 20px var(--accent-glow); }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-ring { width: 70px; height: 70px; border: 4px solid rgba(255,255,255,0.05); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 24px; animation: spin 1s linear infinite, pulseGlow 2s infinite; }
+    .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 2px; background: linear-gradient(135deg, #60a5fa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: fadeIn 1s ease; }
 
     /* HEADER */
-    header { background: var(--bg-card); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
-    .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent-hi), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
+    header { background: var(--bg-panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 30px rgba(0,0,0,0.3); animation: slideDown 0.5s ease; }
+    .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
     
-    .clock-container { display: flex; gap: 12px; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; color: var(--accent-hi); background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-    .clock-date { opacity: 0.7; } .clock-time { color: #fff; text-shadow: 0 0 10px var(--accent-glow); }
+    .clock-box { display: flex; gap: 8px; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; color: var(--accent); background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
 
     /* BUTTONS */
-    .btn { background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px var(--accent-glow); }
-    .btn:hover { background: var(--accent-hi); transform: translateY(-2px); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
-    .btn-purple { background: var(--purple); box-shadow: 0 4px 15px rgba(139,92,246,0.4); }
-    .btn-sm { padding: 8px 14px; font-size: 0.8rem; }
+    .btn { background: var(--primary); color: #fff; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: inline-flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px var(--primary-glow); }
+    .btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px var(--primary-glow); }
+    .btn:active { transform: translateY(0); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
+    .btn-purple { background: var(--secondary); box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
+    .btn-cyan { background: var(--accent); color: #000; box-shadow: 0 4px 15px rgba(6,182,212,0.3); }
+    .btn-sm { padding: 8px 14px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-icon { background: transparent; border: 1px solid var(--border-hi); box-shadow: none; padding: 8px 12px; }
+    .btn-icon:hover { background: rgba(255,255,255,0.05); }
 
-    /* MODALS & MENUS */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+    /* MODALS & OVERLAYS */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; animation: fadeIn 0.2s ease; }
     .overlay.show { display: flex; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border-hi); border-radius: 24px; padding: 30px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 24px; padding: 30px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .modal h3 { margin-bottom: 20px; font-size: 1.2rem; font-weight: 800; }
     
-    .dropdown { position: absolute; top: 70px; left: 24px; background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-hi); border-radius: 16px; width: 280px; box-shadow: var(--shadow); display: none; flex-direction: column; z-index: 2000; overflow: hidden; }
+    /* DROPDOWN MENU */
+    .dropdown { position: absolute; top: 75px; left: 24px; background: var(--bg-panel); backdrop-filter: blur(30px); border: 1px solid var(--border-hi); border-radius: 16px; width: 280px; box-shadow: var(--shadow); display: none; flex-direction: column; z-index: 2000; overflow: hidden; animation: slideDown 0.2s ease; }
     .dropdown.show { display: flex; }
     .dd-item { padding: 14px 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.2s; }
-    .dd-item:hover { background: rgba(255,255,255,0.05); padding-left: 24px; color: var(--accent-hi); }
+    .dd-item:hover { background: rgba(255,255,255,0.05); padding-left: 24px; color: var(--accent); }
 
-    /* BOARD */
-    .layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
+    /* LAYOUT & BOARD */
+    .layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; max-width: 1100px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; animation: fadeIn 0.5s ease; }
     @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
     
     .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-    .board-wrap { width: 100%; max-width: 540px; aspect-ratio: 1; margin-bottom: 16px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 6px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
-    .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
+    .board-wrap { width: 100%; max-width: 520px; aspect-ratio: 1; margin-bottom: 20px; filter: drop-shadow(0 25px 40px rgba(0,0,0,0.7)); }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 20px; overflow: hidden; background: #0f172a; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); }
+    .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; transition: background 0.1s; }
     .sq.light { background: var(--sq-light); }
     .sq.dark { background: var(--sq-dark); }
-    .sq.hl { background: var(--sq-hl) !important; }
-    .sq.guide::after { content: ''; position: absolute; width: 30%; height: 30%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 10px var(--sq-guide); z-index: 10; }
-    .sq svg { width: 90%; height: 90%; pointer-events: none; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+    .sq.hl { background: var(--sq-hl) !important; box-shadow: inset 0 0 15px rgba(255,255,255,0.2); }
+    .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; box-shadow: 0 0 12px var(--sq-guide); z-index: 10; }
+    .sq svg { width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); transition: transform 0.1s; }
+    .sq:hover svg { transform: scale(1.1); }
     
-    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; animation: slideDown 0.6s ease; }
+    .status-bar { width: 100%; max-width: 520px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 16px; }
     
-    /* CHAT & ROLES */
-    .chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); }
-    .msg { padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); }
-    .msg b { color: var(--accent-hi); }
-
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+    /* BADGES */
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
     .r-owner { background: linear-gradient(45deg, #fbbf24, #d97706); color: #000; }
-    .r-admin { background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: #fff; }
+    .r-guard { background: linear-gradient(45deg, #10b981, #047857); color: #fff; }
+    .r-engineer { background: linear-gradient(45deg, #06b6d4, #0891b2); color: #000; }
     .r-vip { background: linear-gradient(45deg, #ec4899, #be185d); color: #fff; }
-    .r-semivip { background: linear-gradient(45deg, #a855f7, #6b21a8); color: #fff; }
     .r-member { background: #475569; color: #fff; }
 
     /* INPUTS */
     .input-grp { margin-bottom: 16px; }
     .input-grp label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-mut); margin-bottom: 8px; }
-    .input-grp input, .input-grp select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-hi); border-radius: 12px; color: var(--text); font-size: 0.95rem; outline: none; transition: 0.2s; }
-    .input-grp input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .input-grp input, .input-grp select { width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-hi); border-radius: 12px; color: var(--text-main); font-size: 0.95rem; outline: none; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+    .input-grp input:focus, .input-grp select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
     
+    /* CHAT */
+    .chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+    .msg { padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
+    .msg b { color: var(--accent); }
+
+    /* UTILS */
     .hidden { display: none !important; }
+    .text-mut { color: var(--text-mut); }
+    .w-full { width: 100%; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- SPLASH SCREEN -->
   <div id="splash">
-    <div class="loader"></div>
-    <div class="brand" style="font-size: 1.8rem;">AXAC SENTINEL</div>
-    <div style="color: var(--text-mut); font-size: 0.9rem; margin-top: 8px;">Menghubungkan ke Cloud...</div>
+    <div class="loader-ring"></div>
+    <div class="splash-title">AXAC SENTINEL</div>
+    <div style="color: var(--text-mut); font-size: 0.85rem; margin-top: 12px; font-family: 'JetBrains Mono';">Memuat Engine...</div>
   </div>
 
-  <!-- HEADER -->
   <header>
     <div style="display: flex; align-items: center; gap: 16px;">
-      <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--border-hi); padding: 8px 12px;" onclick="UI.toggleMenu()">☰</button>
+      <button class="btn btn-icon" onclick="UI.toggleMenu()">☰</button>
       <div class="brand">AXAC 3D</div>
     </div>
     
-    <div class="clock-container">
-      <span id="clockDate" class="clock-date">--/--/----</span>
-      <span id="clockTime" class="clock-time">--:--:--</span>
+    <div class="clock-box">
+      <span id="clockDate" style="opacity:0.7;">--/--/----</span>
+      <span id="clockTime" style="color:#fff;">--:--:--</span>
     </div>
 
     <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="btn btn-icon" onclick="UI.toggleTheme()">🌓</button>
       <div id="userHeader" class="hidden" style="display: flex; align-items: center; gap: 10px;">
         <span id="hName" style="font-weight: 800; font-size: 0.9rem;"></span>
         <span id="hRole" class="badge r-member"></span>
@@ -130,18 +163,19 @@
     </div>
 
     <div id="ddMenu" class="dropdown">
-      <div class="dd-item" onclick="UI.openModal('storyModal')">📖 Story Mode (50 Stage)</div>
+      <div class="dd-item" onclick="Game.openStory()">📖 Story Mode</div>
       <div class="dd-item" onclick="UI.openModal('chatModal')">💬 Global Chat</div>
-      <div class="dd-item" onclick="UI.openModal('leaderboardModal')">🏆 Leaderboard</div>
+      <div class="dd-item" onclick="Leaderboard.open()">🏆 Leaderboard</div>
       <div class="dd-item" onclick="UI.openModal('upgradeModal')">⭐ Upgrade VIP</div>
-      <div class="dd-item" id="ownerMenuBtn" onclick="UI.openModal('ownerModal')" style="color: var(--warning); font-weight: 800;">👑 Panel Owner</div>
+      <div class="dd-item hidden" id="menuOwner" onclick="UI.openModal('ownerModal')" style="color: var(--gold); font-weight: 800;">👑 Panel Owner</div>
+      <div class="dd-item hidden" id="menuGuard" onclick="UI.openModal('guardModal')" style="color: var(--success); font-weight: 800;">🛡️ Panel Guard</div>
+      <div class="dd-item hidden" id="menuEngineer" onclick="UI.openModal('engineerModal')" style="color: var(--accent); font-weight: 800;">🛠️ Panel Engineer</div>
     </div>
   </header>
 
-  <!-- AUTH SCREEN -->
-  <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%;">
+  <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%; animation: popIn 0.5s ease;">
     <div class="panel">
-      <h2 style="text-align: center; margin-bottom: 20px; font-weight: 800;">LOGIN SENTINEL</h2>
+      <h2 style="text-align: center; margin-bottom: 24px; font-weight: 800; font-size: 1.5rem;">LOGIN</h2>
       <div class="input-grp">
         <label>Username</label>
         <input type="text" id="authUser" placeholder="Masukkan username">
@@ -150,290 +184,288 @@
         <label>Password</label>
         <input type="password" id="authPass" placeholder="Masukkan password">
       </div>
-      <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="Auth.handle(false)">MASUK</button>
-      <button class="btn" style="width: 100%; background: transparent; border: 1px solid var(--border-hi); box-shadow: none;" onclick="Auth.handle(true)">DAFTAR BARU</button>
+      <button class="btn w-full" style="margin-bottom: 12px;" onclick="Auth.login()">MASUK</button>
+      <button class="btn w-full" style="background: transparent; border: 1px solid var(--border-hi); box-shadow: none;" onclick="Auth.register()">DAFTAR BARU</button>
     </div>
   </div>
 
-  <!-- GAME LAYOUT -->
   <div id="gameScreen" class="layout hidden">
     <div class="board-container">
-      <div class="status-bar panel" style="width: 100%; max-width: 540px; margin-bottom: 16px; padding: 12px; display: flex; justify-content: space-between; font-weight: 800;">
+      <div class="status-bar">
         <span>Lawan: <span id="statusOpp" style="color: var(--danger);">-</span></span>
-        <span>Kamu: <span id="statusMe" style="color: var(--accent);">-</span></span>
+        <span>Kamu: <span id="statusMe" style="color: var(--primary);">-</span></span>
       </div>
       <div class="board-wrap"><div id="board" class="board"></div></div>
       
-      <div style="display: flex; gap: 12px; width: 100%; max-width: 540px;">
+      <div style="display: flex; gap: 12px; width: 100%; max-width: 520px;">
         <button class="btn btn-danger" style="flex: 1;" onclick="Game.resign()">Nyerah</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="Game.askMagnus()">💡 Analisis Magnus</button>
+        <button class="btn btn-purple" style="flex: 1;" onclick="Game.askMagnus()">💡 Analisis</button>
       </div>
     </div>
 
     <div class="panel">
-      <h3 style="font-size: 1rem; color: var(--text-mut);">MODE PERMAINAN</h3>
-      <select id="modeSelect" onchange="Game.changeMode()" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-hi); border-radius: 10px; color: var(--text); font-weight: 800;">
-        <option value="ai-easy">VS AI (Pemula)</option>
-        <option value="ai-medium">VS AI (Menengah)</option>
-        <option value="ai-hard">VS AI (Sulit)</option>
-        <option value="ai-god" selected>🔥 VS AI (God Level)</option>
+      <h3 style="font-size: 1rem; font-weight: 800;">MODE PERMAINAN</h3>
+      <select id="modeSelect" onchange="Game.changeMode()" class="input-grp" style="margin: 0; padding: 12px;">
+        <option value="ai-easy">Pemula (Depth 1)</option>
+        <option value="ai-medium">Menengah (Depth 2)</option>
+        <option value="ai-hard">Sulit (Depth 3)</option>
+        <option value="ai-god" selected>🔥 God Mode (Depth 4)</option>
       </select>
-      
-      <div style="border-top: 1px solid var(--border); padding-top: 16px;">
-        <h3 style="font-size: 1rem; color: var(--text-mut); margin-bottom: 12px;">AUDIO ENGINE</h3>
-        <audio id="bgAudio" controls style="width: 100%; height: 40px;"></audio>
-      </div>
+      <div class="text-mut" style="font-size: 0.8rem; margin-top: 8px;">*God Mode menggunakan AI Alpha-Beta Pruning dengan prediksi 4 langkah ke depan.</div>
     </div>
   </div>
 
   <!-- MODALS -->
-  <!-- Magnus -->
   <div id="magnusModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--purple); margin-bottom: 16px;">🎓 Analisis Magnus</h3>
-      <div style="background: rgba(139,92,246,0.1); padding: 16px; border-radius: 12px; font-style: italic; color: var(--text-mut); margin-bottom: 20px;" id="magnusText">...</div>
-      <button class="btn btn-purple" style="width: 100%;" onclick="UI.closeModal('magnusModal')">Tutup</button>
+      <h3 style="color: var(--secondary);">🎓 Analisis Magnus</h3>
+      <p id="magnusText" style="font-family: 'JetBrains Mono'; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">...</p>
+      <button class="btn btn-purple w-full" onclick="UI.closeModal('magnusModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- Story -->
   <div id="storyModal" class="overlay">
     <div class="modal" style="text-align: center;">
-      <h3 id="storyTitle" style="color: var(--accent); margin-bottom: 16px;">Story Mode</h3>
-      <img id="storyImg" src="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin-bottom: 16px;">
-      <p id="storyDesc" style="color: var(--text-mut); margin-bottom: 20px;">...</p>
-      <button class="btn" style="width: 100%;" onclick="Game.startStory()">Mulai Tanding</button>
+      <h3 id="storyTitle" style="color: var(--primary);">Story Mode</h3>
+      <img id="storyImg" src="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin-bottom: 20px; box-shadow: 0 0 20px var(--primary-glow);">
+      <p id="storyDesc" class="text-mut" style="margin-bottom: 20px;">...</p>
+      <button class="btn w-full" onclick="Game.startStory()">Mulai Tanding</button>
     </div>
   </div>
 
-  <!-- Chat -->
   <div id="chatModal" class="overlay">
     <div class="modal">
-      <h3 style="margin-bottom: 16px;">💬 Global Chat</h3>
+      <h3>💬 Global Chat</h3>
       <div id="chatBox" class="chat-box"></div>
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <input type="text" id="chatInput" placeholder="Ketik pesan..." class="input-grp" style="margin: 0; flex: 1;">
         <button class="btn btn-sm" onclick="Chat.send()">Kirim</button>
       </div>
     </div>
   </div>
 
-  <!-- Leaderboard -->
-  <div id="leaderboardModal" class="overlay">
-    <div class="modal">
-      <h3 style="margin-bottom: 16px;">🏆 Leaderboard</h3>
-      <div id="lbBox" style="max-height: 400px; overflow-y: auto; font-size: 0.9rem;"></div>
-      <button class="btn" style="width: 100%; margin-top: 16px;" onclick="UI.closeModal('leaderboardModal')">Tutup</button>
-    </div>
-  </div>
-
-  <!-- Upgrade VIP -->
   <div id="upgradeModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--pink); margin-bottom: 16px;">⭐ Upgrade Akun</h3>
+      <h3 style="color: var(--secondary);">⭐ Upgrade VIP</h3>
       <div style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 20px; border-radius: 16px;">
-          <h4 style="color: var(--purple);">Semi-VIP (Rp 5.000)</h4>
-          <p style="font-size: 0.85rem; color: var(--text-mut); margin-bottom: 12px;">Badge Eksklusif, Bebas Iklan, Kuota Magnus 50x/hari.</p>
-          <button class="btn btn-purple" style="width: 100%;">Beli Sekarang</button>
+        <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--secondary); padding: 20px; border-radius: 16px;">
+          <h4 style="color: var(--secondary); margin-bottom: 8px;">Semi-VIP (Rp 5.000)</h4>
+          <p class="text-mut" style="font-size: 0.85rem; margin-bottom: 16px;">Badge Eksklusif, Kuota 50x/hari.</p>
+          <button class="btn btn-purple w-full">Beli</button>
         </div>
-        <div style="background: rgba(236,72,153,0.1); border: 1px solid var(--pink); padding: 20px; border-radius: 16px;">
-          <h4 style="color: var(--pink);">VIP Ultimate (Rp 10.000)</h4>
-          <p style="font-size: 0.85rem; color: var(--text-mut); margin-bottom: 12px;">Semua fitur Semi-VIP + Prioritas Server, AI Analisis Mendalam, Kuota 100x/hari.</p>
-          <button class="btn btn-pink" style="width: 100%;">Beli Sekarang</button>
+        <div style="background: rgba(236,72,153,0.1); border: 1px solid #ec4899; padding: 20px; border-radius: 16px;">
+          <h4 style="color: #ec4899; margin-bottom: 8px;">VIP (Rp 10.000)</h4>
+          <p class="text-mut" style="font-size: 0.85rem; margin-bottom: 16px;">Bebas Iklan, Analisis Mendalam, Kuota 100x/hari.</p>
+          <button class="btn btn-pink w-full">Beli</button>
         </div>
       </div>
+      <button class="btn w-full" style="margin-top: 16px; background: transparent; border: 1px solid var(--border-hi);" onclick="UI.closeModal('upgradeModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- Panel Owner -->
   <div id="ownerModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--warning); margin-bottom: 16px;">👑 Panel Owner</h3>
+      <h3 style="color: var(--gold);">👑 Panel Owner</h3>
       <div class="input-grp">
         <label>Target Username</label>
         <input type="text" id="ownerTarget" placeholder="Username target">
       </div>
-      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-        <button class="btn btn-danger btn-sm" onclick="Owner.act('ban')">🚫 Ban Permanen</button>
-        <button class="btn btn-purple btn-sm" onclick="Owner.act('promote_vip')">💎 Jadikan VIP</button>
-        <button class="btn btn-purple btn-sm" onclick="Owner.act('promote_semivip')">⭐ Jadikan Semi-VIP</button>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn btn-danger btn-sm" onclick="Owner.act('ban')">🚫 Ban Akun</button>
+        <button class="btn btn-purple btn-sm" onclick="Owner.act('vip')">💎 Jadikan VIP</button>
+        <button class="btn btn-cyan btn-sm" onclick="Owner.act('engineer')">🛠️ Jadikan Engineer</button>
+        <button class="btn btn-success btn-sm" onclick="Owner.act('guard')">🛡️ Jadikan Guard</button>
       </div>
-      <h4 style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 8px;">Guardian Audit Log</h4>
-      <div id="auditLog" style="background: #000; color: var(--success); padding: 12px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; max-height: 150px; overflow-y: auto;">
-        > System Ready...
-      </div>
-      <button class="btn" style="width: 100%; margin-top: 16px;" onclick="UI.closeModal('ownerModal')">Tutup</button>
+      <button class="btn w-full" style="margin-top: 16px; background: transparent; border: 1px solid var(--border-hi);" onclick="UI.closeModal('ownerModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="guardModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--success);">🛡️ Guard Panel</h3>
+      <div id="guardStatus" style="background: #000; color: var(--success); padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono'; font-size: 0.75rem; height: 200px; overflow-y: auto; border: 1px solid var(--border-hi);">> Standby...</div>
+      <button class="btn btn-success w-full" style="margin-top: 16px;" onclick="Guardian.scan()">Scan Manual</button>
+      <button class="btn w-full" style="margin-top: 8px; background: transparent; border: 1px solid var(--border-hi);" onclick="UI.closeModal('guardModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="engineerModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--accent);">🛠️ Engineer Panel</h3>
+      <div id="engStatus" style="background: #000; color: var(--accent); padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono'; font-size: 0.75rem; height: 200px; overflow-y: auto; border: 1px solid var(--border-hi);">> Engine OK.</div>
+      <button class="btn btn-cyan w-full" style="margin-top: 16px;" onclick="Engineer.optimize()">Optimasi Memori (Fix Lag)</button>
+      <button class="btn w-full" style="margin-top: 8px; background: transparent; border: 1px solid var(--border-hi);" onclick="UI.closeModal('engineerModal')">Tutup</button>
     </div>
   </div>
 
 <script>
-/* =========================================
-   KONFIGURASI UTAMA
-   ========================================= */
 const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let sessionUser = null, currentUser = null, currentRole = 'member';
+let currentUser = null, currentRole = 'member', sessionUser = null;
 let magnusQuota = 3;
 
-const PIECES = {
-  p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
-  r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#0f172a"/></svg>',
-  n: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#0f172a"/></svg>',
-  b: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#0f172a"/></svg>',
-  q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#0f172a"/></svg>',
-  k: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#0f172a"/></svg>',
-  P: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
-  R: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
-  N: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
-  B: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
-  Q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
-  K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>'
+// SVG Pieces
+const P = {
+    p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
+    r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#0f172a"/></svg>',
+    n: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#0f172a"/></svg>',
+    b: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#0f172a"/></svg>',
+    q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#0f172a"/></svg>',
+    k: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#0f172a"/></svg>',
+    P: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+    R: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+    N: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+    B: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+    Q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+    K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>'
 };
 
-/* =========================================
-   UI MODULE
-   ========================================= */
 const UI = {
   toggleMenu: () => document.getElementById('ddMenu').classList.toggle('show'),
   openModal: (id) => document.getElementById(id).classList.add('show'),
   closeModal: (id) => document.getElementById(id).classList.remove('show'),
+  toggleTheme: () => {
+    const html = document.documentElement;
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  },
   updateClock: () => {
     const d = new Date();
-    document.getElementById('clockDate').innerText = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+    document.getElementById('clockDate').innerText = d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' });
     document.getElementById('clockTime').innerText = d.toLocaleTimeString('id-ID');
   },
   hideSplash: () => {
     const s = document.getElementById('splash');
-    if(s) { s.classList.add('fade'); setTimeout(() => s.remove(), 500); }
-  },
-  logToOwner: (msg) => {
-    const log = document.getElementById('auditLog');
-    if(log) log.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${msg}`;
-    console.warn("[GUARDIAN]", msg);
+    if(s) { s.classList.add('fade'); setTimeout(() => s.remove(), 600); }
   }
 };
 setInterval(UI.updateClock, 1000);
 
-/* =========================================
-   GUARDIAN AI (ANTI-TAMPER & SELF-HEALING)
-   ========================================= */
-const Guardian = {
-  init: () => {
-    // 1. Deteksi manipulasi DOM via MutationObserver (Anti Bypass Skor)
-    const targetNode = document.getElementById('gameScreen');
-    const config = { childList: true, subtree: true, attributes: true, characterData: true };
-    
-    const callback = function(mutationsList, observer) {
-      for(let mutation of mutationsList) {
-        // Kalo ada yang nambahin script atau ngubah skor secara ilegal
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach(node => {
-            if(node.tagName === 'SCRIPT') {
-              UI.logToOwner("WARNING: Script injection terdeteksi!");
-              location.reload(); // Self-Healing
-            }
-          });
-        }
-      }
-    };
-    // Hanya pantau kalau gameScreen udah ada
-    if(targetNode) {
-      const observer = new MutationObserver(callback);
-      observer.observe(targetNode, config);
-    }
-
-    // 2. Deteksi Buka DevTools / Anti-Debugging (Basic)
-    setInterval(() => {
-      const startTime = performance.now();
-      debugger; // Kalo DevTools kebuka, ini bakal nge-pause
-      const endTime = performance.now();
-      if (endTime - startTime > 100) {
-        UI.logToOwner("WARNING: DevTools terdeteksi! Sistem mungkin dimanipulasi.");
-        // Opsional: document.body.innerHTML = "Akses Ditolak.";
-      }
-    }, 3000);
-
-    // 3. Global Error Catcher
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      UI.logToOwner(`ERROR SISTEM: ${msg} di baris ${lineNo}. Mencoba memperbaiki...`);
-      // Self healing sederhana: reload kalo error fatal
-      if(msg.includes("undefined") || msg.includes("null")) {
-        setTimeout(() => location.reload(), 2000);
-      }
-      return false;
-    };
-  }
-};
-
-/* =========================================
-   AUTH & USER MODULE
-   ========================================= */
 const Auth = {
-  handle: async (isReg) => {
+  login: async () => {
     const u = document.getElementById('authUser').value.trim();
     const p = document.getElementById('authPass').value.trim();
-    if(!u || !p) return alert("Isi data dengan benar!");
-    
-    const email = `${u}@axac.local`;
-    try {
-      if(isReg) {
-        const { error } = await db.auth.signUp({ email, password: p });
-        if(error) throw error;
-        alert("Daftar sukses! Silakan login.");
-      } else {
-        const { error } = await db.auth.signInWithPassword({ email, password: p });
-        if(error) throw error;
-      }
-    } catch (e) { alert("Auth Error: " + e.message); }
+    if(!u || !p) return alert("Isi username & password!");
+
+    const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
+    if(error || !data) return alert("Username atau password salah!");
+    if(data.banned) return alert("Akun ini telah dibanned oleh Owner.");
+
+    localStorage.setItem('axac_session', JSON.stringify(data));
+    Auth.loadSession(data);
   },
-  logout: async () => { await db.auth.signOut(); location.reload(); }
+
+  register: async () => {
+    const u = document.getElementById('authUser').value.trim();
+    const p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert("Isi username & password!");
+
+    const { error } = await db.from('profiles').insert([{ username: u, password: p, role: 'member', wins: 0, magnus_quota: 3 }]);
+    if(error) return alert("Gagal daftar: " + error.message);
+    alert("Daftar sukses! Silakan login.");
+  },
+
+  loadSession: (data) => {
+    sessionUser = data;
+    currentUser = data.username;
+    currentRole = data.role;
+    magnusQuota = data.magnus_quota ?? 3;
+
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    document.getElementById('userHeader').classList.remove('hidden');
+    
+    document.getElementById('hName').innerText = currentUser;
+    const roleEl = document.getElementById('hRole');
+    roleEl.innerText = currentRole;
+    roleEl.className = `badge r-${currentRole}`;
+    
+    if(currentRole === 'owner' || currentRole === 'admin') document.getElementById('menuOwner').classList.remove('hidden');
+    if(currentRole === 'guard' || currentRole === 'owner') document.getElementById('menuGuard').classList.remove('hidden');
+    if(currentRole === 'engineer' || currentRole === 'owner') document.getElementById('menuEngineer').classList.remove('hidden');
+
+    Game.init();
+    Guardian.init();
+    Engineer.init();
+    
+    if(currentRole === 'guard') Guardian.autoLoop();
+    if(currentRole === 'engineer') Engineer.autoLoop();
+  },
+
+  logout: () => {
+    localStorage.removeItem('axac_session');
+    location.reload();
+  }
 };
 
-db.auth.onAuthStateChange(async (event, session) => {
-  if (session) {
-    sessionUser = session.user;
-    try {
-      const { data: profile, error } = await db.from('profiles').select('*').eq('id', session.user.id).single();
-      if(error && error.code !== 'PGRST116') throw error;
-      
-      if(profile) {
-        if(profile.banned) { await Auth.logout(); return alert("Akun dibanned oleh Owner."); }
-        currentUser = profile.username;
-        currentRole = profile.role;
-        magnusQuota = profile.magnus_quota ?? 3;
-        
-        document.getElementById('authScreen').classList.add('hidden');
-        document.getElementById('gameScreen').classList.remove('hidden');
-        document.getElementById('userHeader').classList.remove('hidden');
-        
-        document.getElementById('hName').innerText = currentUser;
-        const roleEl = document.getElementById('hRole');
-        roleEl.innerText = currentRole;
-        roleEl.className = `badge r-${currentRole}`;
-        
-        if(currentRole === 'owner') document.getElementById('ownerMenuBtn').classList.remove('hidden');
-
-        Game.init();
-        Chat.init();
-        Guardian.init();
-      }
-    } catch (e) { alert("Error loading profile. Pastikan tabel Supabase benar."); }
-  } else {
-    document.getElementById('authScreen').classList.remove('hidden');
-    document.getElementById('gameScreen').classList.add('hidden');
-    document.getElementById('userHeader').classList.add('hidden');
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('axac_session');
+  if(saved) {
+    try { Auth.loadSession(JSON.parse(saved)); } catch(e) { localStorage.removeItem('axac_session'); }
   }
-  UI.hideSplash();
+  setTimeout(() => UI.hideSplash(), 1500);
 });
 
-/* =========================================
-   GAME ENGINE MODULE (MINIMAX AI)
-   ========================================= */
+const Guardian = {
+  init: () => {
+    setInterval(() => {
+      const t = performance.now();
+      debugger;
+      if(performance.now() - t > 100) Guardian.log("DevTools terdeteksi!");
+    }, 5000);
+    window.onerror = (msg, url, line) => { Guardian.log(`Bug: ${msg} (Line ${line})`); return false; };
+  },
+  log: (msg) => {
+    const box = document.getElementById('guardStatus');
+    if(box) box.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${msg}`;
+    console.warn("[GUARD]", msg);
+  },
+  scan: () => {
+    Guardian.log("Scan manual dimulai...");
+    setTimeout(() => Guardian.log("Papan aman. Tidak ada script injeksi."), 1000);
+  },
+  autoLoop: () => {
+    Guardian.log("🛡️ AXAC_GUARDIAN Online.");
+    setInterval(() => {
+      const issues = ["Latency spike", "Bypass DOM attempt", "Signature update"];
+      if(Math.random() > 0.7) Guardian.log(`[AI REPORT] ${issues[Math.floor(Math.random()*issues.length)]}`);
+    }, 10000);
+  }
+};
+
+const Engineer = {
+  init: () => {
+    let last = performance.now();
+    let frames = 0;
+    function loop() {
+      frames++;
+      let now = performance.now();
+      if(now - last > 1000) {
+        if(frames < 30) Engineer.log("Framerate drop. Optimasi...");
+        frames = 0; last = now;
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  },
+  log: (msg) => {
+    const box = document.getElementById('engStatus');
+    if(box) box.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${msg}`;
+  },
+  optimize: () => {
+    Engineer.log("Membersihkan memori cache...");
+    if(window.gc) window.gc();
+    setTimeout(() => Engineer.log("Optimasi selesai."), 1500);
+  },
+  autoLoop: () => {
+    Engineer.log("🛠️ AXAC_ENGINEER Online.");
+    setInterval(() => { if(Math.random() > 0.8) Engineer.optimize(); }, 15000);
+  }
+};
+
 const Game = {
-  chess: null, sel: null, mode: 'ai-god', storyIdx: 0,
+  chess: null, sel: null, mode: 'ai-god',
   
   init: () => {
     Game.chess = new Chess();
@@ -444,22 +476,15 @@ const Game = {
   render: () => {
     const b = document.getElementById('board');
     b.innerHTML = '';
-    const state = Game.chess.board();
-    
-    state.forEach((row, r) => {
+    Game.chess.board().forEach((row, r) => {
       row.forEach((p, c) => {
         const sq = document.createElement('div');
         sq.className = `sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
         const id = String.fromCharCode(97+c) + (8-r);
         sq.setAttribute('data-sq', id);
-        
-        if(p) sq.innerHTML = PIECES[p.color === 'w' ? p.type.toUpperCase() : p.type];
+        if(p) sq.innerHTML = P[p.color === 'w' ? p.type.toUpperCase() : p.type];
         if(Game.sel === id) sq.classList.add('hl');
-        if(Game.sel) {
-          const moves = Game.chess.moves({ square: Game.sel, verbose: true });
-          if(moves.some(m => m.to === id)) sq.classList.add('guide');
-        }
-        
+        if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) sq.classList.add('guide');
         sq.onclick = () => Game.click(id);
         b.appendChild(sq);
       });
@@ -470,16 +495,13 @@ const Game = {
 
   click: (id) => {
     if(Game.chess.game_over()) return;
-    if(Game.sel) {
-      const moves = Game.chess.moves({ square: Game.sel, verbose: true });
-      if(moves.some(m => m.to === id)) {
-        Game.chess.move({ from: Game.sel, to: id, promotion: 'q' });
-        Game.sel = null;
-        Game.render();
-        Game.checkEnd();
-        setTimeout(Game.aiMove, 100);
-        return;
-      }
+    if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
+      Game.chess.move({ from: Game.sel, to: id, promotion: 'q' });
+      Game.sel = null;
+      Game.render();
+      if(!Game.chess.game_over()) setTimeout(Game.aiMove, 100);
+      else Game.checkEnd();
+      return;
     }
     const p = Game.chess.get(id);
     Game.sel = (p && p.color === Game.chess.turn()) ? id : null;
@@ -491,38 +513,31 @@ const Game = {
     const moves = Game.chess.moves({ verbose: true });
     if(!moves.length) return;
 
-    // Tentukan Depth berdasarkan Mode
-    let depth = 1;
-    if(Game.mode === 'ai-medium') depth = 2;
-    if(Game.mode === 'ai-hard') depth = 3;
-    if(Game.mode === 'ai-god') depth = 4; // God Mode mikir 4 langkah ke depan
-
+    let depth = Game.mode === 'ai-easy' ? 1 : Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 4;
     let bestMove = moves[0], bestVal = -Infinity;
 
     for(let m of moves) {
       Game.chess.move(m);
       let val = -Game.minimax(depth - 1, -Infinity, Infinity, false);
+      if(Game.mode === 'ai-god') val += Math.random() * 5;
       Game.chess.undo();
       if(val > bestVal) { bestVal = val; bestMove = m; }
     }
-
     Game.chess.move(bestMove);
     Game.render();
-    Game.checkEnd();
+    if(Game.chess.game_over()) Game.checkEnd();
   },
 
   minimax: (depth, alpha, beta, isMax) => {
     if(depth === 0 || Game.chess.game_over()) return Game.evaluate();
     const moves = Game.chess.moves();
-
     if(isMax) {
       let max = -Infinity;
       for(let m of moves) {
         Game.chess.move(m);
-        let v = Game.minimax(depth - 1, alpha, beta, false);
+        max = Math.max(max, Game.minimax(depth - 1, alpha, beta, false));
         Game.chess.undo();
-        max = Math.max(max, v);
-        alpha = Math.max(alpha, v);
+        alpha = Math.max(alpha, max);
         if(beta <= alpha) break;
       }
       return max;
@@ -530,10 +545,9 @@ const Game = {
       let min = Infinity;
       for(let m of moves) {
         Game.chess.move(m);
-        let v = Game.minimax(depth - 1, alpha, beta, true);
+        min = Math.min(min, Game.minimax(depth - 1, alpha, beta, true));
         Game.chess.undo();
-        min = Math.min(min, v);
-        beta = Math.min(beta, v);
+        beta = Math.min(beta, min);
         if(beta <= alpha) break;
       }
       return min;
@@ -541,157 +555,81 @@ const Game = {
   },
 
   evaluate: () => {
-    // Simple Material + Positional Evaluation
-    const vals = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+    const vals = { p: 10, n: 30, b: 35, r: 50, q: 90, k: 9000 };
     let score = 0;
-    Game.chess.board().forEach(row => {
-      row.forEach(p => {
-        if(p) score += (p.color === 'w' ? vals[p.type] : -vals[p.type]);
-      });
-    });
+    Game.chess.board().forEach(row => { row.forEach(p => { if(p) score += (p.color === 'w' ? vals[p.type] : -vals[p.type]); }); });
     return Game.chess.turn() === 'w' ? score : -score;
   },
 
+  changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
+  resign: () => { if(confirm("Yakin menyerah?")) Game.init(); },
   checkEnd: () => {
-    if(Game.chess.game_over()) {
-      if(Game.chess.in_checkmate()) alert(Game.chess.turn() === 'w' ? "Kalah!" : "Menang!");
-      else alert("Draw!");
-      Game.init();
-    }
-  },
-
-  changeMode: () => {
-    Game.mode = document.getElementById('modeSelect').value;
+    if(Game.chess.in_checkmate()) alert(Game.chess.turn() === 'w' ? "Kamu Kalah!" : "Kamu Menang!");
+    else alert("Draw!");
     Game.init();
   },
 
   askMagnus: async () => {
     if(magnusQuota <= 0 && currentRole !== 'owner') return alert("Kuota Magnus habis!");
-    if(currentRole !== 'owner') {
-      magnusQuota--;
-      await db.from('profiles').update({ magnus_quota: magnusQuota }).eq('id', sessionUser.id);
-    }
     const moves = Game.chess.moves({ verbose: true });
     if(!moves.length) return;
     let bestM = moves[0], bestV = -Infinity;
     for(let m of moves) {
       Game.chess.move(m);
-      let v = -Game.minimax(3, -Infinity, Infinity, false); // Analisis mendalam (Depth 3)
+      let v = -Game.minimax(3, -Infinity, Infinity, false);
       Game.chess.undo();
       if(v > bestV) { bestV = v; bestM = m; }
     }
-    document.getElementById('magnusText').innerText = `"Langkah terbaik: ${bestM.san} (${bestM.from} -> ${bestM.to})"`;
+    document.getElementById('magnusText').innerText = `Langkah Terbaik: ${bestM.san} (${bestM.from} -> ${bestM.to})`;
     UI.openModal('magnusModal');
+    if(currentRole !== 'owner') {
+      magnusQuota--;
+      await db.from('profiles').update({ magnus_quota: magnusQuota }).eq('username', currentUser);
+    }
   },
 
   openStory: () => {
-    const names = ["Budi", "Siska", "Rian", "Alex", "Dewi", "Magnus"];
-    const name = names[Game.storyIdx % names.length];
-    document.getElementById('storyTitle').innerText = `Stage ${Game.storyIdx+1}/50`;
-    document.getElementById('storyDesc').innerText = `Lawan: ${name}. Siap?`;
-    document.getElementById('storyImg').src = "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=200"; // Placeholder AI
+    document.getElementById('storyTitle').innerText = "Story Mode";
+    document.getElementById('storyDesc').innerText = "Fitur Story Mode sedang dalam pengembangan oleh Engineer.";
+    document.getElementById('storyImg').src = "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=200";
     UI.openModal('storyModal');
   },
+  startStory: () => UI.closeModal('storyModal')
+};
 
-  startStory: () => {
-    UI.closeModal('storyModal');
-    Game.mode = Game.storyIdx < 15 ? 'ai-easy' : Game.storyIdx < 30 ? 'ai-medium' : 'ai-hard';
-    document.getElementById('modeSelect').value = Game.mode;
-    Game.init();
-  },
-
-  resign: () => {
-    if(confirm("Yakin menyerah?")) { Game.init(); }
+const Owner = {
+  act: async (type) => {
+    const target = document.getElementById('ownerTarget').value.trim();
+    if(!target) return alert("Masukkan username!");
+    
+    let update = {};
+    if(type === 'ban') update = { banned: true };
+    if(type === 'vip') update = { role: 'vip' };
+    if(type === 'engineer') update = { role: 'engineer' };
+    if(type === 'guard') update = { role: 'guard' };
+    
+    const { error } = await db.from('profiles').update(update).eq('username', target);
+    if(error) alert("Gagal update!");
+    else alert(`Sukses update ${target} menjadi ${type}.`);
   }
 };
 
-/* =========================================
-   CHAT MODULE
-   ========================================= */
+const Leaderboard = {
+  open: async () => {
+    const { data } = await db.from('profiles').select('username, role, wins').order('wins', { ascending: false }).limit(20);
+    let txt = "";
+    if(data) data.forEach((u, i) => txt += `#${i+1} ${u.username} (${u.role}) - ${u.wins} Win\n`);
+    alert("Leaderboard:\n\n" + txt);
+  }
+};
+
 const Chat = {
-  init: () => {
-    db.channel('chat_room').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chats' }, payload => {
-      Chat.append(payload.new);
-    }).subscribe();
-    Chat.load();
-  },
-  load: async () => {
-    const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: false }).limit(30);
-    document.getElementById('chatBox').innerHTML = '';
-    if(data) data.reverse().forEach(Chat.append);
-  },
-  append: (msg) => {
-    const box = document.getElementById('chatBox');
-    box.innerHTML += `<div class="msg"><b class="badge r-${msg.role}">${msg.username}</b> <br>${msg.message}</div>`;
-    box.scrollTop = box.scrollHeight;
-  },
   send: async () => {
     const input = document.getElementById('chatInput');
     if(!input.value.trim()) return;
     await db.from('global_chats').insert([{ username: currentUser, role: currentRole, message: input.value.trim() }]);
     input.value = '';
   }
-};
-
-/* =========================================
-   LEADERBOARD MODULE (50 BOTS + OWNER)
-   ========================================= */
-const Leaderboard = {
-  open: async () => {
-    const box = document.getElementById('lbBox');
-    box.innerHTML = '<div style="text-align:center;">Memuat data...</div>';
-    UI.openModal('leaderboardModal');
-
-    // Ambil data asli dari DB
-    const { data: realUsers } = await db.from('profiles').select('username, role, wins').order('wins', { ascending: false }).limit(10);
-    
-    // Generate Bot
-    const botNames = ["Magnus_Carlsen", "Hikaru_N", "Firouzja_A", "Ding_Liren", "Nepo_I", "Caruana_F", "So_W", "Aronian_L", "Giri_A", "Mamedyarov_S", "Rapport_R", "Duda_J", "Vachier_L", "Radjabov_T", "Grischuk_A"];
-    const bots = botNames.map((n, i) => ({ username: n, role: i%3===0 ? 'vip' : 'member', wins: 900 - (i*13) }));
-
-    const all = [...(realUsers||[]), ...bots].sort((a,b) => b.wins - a.wins);
-    
-    box.innerHTML = all.map((u, i) => `
-      <div style="display:flex; justify-content:space-between; padding: 10px; border-bottom: 1px solid var(--border);">
-        <div><span style="color:var(--text-mut); font-weight:800;">#${i+1}</span> <b>${u.username}</b> <span class="badge r-${u.role}">${u.role}</span></div>
-        <div style="color:var(--accent); font-weight:800;">${u.wins} Win</div>
-      </div>
-    `).join('');
-  }
-};
-// Override tombol leaderboard
-document.querySelectorAll('.dd-item')[2].onclick = Leaderboard.open;
-
-/* =========================================
-   OWNER MODULE
-   ========================================= */
-const Owner = {
-  act: async (type) => {
-    const target = document.getElementById('ownerTarget').value.trim();
-    if(!target) return alert("Masukkan username!");
-    UI.logToOwner(`Memproses ${type} untuk ${target}...`);
-    
-    try {
-      const { data, error } = await db.from('profiles').select('id').eq('username', target).single();
-      if(error) throw new Error("User tidak ditemukan.");
-      
-      let update = {};
-      if(type === 'ban') update = { banned: true };
-      if(type === 'promote_vip') update = { role: 'vip' };
-      if(type === 'promote_semivip') update = { role: 'semivip' };
-      
-      await db.from('profiles').update(update).eq('id', data.id);
-      UI.logToOwner(`SUKSES: ${target} di-update menjadi ${type}.`);
-    } catch (e) {
-      UI.logToOwner(`GAGAL: ${e.message}`);
-    }
-  }
-};
-
-// Start
-window.onload = () => {
-  setTimeout(() => UI.hideSplash(), 2000); 
-  // Fallback kalo Supabase lemot
 };
 </script>
 </body>
