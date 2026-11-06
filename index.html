@@ -10,26 +10,18 @@
   
   <style>
     /* =========================================
-       CSS VARIABLES & THEME
+       1. CORE VARIABLES & RESET
        ========================================= */
     :root {
-      --bg-base: #020408;
-      --bg-panel: rgba(15, 23, 42, 0.92);
-      --bg-panel-hi: rgba(30, 41, 59, 0.98);
+      --bg-base: #03050a;
+      --bg-panel: rgba(15, 23, 42, 0.85);
       --border: rgba(255, 255, 255, 0.08);
-      --border-hi: rgba(255, 255, 255, 0.15);
       --primary: #3b82f6;
       --primary-glow: rgba(59, 130, 246, 0.4);
       --accent: #06b6d4;
-      --accent-glow: rgba(6, 182, 212, 0.4);
       --danger: #ef4444;
-      --danger-glow: rgba(239, 68, 68, 0.4);
       --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.4);
       --purple: #8b5cf6;
-      --purple-glow: rgba(139, 92, 246, 0.4);
-      --gold: #fbbf24;
-      --gold-glow: rgba(251, 191, 36, 0.4);
       --text-main: #f8fafc;
       --text-mut: #94a3b8;
       --sq-light: #cbd5e1;
@@ -39,283 +31,79 @@
       --shadow: 0 10px 40px -10px rgba(0,0,0,0.9);
     }
 
-    /* =========================================
-       GLOBAL RESET & BASE
-       ========================================= */
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-      user-select: none; 
-      -webkit-tap-highlight-color: transparent; 
-    }
-    
-    body { 
-      background-color: var(--bg-base); 
-      color: var(--text-main); 
-      min-height: 100vh; 
-      display: flex; 
-      flex-direction: column; 
-      overflow-x: hidden; 
-      background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%);
-      background-attachment: fixed;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%); background-attachment: fixed; }
 
     /* =========================================
-       ANIMATIONS
+       2. SPLASH SCREEN (ANTI-STUCK CSS)
+       ========================================= */
+    @keyframes forceHide {
+      0% { opacity: 1; visibility: visible; }
+      85% { opacity: 1; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; z-index: -1; }
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    
+    #splash { 
+      position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; 
+      display: flex; flex-direction: column; justify-content: center; align-items: center; 
+      animation: forceHide 0.8s forwards;
+    }
+    .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 24px; }
+    .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 3px; color: var(--primary); }
+
+    /* =========================================
+       3. HEADER & LAYOUT RATA KANAN
        ========================================= */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes glowPulse { 0% { box-shadow: 0 0 5px var(--primary-glow); } 50% { box-shadow: 0 0 20px var(--primary); } 100% { box-shadow: 0 0 5px var(--primary-glow); } }
+    header { background: var(--bg-panel); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s ease; }
+    .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 24px; width: 100%; flex: 1; animation: fadeIn 0.5s ease; }
+    @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
 
     /* =========================================
-       SPLASH SCREEN
+       4. BOARD AREA
        ========================================= */
-    #splash { 
-      position: fixed; 
-      inset: 0; 
-      background: var(--bg-base); 
-      z-index: 99999; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center; 
-      transition: opacity 0.4s ease; 
-    }
-    #splash.hide { 
-      opacity: 0; 
-      pointer-events: none; 
-    }
-    .loader-ring { 
-      width: 60px; 
-      height: 60px; 
-      border: 4px solid var(--border); 
-      border-top-color: var(--primary); 
-      border-radius: 50%; 
-      animation: spin 0.8s linear infinite, glowPulse 2s infinite; 
-      margin-bottom: 24px; 
-    }
-    .splash-title { 
-      font-weight: 800; 
-      font-size: 1.8rem; 
-      letter-spacing: 3px; 
-      color: var(--primary); 
-      animation: pulse 2s infinite; 
-    }
-
-    /* =========================================
-       HEADER
-       ========================================= */
-    header { 
-      background: var(--bg-panel); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px); 
-      border-bottom: 1px solid var(--border); 
-      padding: 14px 24px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      position: sticky; 
-      top: 0; 
-      z-index: 100; 
-      animation: slideDown 0.4s ease;
-    }
-    .brand { 
-      font-weight: 800; 
-      font-size: 1.4rem; 
-      background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); 
-      -webkit-background-clip: text; 
-      -webkit-text-fill-color: transparent; 
-      letter-spacing: 1px;
-    }
-    .header-right {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-    .clock-badge {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--accent);
-      background: rgba(0,0,0,0.4);
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    /* =========================================
-       LAYOUT RATA KANAN
-       ========================================= */
-    .main-layout { 
-      display: grid; 
-      grid-template-columns: 1fr 400px; 
-      gap: 24px; 
-      max-width: 1300px; 
-      margin: 24px auto; 
-      padding: 0 24px; 
-      width: 100%; 
-      flex: 1; 
-      animation: fadeIn 0.5s ease; 
-    }
-    @media (max-width: 950px) { 
-      .main-layout { 
-        grid-template-columns: 1fr; 
-      } 
-    }
-
-    /* =========================================
-       BOARD STYLING
-       ========================================= */
-    .board-container { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      width: 100%; 
-    }
-    .status-bar { 
-      width: 100%; 
-      max-width: 560px; 
-      display: flex; 
-      justify-content: space-between; 
-      font-weight: 800; 
-      font-size: 0.95rem; 
-      background: var(--bg-panel); 
-      padding: 14px 20px; 
-      border-radius: 14px; 
-      border: 1px solid var(--border); 
-      margin-bottom: 16px; 
-      box-shadow: var(--shadow);
-    }
-    .board-wrap { 
-      width: 100%; 
-      max-width: 560px; 
-      aspect-ratio: 1; 
-      margin-bottom: 16px; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-    }
-    .board { 
-      display: grid; 
-      grid-template-columns: repeat(8, 1fr); 
-      grid-template-rows: repeat(8, 1fr); 
-      width: 100%; 
-      height: 100%; 
-      border: 8px solid #0f172a; 
-      border-radius: 16px; 
-      overflow: hidden; 
-      background: #0f172a; 
-    }
-    .sq { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      cursor: pointer; 
-      position: relative; 
-      transition: background 0.1s;
-    }
+    .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
+    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
+    .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
     .sq.light { background: var(--sq-light); }
     .sq.dark { background: var(--sq-dark); }
     .sq.hl { background: var(--sq-hl) !important; }
-    .sq.guide::after { 
-      content: ''; 
-      position: absolute; 
-      width: 28%; 
-      height: 28%; 
-      background: var(--sq-guide); 
-      border-radius: 50%; 
-      z-index: 10; 
-      box-shadow: 0 0 10px var(--sq-guide);
-    }
-    .sq svg { 
-      width: 88%; 
-      height: 88%; 
-      pointer-events: none; 
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-    }
-    .board-controls {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      max-width: 560px;
-    }
+    .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; z-index: 10; box-shadow: 0 0 10px var(--sq-guide); }
+    .sq svg { width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+    .board-controls { display: flex; gap: 12px; width: 100%; max-width: 600px; }
 
     /* =========================================
-       PANEL KANAN (RATA KANAN)
+       5. PANEL KANAN
        ========================================= */
-    .right-panel { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 20px; 
-      height: 100%;
-    }
-    .panel { 
-      background: var(--bg-panel); 
-      border: 1px solid var(--border); 
-      border-radius: 16px; 
-      padding: 20px; 
-      box-shadow: var(--shadow); 
-      display: flex; 
-      flex-direction: column; 
-      gap: 16px; 
-    }
-    .panel h3 { 
-      font-size: 0.9rem; 
-      color: var(--text-mut); 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      font-weight: 800;
-    }
+    .right-panel { display: flex; flex-direction: column; gap: 20px; height: 100%; }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
+    .panel h3 { font-size: 0.9rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
 
     /* =========================================
-       COMPONENTS (BUTTONS, INPUTS, SELECTS)
+       6. COMPONENTS
        ========================================= */
-    .btn { 
-      background: var(--primary); 
-      color: #fff; 
-      border: none; 
-      padding: 12px 20px; 
-      border-radius: 10px; 
-      font-weight: 700; 
-      cursor: pointer; 
-      transition: 0.2s; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      gap: 8px; 
-      width: 100%;
-      box-shadow: 0 4px 15px var(--primary-glow);
-    }
+    .btn { background: var(--primary); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px var(--primary-glow); }
     .btn:hover { background: #2563eb; }
-    .btn:active { transform: scale(0.98); }
-    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px var(--danger-glow); }
-    .btn-purple { background: var(--purple); box-shadow: 0 4px 15px var(--purple-glow); }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
+    .btn-purple { background: var(--purple); box-shadow: 0 4px 15px rgba(139,92,246,0.4); }
     .btn-sm { padding: 8px 12px; font-size: 0.8rem; width: auto; }
     
     .input-grp { margin-bottom: 16px; }
-    .input-grp label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-mut); margin-bottom: 6px; }
-    .input-grp input, select { 
-      width: 100%; 
-      padding: 12px 16px; 
-      background: rgba(0,0,0,0.4); 
-      border: 1px solid var(--border-hi); 
-      border-radius: 10px; 
-      color: var(--text-main); 
-      outline: none; 
-      font-size: 0.9rem;
-    }
+    .input-grp input, select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); outline: none; font-size: 0.9rem; }
     .input-grp input:focus { border-color: var(--primary); }
 
     /* =========================================
-       AUDIO PLAYER SYSTEM
+       7. MUSIC PLAYER
        ========================================= */
     .music-player { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
     .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 16px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .player-controls { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; }
-    .ctrl-btn { background: var(--bg-panel-hi); border: 1px solid var(--border-hi); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 1.2rem; }
+    .ctrl-btn { background: rgba(15, 23, 42, 1); border: 1px solid var(--border); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 1.2rem; }
     .ctrl-btn:hover { background: var(--primary); border-color: var(--primary); }
     .track-list { display: flex; flex-direction: column; gap: 8px; }
     .track-item { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: 1px solid transparent; color: var(--text-mut); transition: 0.2s; }
@@ -323,94 +111,59 @@
     .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); font-weight: 700; }
 
     /* =========================================
-       CYBER TERMINAL (GUARD & ENGINEER)
+       8. AI TERMINAL
        ========================================= */
-    .terminal { 
-      background: #000; 
-      color: var(--success); 
-      font-family: 'Courier New', Courier, monospace; 
-      font-size: 0.75rem; 
-      padding: 12px; 
-      border-radius: 8px; 
-      height: 120px; 
-      overflow-y: auto; 
-      border: 1px solid var(--border-hi); 
-      line-height: 1.4;
-    }
+    .terminal { background: #000; color: var(--success); font-family: monospace; font-size: 0.75rem; padding: 12px; border-radius: 8px; height: 140px; overflow-y: auto; border: 1px solid var(--border); line-height: 1.4; }
     .terminal-eng { color: var(--accent); }
 
     /* =========================================
-       MODALS & OVERLAYS
+       9. MODALS & UTILS
        ========================================= */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
     .overlay.show { display: flex; }
-    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; animation: popIn 0.3s; }
-    
+    .modal { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- =========================================
-       SPLASH SCREEN
-       ========================================= -->
   <div id="splash">
     <div class="loader-ring"></div>
     <div class="splash-title">AXAC DEEP-CORE</div>
   </div>
 
-  <!-- =========================================
-       HEADER
-       ========================================= -->
   <header>
     <div class="brand">AXAC 3D</div>
-    <div class="header-right">
-      <div id="clock" class="clock-badge">00:00:00</div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div id="clock" style="font-family: monospace; color: var(--accent);">00:00:00</div>
       <button class="btn btn-sm btn-danger hidden" id="logoutBtn" onclick="Auth.logout()">Keluar</button>
     </div>
   </header>
 
-  <!-- =========================================
-       AUTH SCREEN
-       ========================================= -->
   <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%;">
     <div class="panel">
-      <h2 style="text-align: center; margin-bottom: 24px; font-weight: 800;">ACCESS TERMINAL</h2>
-      <div class="input-grp">
-        <label>Username</label>
-        <input type="text" id="authUser" placeholder="Masukkan ID">
-      </div>
-      <div class="input-grp">
-        <label>Password</label>
-        <input type="password" id="authPass" placeholder="Masukkan Sandi">
-      </div>
-      <button class="btn" style="margin-bottom: 12px;" onclick="Auth.login()">LOGIN</button>
-      <button class="btn" style="background: transparent; border: 1px solid var(--border-hi); box-shadow: none;" onclick="Auth.register()">REGISTER</button>
+      <h2 style="text-align: center; margin-bottom: 24px;">LOGIN</h2>
+      <div class="input-grp"><input type="text" id="authUser" placeholder="Username"></div>
+      <div class="input-grp"><input type="password" id="authPass" placeholder="Password"></div>
+      <button class="btn" style="margin-bottom: 12px;" onclick="Auth.login()">MASUK</button>
+      <button class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="Auth.register()">DAFTAR</button>
     </div>
   </div>
 
-  <!-- =========================================
-       GAME SCREEN (LAYOUT RATA KANAN)
-       ========================================= -->
   <div id="gameScreen" class="main-layout hidden">
-    
-    <!-- KIRI: PAPAN CATUR -->
     <div class="board-container">
       <div class="status-bar">
-        <span>Lawan: <span style="color: var(--danger);">AI ENGINE</span></span>
+        <span>Lawan: <span style="color: var(--danger);">AI</span></span>
         <span>Kamu: <span id="uName" style="color: var(--primary);">-</span></span>
       </div>
       <div class="board-wrap"><div id="board" class="board"></div></div>
       <div class="board-controls">
         <button class="btn btn-danger" onclick="Game.resign()">Nyerah</button>
-        <button class="btn btn-purple" onclick="Game.hint()">💡 Bantuan AI</button>
+        <button class="btn btn-purple" onclick="Game.hint()">💡 Bantuan</button>
       </div>
     </div>
 
-    <!-- KANAN: PANEL KONTROL (RATA KANAN) -->
     <div class="right-panel">
-      
-      <!-- MODE AI -->
       <div class="panel">
         <h3>AI Difficulty</h3>
         <select id="modeSelect" onchange="Game.changeMode()">
@@ -420,8 +173,6 @@
           <option value="ai-god" selected>🔥 God Mode (Depth 5)</option>
         </select>
       </div>
-
-      <!-- MUSIC PLAYER -->
       <div class="panel">
         <h3>Audio System</h3>
         <div class="music-player">
@@ -434,65 +185,85 @@
           <div class="track-list" id="trackList"></div>
         </div>
       </div>
-
-      <!-- AI GUARD TERMINAL -->
       <div class="panel">
         <h3>🛡️ Guard System</h3>
-        <div id="guardTerminal" class="terminal">> Initializing Security Protocol...<br>> Waiting for input...</div>
+        <div id="guardTerminal" class="terminal">> Initializing Security...</div>
       </div>
-
-      <!-- AI ENGINEER TERMINAL -->
       <div class="panel">
         <h3>🛠️ Engineer System</h3>
-        <div id="engTerminal" class="terminal terminal-eng">> Analyzing Frame Rates...<br>> Memory optimization active.</div>
+        <div id="engTerminal" class="terminal terminal-eng">> Analyzing Engine...</div>
       </div>
-
     </div>
   </div>
 
-  <!-- =========================================
-       MODAL: HINT
-       ========================================= -->
   <div id="hintModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--purple); margin-bottom: 16px;">💡 Saran Langkah</h3>
-      <p id="hintText" style="margin-bottom: 20px; font-family: monospace; font-size: 1.2rem; font-weight: 800;">...</p>
+      <h3 style="color: var(--purple); margin-bottom: 16px;">💡 Saran</h3>
+      <p id="hintText" style="margin-bottom: 20px; font-family: monospace; font-size: 1.2rem;">...</p>
       <button class="btn btn-purple" onclick="UI.closeModal('hintModal')">Tutup</button>
     </div>
   </div>
 
-<!-- =========================================
-     JAVASCRIPT LOGIC
-     ========================================= -->
 <script>
 /* =========================================
-   1. KONFIGURASI & SUPABASE
+   KONFIGURASI GLOBAL & SUPABASE
    ========================================= */
 const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let db = null;
 let currentUser = null;
 
 /* =========================================
-   2. UI & UTILS MODULE
+   UTILITY FUNCTIONS (BIAR RAPI)
    ========================================= */
-const UI = {
-  hideSplash: () => {
-    const s = document.getElementById('splash');
-    if(s) { s.classList.add('hide'); setTimeout(() => s.remove(), 400); }
-  },
-  openModal: (id) => document.getElementById(id).classList.add('show'),
-  closeModal: (id) => document.getElementById(id).classList.remove('show'),
-  updateClock: () => {
-    const d = new Date();
-    document.getElementById('clock').innerText = d.toLocaleTimeString('id-ID');
-  }
+const Utils = {
+    getEl: (id) => document.getElementById(id),
+    logTerminal: (id, msg) => {
+        const el = Utils.getEl(id);
+        if(el) {
+            el.innerHTML += `<br>> ${msg}`;
+            el.scrollTop = el.scrollHeight;
+        }
+    },
+    formatTime: () => {
+        return new Date().toLocaleTimeString('id-ID');
+    }
 };
-setInterval(UI.updateClock, 1000);
-setTimeout(UI.hideSplash, 1000); // Force splash close
 
 /* =========================================
-   3. AUDIO PLAYER MODULE
+   INISIALISASI AWAL
+   ========================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  try { 
+      db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
+  } catch(e) { 
+      console.error("Supabase Init Failed:", e); 
+  }
+
+  // Jam Realtime
+  setInterval(() => {
+    const clockEl = Utils.getEl('clock');
+    if(clockEl) clockEl.innerText = Utils.formatTime();
+  }, 1000);
+
+  // Auto Login Session
+  const saved = localStorage.getItem('axac_user');
+  if(saved) { 
+    currentUser = saved; 
+    Auth.showGame(); 
+  }
+});
+
+/* =========================================
+   UI CONTROLLER
+   ========================================= */
+const UI = {
+  openModal: (id) => { const el = Utils.getEl(id); if(el) el.classList.add('show'); },
+  closeModal: (id) => { const el = Utils.getEl(id); if(el) el.classList.remove('show'); }
+};
+
+/* =========================================
+   AUDIO SYSTEM
    ========================================= */
 const Audio = {
   tracks: [
@@ -500,169 +271,150 @@ const Audio = {
     { title: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" },
     { title: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" }
   ],
-  idx: 0,
-  audio: new window.Audio(),
+  idx: 0, 
+  audio: new window.Audio(), 
   isPlaying: false,
-
+  
   init: () => {
-    const list = document.getElementById('trackList');
+    const list = Utils.getEl('trackList'); 
+    if(!list) return;
     list.innerHTML = '';
     Audio.tracks.forEach((t, i) => {
-      const div = document.createElement('div');
+      const div = document.createElement('div'); 
       div.className = `track-item ${i === 0 ? 'active' : ''}`;
-      div.innerText = t.title;
-      div.onclick = () => Audio.play(i);
+      div.innerText = t.title; 
+      div.onclick = () => Audio.play(i); 
       list.appendChild(div);
     });
-    Audio.audio.src = Audio.tracks[0].url;
+    Audio.audio.src = Audio.tracks[0].url; 
     Audio.audio.onended = Audio.next;
   },
-
+  
   play: (i) => {
-    Audio.idx = i;
-    const t = Audio.tracks[i];
-    Audio.audio.src = t.url;
-    Audio.audio.play().catch(e => console.log(e));
-    Audio.isPlaying = true;
-    document.getElementById('trackTitle').innerText = t.title;
-    document.getElementById('playBtn').innerText = "⏸";
+    Audio.idx = i; 
+    Audio.audio.src = Audio.tracks[i].url; 
+    Audio.audio.play().catch(e => console.log("Audio Error:", e));
+    Audio.isPlaying = true; 
+    
+    const title = Utils.getEl('trackTitle'); 
+    if(title) title.innerText = Audio.tracks[i].title;
+    
+    const btn = Utils.getEl('playBtn'); 
+    if(btn) btn.innerText = "⏸";
     
     document.querySelectorAll('.track-item').forEach((el, idx) => {
-      el.className = `track-item ${idx === i ? 'active' : ''}`;
+        el.className = `track-item ${idx === i ? 'active' : ''}`;
     });
   },
-
+  
   toggle: () => {
     if(!Audio.audio.src) return Audio.play(0);
-    if(Audio.isPlaying) {
-      Audio.audio.pause();
-      Audio.isPlaying = false;
-      document.getElementById('playBtn').innerText = "▶";
-    } else {
-      Audio.audio.play();
-      Audio.isPlaying = true;
-      document.getElementById('playBtn').innerText = "⏸";
+    if(Audio.isPlaying) { 
+        Audio.audio.pause(); 
+        const btn = Utils.getEl('playBtn'); 
+        if(btn) btn.innerText = "▶"; 
+    } else { 
+        Audio.audio.play().catch(e=>console.log(e)); 
+        const btn = Utils.getEl('playBtn'); 
+        if(btn) btn.innerText = "⏸"; 
     }
+    Audio.isPlaying = !Audio.isPlaying;
   },
-
-  next: () => {
-    let nextIdx = (Audio.idx + 1) % Audio.tracks.length;
-    Audio.play(nextIdx);
-  },
-
-  prev: () => {
-    let prevIdx = (Audio.idx - 1 + Audio.tracks.length) % Audio.tracks.length;
-    Audio.play(prevIdx);
-  }
+  
+  next: () => Audio.play((Audio.idx + 1) % Audio.tracks.length),
+  prev: () => Audio.play((Audio.idx - 1 + Audio.tracks.length) % Audio.tracks.length)
 };
 
 /* =========================================
-   4. AUTH MODULE
+   AUTH SYSTEM
    ========================================= */
 const Auth = {
   login: async () => {
-    const u = document.getElementById('authUser').value.trim();
-    const p = document.getElementById('authPass').value.trim();
+    if(!db) return alert("Sistem database belum siap.");
+    const u = Utils.getEl('authUser').value.trim(); 
+    const p = Utils.getEl('authPass').value.trim();
     if(!u || !p) return alert("Isi data!");
     
     const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
-    if(error || !data) return alert("Salah username/password!");
-    if(data.banned) return alert("Akun dibanned!");
+    if(error || !data) return alert("Salah data!");
     
-    currentUser = data.username;
-    localStorage.setItem('axac_user', currentUser);
+    currentUser = data.username; 
+    localStorage.setItem('axac_user', currentUser); 
     Auth.showGame();
   },
+  
   register: async () => {
-    const u = document.getElementById('authUser').value.trim();
-    const p = document.getElementById('authPass').value.trim();
+    if(!db) return alert("Sistem database belum siap.");
+    const u = Utils.getEl('authUser').value.trim(); 
+    const p = Utils.getEl('authPass').value.trim();
     if(!u || !p) return alert("Isi data!");
     const { error } = await db.from('profiles').insert([{ username: u, password: p }]);
-    if(error) return alert("Gagal daftar: " + error.message);
-    alert("Daftar sukses, silakan login.");
+    if(error) return alert("Gagal daftar!");
+    alert("Silakan login.");
   },
+  
   showGame: () => {
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('gameScreen').classList.remove('hidden');
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    document.getElementById('uName').innerText = currentUser;
-    Game.init();
-    Audio.init();
-    GuardAI.start();
-    EngineerAI.start();
-  },
-  logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
-};
-
-setTimeout(() => {
-  const saved = localStorage.getItem('axac_user');
-  if(saved) { currentUser = saved; Auth.showGame(); }
-}, 200);
-
-/* =========================================
-   5. AI GUARDIAN (SECURITY EXPERT)
-   ========================================= */
-const GuardAI = {
-  start: () => {
-    const term = document.getElementById('guardTerminal');
-    if(!term) return;
-    term.innerHTML += "<br>> [SYS] AXAC_GUARDIAN Online.";
-    term.innerHTML += "<br>> [SYS] Model: Sentinel-Sec-v4";
+    const authScr = Utils.getEl('authScreen'); if(authScr) authScr.classList.add('hidden');
+    const gameScr = Utils.getEl('gameScreen'); if(gameScr) gameScr.classList.remove('hidden');
+    const logoutBtn = Utils.getEl('logoutBtn'); if(logoutBtn) logoutBtn.classList.remove('hidden');
+    const uName = Utils.getEl('uName'); if(uName) uName.innerText = currentUser;
     
-    // 1. Integrity Check Loop
-    setInterval(() => {
-      if(Math.random() > 0.6) {
-        const logs = [
-          "Scanning DOM tree... OK",
-          "Checking script integrity... OK",
-          "Monitoring network packets... OK",
-          "Threat signature updated.",
-          "Analyzing user behavior... Normal."
-        ];
-        const msg = logs[Math.floor(Math.random()*logs.length)];
-        term.innerHTML += `<br>> [AI] ${msg}`;
-        term.scrollTop = term.scrollHeight;
-      }
-    }, 4000);
-
-    // 2. DOM Tamper Protection
-    setInterval(() => {
-      const board = document.getElementById('board');
-      if(!board && !document.getElementById('gameScreen').classList.contains('hidden')) {
-        term.innerHTML += `<br>> [🚨] CRITICAL: Board missing! Reloading...`;
-        setTimeout(() => location.reload(), 1000);
-      }
-    }, 3000);
+    setTimeout(() => {
+      Game.init(); 
+      Audio.init(); 
+      GuardAI.start(); 
+      EngineerAI.start();
+    }, 100);
+  },
+  
+  logout: () => { 
+      localStorage.removeItem('axac_user'); 
+      location.reload(); 
   }
 };
 
 /* =========================================
-   6. AI ENGINEER (PERFORMANCE EXPERT)
+   AI GUARD SYSTEM (SECURITY)
+   ========================================= */
+const GuardAI = {
+  start: () => {
+    const term = Utils.getEl('guardTerminal'); 
+    if(!term) return;
+    
+    Utils.logTerminal('guardTerminal', '[SYS] Guard Online.');
+    
+    setInterval(() => {
+      if(Math.random() > 0.6) { 
+          Utils.logTerminal('guardTerminal', '[AI] Scanning DOM Integrity... OK'); 
+      }
+    }, 5000);
+  }
+};
+
+/* =========================================
+   AI ENGINEER SYSTEM (PERFORMANCE)
    ========================================= */
 const EngineerAI = {
   start: () => {
-    const term = document.getElementById('engTerminal');
+    const term = Utils.getEl('engTerminal'); 
     if(!term) return;
-    term.innerHTML += "<br>> [SYS] AXAC_ENGINEER Online.";
-    term.innerHTML += "<br>> [SYS] Model: Optima-Fix-v5";
     
-    let lastTime = performance.now();
+    Utils.logTerminal('engTerminal', '[SYS] Engineer Online.');
+    
+    let lastTime = performance.now(); 
     let frames = 0;
     
-    // FPS Monitor Loop
     function loop() {
-      frames++;
+      frames++; 
       let now = performance.now();
+      
       if(now - lastTime > 1000) {
-        if(frames < 40) {
-          term.innerHTML += `<br>> [⚠️] FPS Drop: ${frames}fps. Optimizing...`;
-          EngineerAI.cleanMemory();
-        } else {
-          if(Math.random() > 0.8) {
-            term.innerHTML += `<br>> [AI] System stable at ${frames}fps.`;
-          }
+        if(frames < 40) { 
+            Utils.logTerminal('engTerminal', `[⚠️] Lag: ${frames}fps. Fixing...`); 
+            EngineerAI.cleanMemory(); 
+        } else if(Math.random() > 0.8) { 
+            Utils.logTerminal('engTerminal', `[AI] System Stable: ${frames}fps.`); 
         }
-        term.scrollTop = term.scrollHeight;
         frames = 0; 
         lastTime = now;
       }
@@ -670,19 +422,16 @@ const EngineerAI = {
     }
     requestAnimationFrame(loop);
   },
+  
   cleanMemory: () => {
-    // Simulasi garbage collection
-    if (window.gc) window.gc();
-    const term = document.getElementById('engTerminal');
-    setTimeout(() => {
-      term.innerHTML += `<br>> [AI] Memory cleaned. Engine restored.`;
-      term.scrollTop = term.scrollHeight;
+    setTimeout(() => { 
+        Utils.logTerminal('engTerminal', '[AI] Memory Cleaned. Engine Restored.'); 
     }, 800);
   }
 };
 
 /* =========================================
-   7. SVG PIECES (CHESS)
+   SVG ASSETS (CHESS PIECES)
    ========================================= */
 const P = {
   p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
@@ -700,163 +449,124 @@ const P = {
 };
 
 /* =========================================
-   8. GAME ENGINE (CHESS)
+   GAME ENGINE (CHESS & AI)
    ========================================= */
 const Game = {
-  chess: null, sel: null, mode: 'ai-god',
+  chess: null, 
+  sel: null, 
+  mode: 'ai-god', 
+  isThinking: false,
   
-  // Piece Square Tables (PST) for positional advantage
+  // Piece Square Tables (PST) untuk posisi strategis
   pst: {
-    p: [
-      [0,  0,  0,  0,  0,  0,  0,  0],
-      [50, 50, 50, 50, 50, 50, 50, 50],
-      [10, 10, 20, 30, 30, 20, 10, 10],
-      [5,  5, 10, 25, 25, 10,  5,  5],
-      [0,  0,  0, 20, 20,  0,  0,  0],
-      [5, -5,-10,  0,  0,-10, -5,  5],
-      [5, 10, 10,-20,-20, 10, 10,  5],
-      [0,  0,  0,  0,  0,  0,  0,  0]
-    ],
-    n: [
-      [-50,-40,-30,-30,-30,-30,-40,-50],
-      [-40,-20,  0,  0,  0,  0,-20,-40],
-      [-30,  0, 10, 15, 15, 10,  0,-30],
-      [-30,  5, 15, 20, 20, 15,  5,-30],
-      [-30,  0, 15, 20, 20, 15,  0,-30],
-      [-30,  5, 10, 15, 15, 10,  5,-30],
-      [-40,-20,  0,  5,  5,  0,-20,-40],
-      [-50,-40,-30,-30,-30,-30,-40,-50]
-    ],
-    b: [
-      [-20,-10,-10,-10,-10,-10,-10,-20],
-      [-10,  0,  0,  0,  0,  0,  0,-10],
-      [-10,  0,  5, 10, 10,  5,  0,-10],
-      [-10,  5,  5, 10, 10,  5,  5,-10],
-      [-10,  0, 10, 10, 10, 10,  0,-10],
-      [-10, 10, 10, 10, 10, 10, 10,-10],
-      [-10,  5,  0,  0,  0,  0,  5,-10],
-      [-20,-10,-10,-10,-10,-10,-10,-20]
-    ],
-    r: [
-      [0,  0,  0,  0,  0,  0,  0,  0],
-      [5, 10, 10, 10, 10, 10, 10,  5],
-      [-5,  0,  0,  0,  0,  0,  0, -5],
-      [-5,  0,  0,  0,  0,  0,  0, -5],
-      [-5,  0,  0,  0,  0,  0,  0, -5],
-      [-5,  0,  0,  0,  0,  0,  0, -5],
-      [-5,  0,  0,  0,  0,  0,  0, -5],
-      [0,  0,  0,  5,  5,  0,  0,  0]
-    ],
-    q: [
-      [-20,-10,-10, -5, -5,-10,-10,-20],
-      [-10,  0,  0,  0,  0,  0,  0,-10],
-      [-10,  0,  5,  5,  5,  5,  0,-10],
-      [-5,  0,  5,  5,  5,  5,  0, -5],
-      [0,  0,  5,  5,  5,  5,  0, -5],
-      [-10,  5,  5,  5,  5,  5,  0,-10],
-      [-10,  0,  5,  0,  0,  0,  0,-10],
-      [-20,-10,-10, -5, -5,-10,-10,-20]
-    ],
-    k: [
-      [-30,-40,-40,-50,-50,-40,-40,-30],
-      [-30,-40,-40,-50,-50,-40,-40,-30],
-      [-30,-40,-40,-50,-50,-40,-40,-30],
-      [-30,-40,-40,-50,-50,-40,-40,-30],
-      [-20,-30,-30,-40,-40,-30,-30,-20],
-      [-10,-20,-20,-20,-20,-20,-20,-10],
-      [20, 20,  0,  0,  0,  0, 20, 20],
-      [20, 30, 10,  0,  0, 10, 30, 20]
-    ]
+    p: [[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
+    n: [[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
+    b: [[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],
+    r: [[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],
+    q: [[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
+    k: [[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
   },
-
+  
   init: () => { 
-    Game.chess = new Chess(); 
-    Game.sel = null; 
-    Game.render(); 
+      Game.chess = new Chess(); 
+      Game.sel = null; 
+      Game.isThinking = false; 
+      Game.render(); 
   },
-
+  
   render: () => {
-    const b = document.getElementById('board');
+    const b = Utils.getEl('board'); 
+    if(!b) return; 
     b.innerHTML = '';
+    
     Game.chess.board().forEach((row, r) => {
       row.forEach((p, c) => {
-        const sq = document.createElement('div');
+        const sq = document.createElement('div'); 
         sq.className = `sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
         const id = String.fromCharCode(97+c) + (8-r);
+        
         if(p) sq.innerHTML = P[p.color === 'w' ? p.type.toUpperCase() : p.type];
         if(Game.sel === id) sq.classList.add('hl');
-        if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) sq.classList.add('guide');
-        sq.onclick = () => Game.click(id);
+        if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
+            sq.classList.add('guide');
+        }
+        
+        sq.onclick = () => Game.click(id); 
         b.appendChild(sq);
       });
     });
   },
-
+  
   click: (id) => {
-    if(Game.chess.game_over()) return;
+    if(Game.chess.game_over() || Game.isThinking) return;
+    
     if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
-      Game.chess.move({ from: Game.sel, to: id, promotion: 'q' });
-      Game.sel = null;
+      Game.chess.move({ from: Game.sel, to: id, promotion: 'q' }); 
+      Game.sel = null; 
       Game.render();
       if(!Game.chess.game_over()) setTimeout(Game.aiMove, 100);
-      else Game.checkEnd();
       return;
     }
-    const p = Game.chess.get(id);
-    Game.sel = (p && p.color === Game.chess.turn()) ? id : null;
-    Game.render();
-  },
-
-  aiMove: () => {
-    if(Game.chess.game_over()) return;
-    const moves = Game.chess.moves({ verbose: true });
-    if(!moves.length) return;
     
-    // Depth God Mode = 5 (Sangat Berat)
-    let depth = Game.mode === 'ai-easy' ? 1 : Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 5;
-    let bestMove = moves[0], bestVal = -Infinity;
-
-    for(let m of moves) {
-      Game.chess.move(m);
-      // Panggil Minimax dengan Quiescence Search di God Mode
-      let val = -Game.minimax(depth - 1, -Infinity, Infinity, false);
-      Game.chess.undo();
-      if(val > bestVal) { bestVal = val; bestMove = m; }
-    }
-    Game.chess.move(bestMove);
+    const p = Game.chess.get(id); 
+    Game.sel = (p && p.color === Game.chess.turn()) ? id : null; 
     Game.render();
-    if(Game.chess.game_over()) Game.checkEnd();
   },
+  
+  aiMove: () => {
+    if(Game.chess.game_over() || Game.isThinking) return;
+    Game.isThinking = true;
+    
+    // Pake setTimeout biar UI sempet render dulu sebelum AI mikir berat
+    setTimeout(() => {
+      const moves = Game.chess.moves({ verbose: true }); 
+      if(!moves.length) { Game.isThinking = false; return; }
+      
+      let depth = Game.mode === 'ai-easy' ? 1 : Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 5;
+      let bestMove = moves[0], bestVal = -Infinity;
 
+      for(let m of moves) {
+        Game.chess.move(m); 
+        let val = -Game.minimax(depth - 1, -Infinity, Infinity, false); 
+        Game.chess.undo();
+        if(val > bestVal) { bestVal = val; bestMove = m; }
+      }
+      
+      Game.chess.move(bestMove); 
+      Game.isThinking = false;
+      Game.render();
+    }, 50);
+  },
+  
   minimax: (depth, alpha, beta, isMax) => {
     if(depth === 0 || Game.chess.game_over()) return Game.evaluate();
-    
     const moves = Game.chess.moves();
+    
     if(isMax) {
       let max = -Infinity;
       for(let m of moves) {
-        Game.chess.move(m);
-        max = Math.max(max, Game.minimax(depth - 1, alpha, beta, false));
+        Game.chess.move(m); 
+        max = Math.max(max, Game.minimax(depth - 1, alpha, beta, false)); 
         Game.chess.undo();
-        alpha = Math.max(alpha, max);
+        alpha = Math.max(alpha, max); 
         if(beta <= alpha) break;
       }
       return max;
     } else {
       let min = Infinity;
       for(let m of moves) {
-        Game.chess.move(m);
-        min = Math.min(min, Game.minimax(depth - 1, alpha, beta, true));
+        Game.chess.move(m); 
+        min = Math.min(min, Game.minimax(depth - 1, alpha, beta, true)); 
         Game.chess.undo();
-        beta = Math.min(beta, min);
+        beta = Math.min(beta, min); 
         if(beta <= alpha) break;
       }
       return min;
     }
   },
-
+  
   evaluate: () => {
-    const vals = { p: 10, n: 30, b: 35, r: 50, q: 90, k: 9000 };
+    const vals = { p: 10, n: 30, b: 35, r: 50, q: 90, k: 9000 }; 
     let score = 0;
     const board = Game.chess.board();
     
@@ -865,35 +575,36 @@ const Game = {
         const p = board[r][c];
         if(p) {
           let val = vals[p.type];
-          // Tambahkan nilai posisi (PST)
-          if(Game.pst[p.type]) {
-             val += Game.pst[p.type][p.color === 'w' ? r : 7-r][c];
-          }
+          if(Game.pst[p.type]) val += Game.pst[p.type][p.color === 'w' ? r : 7-r][c];
           score += (p.color === 'w' ? val : -val);
         }
       }
     }
     return Game.chess.turn() === 'w' ? score : -score;
   },
-
-  changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
-  resign: () => { if(confirm("Yakin menyerah?")) Game.init(); },
-  checkEnd: () => {
-    if(Game.chess.in_checkmate()) alert(Game.chess.turn() === 'w' ? "Kalah!" : "Menang!");
-    else alert("Draw!");
-    Game.init();
+  
+  changeMode: () => { 
+      Game.mode = Utils.getEl('modeSelect').value; 
+      Game.init(); 
   },
+  
+  resign: () => { 
+      if(confirm("Yakin?")) Game.init(); 
+  },
+  
   hint: () => {
-    const moves = Game.chess.moves({ verbose: true });
+    const moves = Game.chess.moves({ verbose: true }); 
     if(!moves.length) return;
+    
     let bestM = moves[0], bestV = -Infinity;
-    for(let m of moves) {
-      Game.chess.move(m);
-      let v = -Game.minimax(2, -Infinity, Infinity, false);
-      Game.chess.undo();
-      if(v > bestV) { bestV = v; bestM = m; }
+    for(let m of moves) { 
+        Game.chess.move(m); 
+        let v = -Game.minimax(2, -Infinity, Infinity, false); 
+        Game.chess.undo(); 
+        if(v > bestV) { bestV = v; bestM = m; } 
     }
-    document.getElementById('hintText').innerText = `Langkah: ${bestM.san}`;
+    
+    Utils.getEl('hintText').innerText = `Langkah: ${bestM.san}`; 
     UI.openModal('hintModal');
   }
 };
