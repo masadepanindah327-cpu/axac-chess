@@ -23,21 +23,13 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-    @keyframes forceHide { 0% { opacity: 1; visibility: visible; } 85% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; z-index: -1; } }
 
-    /* SPLASH */
-    #splash { position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: forceHide 0.8s forwards; }
-    .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 24px; box-shadow: 0 0 20px var(--primary-glow); }
-    .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 3px; color: var(--primary); }
-
-    /* HEADER & LAYOUT */
-    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s; }
+    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
     .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; animation: fadeIn 0.6s; }
+    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
     @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
-    /* BOARD AREA */
     .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
     .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; }
     .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; position: relative; box-shadow: var(--shadow); }
@@ -51,7 +43,6 @@
     #aiThinking { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 16px; }
     #aiThinking.show { display: flex; }
 
-    /* PANEL KANAN */
     .right-panel { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
     .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
     .panel h3 { font-size: 0.85rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
@@ -68,18 +59,6 @@
     .profile-card:hover { background: rgba(255,255,255,0.1); }
     .avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #fff; }
 
-    /* MUSIC PLAYER */
-    .music-player { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-    .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-controls { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
-    .ctrl-btn { background: rgba(15, 23, 42, 1); border: 1px solid var(--border); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
-    .ctrl-btn:hover { background: var(--primary); border-color: var(--primary); }
-    .track-list { display: flex; flex-direction: column; gap: 6px; }
-    .track-item { padding: 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; color: var(--text-mut); transition: 0.2s; }
-    .track-item:hover { background: rgba(255,255,255,0.05); }
-    .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); font-weight: 700; }
-
-    /* MODALS */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
     .overlay.show { display: flex; }
     .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
@@ -101,11 +80,6 @@
   </style>
 </head>
 <body>
-
-  <div id="splash">
-    <div class="loader-ring"></div>
-    <div class="splash-title">AXAC APEX</div>
-  </div>
 
   <header>
     <div class="brand">AXAC APEX</div>
@@ -164,7 +138,7 @@
           <option value="ai-medium">VS AI (Menengah)</option>
         </select>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="btn btn-purple" onclick="Story.open()">📖 Story Mode</button>
+            <button class="btn btn-purple" onclick="UI.openModal('storyModal')">📖 Story Mode</button>
             <button class="btn btn-gold" onclick="Chat.open()">💬 Global Chat</button>
         </div>
       </div>
@@ -216,9 +190,9 @@
   <div id="editProfileModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--primary); margin-bottom: 16px;">✏️ Edit Profil</h3>
-      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName" placeholder="Nama Tampilan"></div>
-      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio" placeholder="Suka main catur..."></div>
-      <div class="input-grp"><label>Hobi / Genre Game</label><input type="text" id="editHobi" placeholder="Suka RPG, Strategy..."></div>
+      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName"></div>
+      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio"></div>
+      <div class="input-grp"><label>Hobi / Genre Game</label><input type="text" id="editHobi"></div>
       <div class="input-grp"><label>Tanggal Lahir</label><input type="date" id="editUltah"></div>
       <button class="btn btn-success" onclick="Profile.saveEdit()">💾 Simpan Perubahan</button>
       <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('editProfileModal')">Batal</button>
@@ -247,11 +221,8 @@
   <div id="storyModal" class="overlay">
     <div class="modal" style="text-align: center;">
       <h3 style="color: var(--purple); margin-bottom: 16px;">📖 Story Mode</h3>
-      <img id="storyImg" src="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--purple); margin-bottom: 16px;">
-      <h4 id="storyName" style="margin-bottom: 8px; font-size: 1.2rem;">Budi</h4>
-      <p id="storyDesc" style="color: var(--text-mut); font-size: 0.9rem; margin-bottom: 20px; font-style: italic;">"..."</p>
-      <button class="btn btn-purple" onclick="Story.startBattle()">Mulai Tanding</button>
-      <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('storyModal')">Batal</button>
+      <p style="margin-bottom: 20px;">Fitur Story sedang dalam perbaikan.</p>
+      <button class="btn" onclick="UI.closeModal('storyModal')">Tutup</button>
     </div>
   </div>
 
@@ -270,7 +241,7 @@
   <div id="ownerAdminModal" class="overlay">
     <div class="modal" style="max-width: 600px;">
       <h3 style="color: var(--gold); margin-bottom: 16px;">👑 Panel Owner</h3>
-      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target (tanpa #)"></div>
+      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target"></div>
       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
         <button class="btn btn-success" onclick="Admin.act('guard')">Tunjuk jadi Guard</button>
         <button class="btn btn-primary" onclick="Admin.act('engineer')">Tunjuk jadi Engineer</button>
@@ -285,8 +256,7 @@
   <div id="adOverlay" class="overlay">
     <div class="modal" style="text-align: center;">
       <h2 style="color: var(--gold);">📺 Iklan Promosi</h2>
-      <p style="color: var(--text-mut); margin-top: 8px;">Tonton hingga selesai untuk klaim reward.</p>
-      <div id="adTimer" class="ad-timer">30</div>
+      <div id="adTimer" style="font-size: 4rem; font-weight: 800; color: var(--gold); font-family: monospace; margin: 20px 0;">30</div>
       <button id="adCloseBtn" class="btn btn-danger hidden" onclick="Ads.close()">Tutup</button>
     </div>
   </div>
@@ -302,7 +272,13 @@ let currentUser = null;
 let userData = {};
 
 window.addEventListener('DOMContentLoaded', () => {
-  try { db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
+  try { 
+    // FIX API ERROR: Pake konfigurasi headers buat key format baru
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    }); 
+  } catch(e) { console.error("Supabase Init Error:", e); }
+  
   setInterval(() => { const c = document.getElementById('clock'); if(c) c.innerText = new Date().toLocaleTimeString('id-ID'); }, 1000);
   
   const saved = localStorage.getItem('axac_user');
@@ -323,46 +299,6 @@ const UI = {
   closeModal: (id) => { const el = document.getElementById(id); if(el) el.classList.remove('show'); }
 };
 
-/* =========================================
-   AUDIO SYSTEM
-   ========================================= */
-const Audio = {
-  tracks: [
-    { title: "Merry Christmas Please Dont Call", url: "https://files.catbox.moe/qaz1xd.mp3" },
-    { title: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" },
-    { title: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" }
-  ],
-  idx: 0, audio: new window.Audio(), isPlaying: false,
-  init: () => {
-    const list = document.getElementById('trackList'); if(!list) return;
-    list.innerHTML = '';
-    Audio.tracks.forEach((t, i) => {
-      const div = document.createElement('div'); div.className = `track-item ${i === 0 ? 'active' : ''}`;
-      div.innerText = t.title; div.onclick = () => Audio.play(i); list.appendChild(div);
-    });
-    Audio.audio.src = Audio.tracks[0].url; Audio.audio.onended = Audio.next;
-  },
-  play: (i) => {
-    Audio.idx = i; Audio.audio.src = Audio.tracks[i].url; 
-    Audio.audio.play().catch(e => console.log(e));
-    Audio.isPlaying = true; 
-    document.getElementById('trackTitle').innerText = Audio.tracks[i].title;
-    document.getElementById('playBtn').innerText = "⏸";
-    document.querySelectorAll('.track-item').forEach((el, idx) => el.className = `track-item ${idx === i ? 'active' : ''}`);
-  },
-  toggle: () => {
-    if(!Audio.audio.src) return Audio.play(0);
-    if(Audio.isPlaying) { Audio.audio.pause(); document.getElementById('playBtn').innerText = "▶"; }
-    else { Audio.audio.play().catch(e=>console.log(e)); document.getElementById('playBtn').innerText = "⏸"; }
-    Audio.isPlaying = !Audio.isPlaying;
-  },
-  next: () => Audio.play((Audio.idx + 1) % Audio.tracks.length),
-  prev: () => Audio.play((Audio.idx - 1 + Audio.tracks.length) % Audio.tracks.length)
-};
-
-/* =========================================
-   ADS SYSTEM
-   ========================================= */
 const Ads = {
   timerInterval: null,
   currentType: null,
@@ -404,9 +340,6 @@ const Ads = {
   close: () => { UI.closeModal('adOverlay'); }
 };
 
-/* =========================================
-   AUTH SYSTEM
-   ========================================= */
 const Auth = {
   login: async () => {
     const u = document.getElementById('authUser').value.trim(); 
@@ -456,14 +389,11 @@ const Auth = {
 
     if(role === 'owner' || role === 'admin') document.getElementById('btnOwnerPanel').classList.remove('hidden');
 
-    setTimeout(() => { Game.init(); Audio.init(); }, 100);
+    setTimeout(() => { Game.init(); }, 200);
   },
   logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
 };
 
-/* =========================================
-   PROFILE SYSTEM
-   ========================================= */
 const Profile = {
   open: () => {
     document.getElementById('modalDisplayName').innerText = userData.display_name || currentUser;
@@ -495,9 +425,6 @@ const Profile = {
   }
 };
 
-/* =========================================
-   ADMIN / OWNER SYSTEM
-   ========================================= */
 const Admin = {
   loadUsers: async () => {
     const { data } = await db.from('profiles').select('username, display_name, password, role, wins').order('wins', { ascending: false });
@@ -532,40 +459,6 @@ const Admin = {
   }
 };
 
-/* =========================================
-   STORY MODE
-   ========================================= */
-const Story = {
-  currentStage: 0,
-  data: [
-    { n:"Budi (Prajurit)", d:"Ayo main bersih, prajurit!", img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200" },
-    { n:"Siska (Kuda Lincah)", d:"Satu langkah salah, tamat!", img:"https://images.unsplash.com/photo-1563237023-b1e970526dcb?w=200" },
-    { n:"Rian (Cyber Hacker)", d:"System hack initiated!", img:"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=200" },
-    { n:"Alex (AI Prototype)", d:"Probabilitas kemenanganmu 0%.", img:"https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200" },
-    { n:"Dewi (Ratu Catur)", d:"Tunduk pada taktikku!", img:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" },
-    { n:"Magnus (Juara Dunia)", d:"Aku juara dunia, kamu siapa?", img:"https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" }
-  ],
-  open: () => {
-    if(Story.currentStage >= 50) return alert("Kamu sudah tamat!");
-    let char = Story.data[Story.currentStage % Story.data.length];
-    document.getElementById('storyImg').src = char.img;
-    document.getElementById('storyName').innerText = `${char.n} (Stage ${Story.currentStage + 1}/50)`;
-    document.getElementById('storyDesc').innerText = `"${char.d}"`;
-    UI.openModal('storyModal');
-  },
-  startBattle: () => {
-    UI.closeModal('storyModal');
-    let diff = Story.currentStage < 15 ? 'ai-medium' : Story.currentStage < 30 ? 'ai-hard' : 'ai-god';
-    document.getElementById('modeSelect').value = diff;
-    Game.mode = diff;
-    Game.init();
-    alert(`Stage ${Story.currentStage + 1} dimulai!`);
-  }
-};
-
-/* =========================================
-   CHAT SYSTEM
-   ========================================= */
 const Chat = {
   open: () => { UI.openModal('chatModal'); Chat.init(); },
   init: () => {
@@ -596,9 +489,6 @@ const Chat = {
   }
 };
 
-/* =========================================
-   CHESS PIECES SVG
-   ========================================= */
 const P = {
   p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
   r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#0f172a"/></svg>',
@@ -614,9 +504,6 @@ const P = {
   K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>'
 };
 
-/* =========================================
-   GAME ENGINE (OPTIMIZED AI)
-   ========================================= */
 const Game = {
   chess: null, sel: null, mode: 'ai-god', isThinking: false,
   init: () => { Game.chess = new Chess(); Game.sel = null; Game.isThinking = false; Game.render(); },
@@ -647,7 +534,6 @@ const Game = {
     Game.isThinking = true;
     document.getElementById('aiThinking').classList.add('show');
     
-    // Delay biar UI sempet render
     setTimeout(() => {
       const moves = Game.chess.moves({ verbose: true }); 
       if(!moves.length) { Game.isThinking = false; document.getElementById('aiThinking').classList.remove('show'); return; }
