@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex Masterpiece</title>
+  <title>AXAC Chess - Apex Final</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,19 +25,22 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
     @keyframes forceHide { 0% { opacity: 1; visibility: visible; } 85% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; z-index: -1; } }
 
+    /* SPLASH */
     #splash { position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: forceHide 0.8s forwards; }
     .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 24px; box-shadow: 0 0 20px var(--primary-glow); }
     .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 3px; color: var(--primary); }
 
-    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    /* HEADER & LAYOUT */
+    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s; }
     .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
+    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; animation: fadeIn 0.6s; }
     @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
+    /* BOARD AREA */
     .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
     .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; }
-    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; position: relative; }
+    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; position: relative; box-shadow: var(--shadow); }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
     .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
     .sq.light { background: var(--sq-light); } .sq.dark { background: var(--sq-dark); }
@@ -48,6 +51,7 @@
     #aiThinking { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 16px; }
     #aiThinking.show { display: flex; }
 
+    /* PANEL KANAN */
     .right-panel { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
     .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
     .panel h3 { font-size: 0.85rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
@@ -64,6 +68,18 @@
     .profile-card:hover { background: rgba(255,255,255,0.1); }
     .avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #fff; }
 
+    /* MUSIC PLAYER */
+    .music-player { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-controls { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
+    .ctrl-btn { background: rgba(15, 23, 42, 1); border: 1px solid var(--border); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+    .ctrl-btn:hover { background: var(--primary); border-color: var(--primary); }
+    .track-list { display: flex; flex-direction: column; gap: 6px; }
+    .track-item { padding: 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; color: var(--text-mut); transition: 0.2s; }
+    .track-item:hover { background: rgba(255,255,255,0.05); }
+    .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); font-weight: 700; }
+
+    /* MODALS */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
     .overlay.show { display: flex; }
     .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
@@ -78,10 +94,7 @@
     .r-engineer { background: linear-gradient(45deg, #06b6d4, #0891b2); color: #000; }
     .r-member { background: #475569; color: #fff; }
 
-    #adOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-    #adOverlay.show { display: flex; }
     .ad-timer { font-size: 4rem; font-weight: 800; color: var(--gold); font-family: monospace; margin: 20px 0; }
-
     .chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; border: 1px solid var(--border); }
     .chat-msg { padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); line-height: 1.4; }
     .chat-me { background: rgba(59,130,246,0.2); border: 1px solid var(--primary); align-self: flex-end; }
@@ -105,7 +118,7 @@
   <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%;">
     <div class="panel">
       <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">AXAC LOGIN</h2>
-      <div class="input-grp"><input type="text" id="authUser" placeholder="Username (Tanpa #)"></div>
+      <div class="input-grp"><input type="text" id="authUser" placeholder="Username"></div>
       <div class="input-grp"><input type="password" id="authPass" placeholder="Password"></div>
       <button class="btn" style="margin-bottom: 10px;" onclick="Auth.login()">MASUK</button>
       <button class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="Auth.register()">DAFTAR</button>
@@ -152,14 +165,8 @@
         </select>
         <div style="display: flex; flex-direction: column; gap: 8px;">
             <button class="btn btn-purple" onclick="Story.open()">📖 Story Mode</button>
-            <button class="btn btn-success" onclick="UI.openModal('tournamentModal')">🏆 Tournament</button>
             <button class="btn btn-gold" onclick="Chat.open()">💬 Global Chat</button>
         </div>
-      </div>
-
-      <div id="rolePanel" class="panel hidden">
-        <h3 id="rolePanelTitle">Panel Khusus</h3>
-        <div id="rolePanelContent"></div>
       </div>
 
       <div class="panel">
@@ -177,7 +184,7 @@
     </div>
   </div>
 
-  <!-- PROFILE MODAL -->
+  <!-- MODALS -->
   <div id="profileModal" class="overlay">
     <div class="modal">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
@@ -206,7 +213,6 @@
     </div>
   </div>
 
-  <!-- EDIT PROFILE MODAL -->
   <div id="editProfileModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--primary); margin-bottom: 16px;">✏️ Edit Profil</h3>
@@ -219,34 +225,25 @@
     </div>
   </div>
 
-  <!-- SHOP MODAL -->
   <div id="shopModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--gold); margin-bottom: 16px;">💎 AXAC Store</h3>
       <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="color: var(--purple); margin-bottom: 4px;">Tambah Kuota</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">Tonton iklan 30 detik untuk +5 Kuota.</p>
-        <button class="btn btn-purple" onclick="Ads.show('kuota')">Tonton Iklan 30s</button>
+        <button class="btn btn-purple" onclick="Ads.show('kuota')">Tonton Iklan 30s (+5 Kuota)</button>
       </div>
       <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="color: var(--purple); margin-bottom: 4px;">Semi-VIP (Rp 5.000)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">50 Kuota Harian.</p>
         <button class="btn btn-purple" onclick="Ads.show('semivip')">Tonton Iklan 30s</button>
       </div>
       <div style="background: rgba(236,72,153,0.1); border: 1px solid #ec4899; padding: 16px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="color: #ec4899; margin-bottom: 4px;">VIP Ultimate (Rp 10.000)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">100 Kuota Harian. Bebas Iklan.</p>
         <button class="btn" style="background: #ec4899;" onclick="Ads.show('vip')">Tonton Iklan 30s</button>
-      </div>
-      <div style="background: rgba(16,185,129,0.1); border: 1px solid var(--success); padding: 16px; border-radius: 12px;">
-        <h4 style="color: var(--success); margin-bottom: 4px;">Hilangkan Iklan (Rp 20.000)</h4>
-        <button class="btn btn-success" onclick="Payment.buyNoAds()">Bayar Rp 20.000</button>
       </div>
       <button class="btn" style="margin-top: 16px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('shopModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- STORY MODAL -->
   <div id="storyModal" class="overlay">
     <div class="modal" style="text-align: center;">
       <h3 style="color: var(--purple); margin-bottom: 16px;">📖 Story Mode</h3>
@@ -258,19 +255,6 @@
     </div>
   </div>
 
-  <!-- TOURNAMENT MODAL -->
-  <div id="tournamentModal" class="overlay">
-    <div class="modal">
-      <h3 style="color: var(--gold); margin-bottom: 16px;">🏆 Tournament</h3>
-      <div style="background: rgba(251,191,36,0.1); border: 1px solid var(--gold); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-        <h4 style="color: var(--gold); margin-bottom: 4px;">AXAC Cyber Cup</h4>
-        <button class="btn btn-gold" onclick="alert('Pendaftaran Berhasil!')">Daftar (Gratis)</button>
-      </div>
-      <button class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('tournamentModal')">Tutup</button>
-    </div>
-  </div>
-
-  <!-- CHAT MODAL -->
   <div id="chatModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--accent); margin-bottom: 16px;">💬 Global Chat</h3>
@@ -283,33 +267,28 @@
     </div>
   </div>
 
-  <!-- OWNER ADMIN PANEL -->
   <div id="ownerAdminModal" class="overlay">
     <div class="modal" style="max-width: 600px;">
       <h3 style="color: var(--gold); margin-bottom: 16px;">👑 Panel Owner</h3>
-      
-      <div class="input-grp">
-        <label>Target Username (Tanpa #)</label>
-        <input type="text" id="adminTarget" placeholder="Username target">
-      </div>
+      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target (tanpa #)"></div>
       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
         <button class="btn btn-success" onclick="Admin.act('guard')">Tunjuk jadi Guard</button>
         <button class="btn btn-primary" onclick="Admin.act('engineer')">Tunjuk jadi Engineer</button>
         <button class="btn btn-danger" onclick="Admin.act('ban')">Ban Akun</button>
       </div>
-      
-      <h4 style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Daftar Semua Akun (Real-time)</h4>
-      <div id="adminUserList" style="background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; max-height: 250px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border);"></div>
-
+      <h4 style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Daftar Akun</h4>
+      <div id="adminUserList" style="background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border);"></div>
       <button class="btn" style="margin-top: 16px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('ownerAdminModal')">Tutup</button>
     </div>
   </div>
 
-  <div id="adOverlay">
-    <h2 style="color: var(--gold);">📺 Iklan Promosi</h2>
-    <p style="color: var(--text-mut); margin-top: 8px;">Tonton hingga selesai untuk klaim reward.</p>
-    <div id="adTimer" class="ad-timer">30</div>
-    <button id="adCloseBtn" class="btn btn-danger hidden" onclick="Ads.close()">Tutup</button>
+  <div id="adOverlay" class="overlay">
+    <div class="modal" style="text-align: center;">
+      <h2 style="color: var(--gold);">📺 Iklan Promosi</h2>
+      <p style="color: var(--text-mut); margin-top: 8px;">Tonton hingga selesai untuk klaim reward.</p>
+      <div id="adTimer" class="ad-timer">30</div>
+      <button id="adCloseBtn" class="btn btn-danger hidden" onclick="Ads.close()">Tutup</button>
+    </div>
   </div>
 
 <script>
@@ -345,7 +324,7 @@ const UI = {
 };
 
 /* =========================================
-   SISTEM AUDIO
+   AUDIO SYSTEM
    ========================================= */
 const Audio = {
   tracks: [
@@ -382,16 +361,16 @@ const Audio = {
 };
 
 /* =========================================
-   ADS & PAYMENT
+   ADS SYSTEM
    ========================================= */
 const Ads = {
   timerInterval: null,
   currentType: null,
   show: (type) => {
-    if(userData.no_ads || userData.role === 'owner' || userData.role === 'admin' || userData.role === 'guard' || userData.role === 'engineer') return alert("Kamu bebas iklan!");
+    if(userData.no_ads || userData.role === 'owner') return alert("Kamu bebas iklan!");
     Ads.currentType = type;
     UI.closeModal('shopModal');
-    document.getElementById('adOverlay').classList.add('show');
+    UI.openModal('adOverlay');
     let timeLeft = 30;
     document.getElementById('adTimer').innerText = timeLeft;
     document.getElementById('adCloseBtn').classList.add('hidden');
@@ -408,12 +387,12 @@ const Ads = {
     }, 1000);
   },
   giveReward: () => {
-    let newRole = Ads.currentType === 'vip' ? 'vip' : (Ads.currentType === 'semivip' ? 'semivip' : 'member');
     if(Ads.currentType === 'kuota') {
         userData.kuota_harian = (userData.kuota_harian || 0) + 5;
         db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
-        alert("Berhasil menambahkan 5 Kuota Bantuan!");
+        alert("Berhasil menambahkan 5 Kuota!");
     } else {
+        let newRole = Ads.currentType === 'vip' ? 'vip' : 'semivip';
         userData.role = newRole;
         if(Ads.currentType === 'vip') userData.no_ads = true;
         db.from('profiles').update({ role: newRole, no_ads: userData.no_ads }).eq('username', currentUser).then();
@@ -422,53 +401,7 @@ const Ads = {
     Ads.close();
     location.reload();
   },
-  close: () => { document.getElementById('adOverlay').classList.remove('show'); }
-};
-
-const Payment = {
-  buyNoAds: () => {
-    if(userData.role === 'owner') return alert("Owner bebas iklan!");
-    if(confirm("Lanjutkan pembayaran Rp 20.000 untuk menghilangkan iklan?")) {
-      db.from('profiles').update({ no_ads: true, role: 'vip' }).eq('username', currentUser).then(() => {
-        alert("Pembayaran Berhasil! Iklan telah dihilangkan permanen.");
-        location.reload();
-      });
-    }
-  }
-};
-
-/* =========================================
-   CHAT SYSTEM
-   ========================================= */
-const Chat = {
-  open: () => { UI.openModal('chatModal'); Chat.init(); },
-  init: () => {
-    if(!db) return;
-    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
-      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
-      if(data) data.forEach(Chat.append);
-    });
-    
-    setInterval(async () => {
-      if(!document.getElementById('chatModal').classList.contains('show')) return;
-      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
-      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
-      if(data) data.forEach(Chat.append);
-    }, 3000);
-  },
-  append: (msg) => {
-    const box = document.getElementById('chatBox');
-    if(!box) return;
-    let cls = msg.username === currentUser ? 'chat-me' : '';
-    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
-    box.scrollTop = box.scrollHeight;
-  },
-  send: async () => {
-    const input = document.getElementById('chatInput');
-    if(!input.value.trim()) return;
-    await db.from('global_chats').insert([{ username: userData.display_name || currentUser, role: userData.role, message: input.value.trim() }]);
-    input.value = '';
-  }
+  close: () => { UI.closeModal('adOverlay'); }
 };
 
 /* =========================================
@@ -476,7 +409,6 @@ const Chat = {
    ========================================= */
 const Auth = {
   login: async () => {
-    if(!db) return alert("Database belum siap.");
     const u = document.getElementById('authUser').value.trim(); 
     const p = document.getElementById('authPass').value.trim();
     if(!u || !p) return alert("Isi data!");
@@ -489,7 +421,6 @@ const Auth = {
     userData = data;
     localStorage.setItem('axac_user', currentUser); 
     Auth.showGame();
-    
     if(data.role === 'owner' || data.role === 'admin') Admin.loadUsers();
   },
   register: async () => {
@@ -497,10 +428,9 @@ const Auth = {
     const p = document.getElementById('authPass').value.trim();
     const randomId = Math.floor(1000 + Math.random() * 9000);
     const autoDisplayName = `${u}#${randomId}`;
-    
     const { error } = await db.from('profiles').insert([{ username: u, password: p, display_name: autoDisplayName, kuota_harian: 5 }]);
     if(error) return alert("Gagal daftar: " + error.message);
-    alert(`Akun berhasil dibuat!\nUsername Login: ${u}\nTampilan: ${autoDisplayName}\nSilakan Login.`);
+    alert(`Akun dibuat!\nLogin: ${u}\nTampilan: ${autoDisplayName}`);
   },
   showGame: () => {
     document.getElementById('authScreen').classList.add('hidden');
@@ -521,12 +451,10 @@ const Auth = {
     document.getElementById('modalRole').className = `badge r-${role}`;
     document.getElementById('profWins').innerText = userData.wins || 0;
     
-    document.getElementById('kuotaText').innerText = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
-    document.getElementById('modalKuota').innerText = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
+    document.getElementById('kuotaText').innerText = (userData.kuota_harian || 0);
+    document.getElementById('modalKuota').innerText = (userData.kuota_harian || 0);
 
-    if(role === 'owner' || role === 'admin') {
-        document.getElementById('btnOwnerPanel').classList.remove('hidden');
-    }
+    if(role === 'owner' || role === 'admin') document.getElementById('btnOwnerPanel').classList.remove('hidden');
 
     setTimeout(() => { Game.init(); Audio.init(); }, 100);
   },
@@ -568,7 +496,7 @@ const Profile = {
 };
 
 /* =========================================
-   ADMIN / OWNER PANEL
+   ADMIN / OWNER SYSTEM
    ========================================= */
 const Admin = {
   loadUsers: async () => {
@@ -636,6 +564,39 @@ const Story = {
 };
 
 /* =========================================
+   CHAT SYSTEM
+   ========================================= */
+const Chat = {
+  open: () => { UI.openModal('chatModal'); Chat.init(); },
+  init: () => {
+    if(!db) return;
+    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.append);
+    });
+    setInterval(async () => {
+      if(!document.getElementById('chatModal').classList.contains('show')) return;
+      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.append);
+    }, 3000);
+  },
+  append: (msg) => {
+    const box = document.getElementById('chatBox');
+    if(!box) return;
+    let cls = msg.username === currentUser ? 'chat-me' : '';
+    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
+    box.scrollTop = box.scrollHeight;
+  },
+  send: async () => {
+    const input = document.getElementById('chatInput');
+    if(!input.value.trim()) return;
+    await db.from('global_chats').insert([{ username: userData.display_name || currentUser, role: userData.role, message: input.value.trim() }]);
+    input.value = '';
+  }
+};
+
+/* =========================================
    CHESS PIECES SVG
    ========================================= */
 const P = {
@@ -654,7 +615,7 @@ const P = {
 };
 
 /* =========================================
-   GAME ENGINE (CHESS & AI)
+   GAME ENGINE (OPTIMIZED AI)
    ========================================= */
 const Game = {
   chess: null, sel: null, mode: 'ai-god', isThinking: false,
@@ -686,7 +647,7 @@ const Game = {
     Game.isThinking = true;
     document.getElementById('aiThinking').classList.add('show');
     
-    // Delay biar UI sempet render, biar gak freeze
+    // Delay biar UI sempet render
     setTimeout(() => {
       const moves = Game.chess.moves({ verbose: true }); 
       if(!moves.length) { Game.isThinking = false; document.getElementById('aiThinking').classList.remove('show'); return; }
@@ -730,16 +691,15 @@ const Game = {
   changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
   resign: () => { if(confirm("Yakin menyerah?")) Game.init(); },
   hint: () => {
-    let kuota = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
+    let kuota = (userData.kuota_harian || 0);
     if(kuota <= 0) {
         alert("Kuota bantuan habis! Tonton iklan atau beli VIP.");
         UI.openModal('shopModal');
         return;
     }
-    if((userData.kuota_iklan || 0) > 0) userData.kuota_iklan--;
-    else userData.kuota_harian--;
-    db.from('profiles').update({ kuota_harian: userData.kuota_harian, kuota_iklan: userData.kuota_iklan }).eq('username', currentUser).then();
-    document.getElementById('kuotaText').innerText = userData.kuota_harian + userData.kuota_iklan;
+    userData.kuota_harian--;
+    db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
+    document.getElementById('kuotaText').innerText = userData.kuota_harian;
     
     const moves = Game.chess.moves({ verbose: true }); if(!moves.length) return;
     let bestM = moves[0], bestV = -Infinity;
