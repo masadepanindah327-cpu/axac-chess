@@ -3,56 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Full Feature</title>
+  <title>AXAC Chess - Apex Masterpiece</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
+    /* =========================================
+       1. CORE VARIABLES & RESET
+       ========================================= */
     :root {
-      --bg: #03050a; --panel: rgba(15, 23, 42, 0.9); --border: rgba(255, 255, 255, 0.1);
-      --primary: #3b82f6; --accent: #06b6d4; --danger: #ef4444; --success: #10b981;
-      --purple: #8b5cf6; --gold: #fbbf24; --text: #f8fafc; --text-mut: #94a3b8;
-      --sq-light: #cbd5e1; --sq-dark: #334155; --sq-hl: rgba(59, 130, 246, 0.75); --sq-guide: rgba(16, 185, 129, 0.9);
+      --bg-base: #020408;
+      --bg-panel: rgba(15, 23, 42, 0.92);
+      --bg-card: rgba(30, 41, 59, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hi: rgba(255, 255, 255, 0.15);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.4);
+      --accent: #06b6d4;
+      --danger: #ef4444;
+      --success: #10b981;
+      --purple: #8b5cf6;
+      --gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-mut: #94a3b8;
+      --sq-light: #cbd5e1;
+      --sq-dark: #334155;
+      --sq-hl: rgba(59, 130, 246, 0.75);
+      --sq-guide: rgba(16, 185, 129, 0.9);
       --shadow: 0 10px 40px -10px rgba(0,0,0,0.9);
+      --glass: blur(20px) saturate(180%);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, rgba(59,130,246,0.2) 0%, transparent 60%); background-attachment: fixed; }
+    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%); background-attachment: fixed; }
 
-    /* ANIMASI */
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    /* =========================================
+       2. ANIMATIONS & SPLASH
+       ========================================= */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes forceHide { 0% { opacity: 1; visibility: visible; } 85% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; z-index: -1; } }
 
-    /* HEADER & LAYOUT */
-    header { background: var(--panel); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s; }
+    #splash { position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: forceHide 0.8s forwards; }
+    .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 24px; box-shadow: 0 0 20px var(--primary-glow); }
+    .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 3px; color: var(--primary); }
+
+    /* =========================================
+       3. HEADER & LAYOUT RATA KANAN
+       ========================================= */
+    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s; }
     .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1300px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; animation: fadeIn 0.6s; }
+    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; animation: fadeIn 0.6s; }
     @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
-    /* BOARD */
-    .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-    .status-bar { width: 100%; max-width: 560px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
-    .board-wrap { width: 100%; max-width: 560px; aspect-ratio: 1; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; }
+    /* =========================================
+       4. BOARD AREA
+       ========================================= */
+    .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
+    .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); backdrop-filter: var(--glass); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
+    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
     .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
     .sq.light { background: var(--sq-light); }
     .sq.dark { background: var(--sq-dark); }
-    .sq.hl { background: var(--sq-hl) !important; }
-    .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; z-index: 10; }
-    .sq svg { width: 88%; height: 88%; pointer-events: none; }
+    .sq.hl { background: var(--sq-hl) !important; box-shadow: inset 0 0 15px rgba(255,255,255,0.2); }
+    .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; z-index: 10; box-shadow: 0 0 10px var(--sq-guide); }
+    .sq svg { width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
 
-    /* AI THINKING */
-    #aiThinking { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 16px; }
+    /* AI THINKING OVERLAY */
+    #aiThinking { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 16px; }
     #aiThinking.show { display: flex; }
 
-    /* PANEL KANAN & WIDGETS */
-    .right-panel { display: flex; flex-direction: column; gap: 20px; }
-    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
+    /* =========================================
+       5. PANEL KANAN & WIDGETS
+       ========================================= */
+    .right-panel { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+    .panel { background: var(--bg-panel); backdrop-filter: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
     .panel h3 { font-size: 0.85rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
     
-    .btn { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+    .btn { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px var(--primary-glow); }
     .btn:hover { background: #2563eb; transform: translateY(-2px); }
     .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
     .btn-purple { background: var(--purple); box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
@@ -60,26 +92,31 @@
     .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 15px rgba(251,191,36,0.3); }
     
     .input-grp { margin-bottom: 12px; }
-    .input-grp input, select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text); outline: none; font-size: 0.9rem; }
+    .input-grp label { display: block; font-size: 0.8rem; color: var(--text-mut); margin-bottom: 6px; }
+    .input-grp input, select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); outline: none; font-size: 0.9rem; }
 
     /* PROFILE CARD */
-    .profile-card { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .profile-card { display: flex; align-items: center; gap: 16px; background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
     .profile-card:hover { background: rgba(255,255,255,0.1); }
-    .avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #fff; }
+    .avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #fff; box-shadow: 0 0 15px var(--primary-glow); }
 
-    /* AUDIO */
+    /* MUSIC PLAYER */
     .music-player { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-    .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; text-align: center; }
+    .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .player-controls { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
-    .ctrl-btn { background: var(--panel); border: 1px solid var(--border); color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+    .ctrl-btn { background: rgba(15, 23, 42, 1); border: 1px solid var(--border); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+    .ctrl-btn:hover { background: var(--primary); border-color: var(--primary); }
     .track-list { display: flex; flex-direction: column; gap: 6px; }
-    .track-item { padding: 8px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; color: var(--text-mut); }
-    .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); }
+    .track-item { padding: 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; color: var(--text-mut); transition: 0.2s; }
+    .track-item:hover { background: rgba(255,255,255,0.05); }
+    .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); font-weight: 700; }
 
-    /* MODALS */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+    /* =========================================
+       6. MODALS & OVERLAYS
+       ========================================= */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
     .overlay.show { display: flex; }
-    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; animation: popIn 0.3s; }
+    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; animation: popIn 0.3s; box-shadow: var(--shadow); }
     .hidden { display: none !important; }
     
     /* BADGES */
@@ -92,13 +129,23 @@
     .r-engineer { background: linear-gradient(45deg, #06b6d4, #0891b2); color: #000; }
     .r-member { background: #475569; color: #fff; }
 
-    /* LOADING IKLAN */
+    /* AD OVERLAY */
     #adOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
     #adOverlay.show { display: flex; }
     .ad-timer { font-size: 4rem; font-weight: 800; color: var(--gold); font-family: monospace; margin: 20px 0; }
+
+    /* CHAT BOX */
+    .chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; border: 1px solid var(--border); }
+    .chat-msg { padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); line-height: 1.4; }
+    .chat-me { background: rgba(59,130,246,0.2); border: 1px solid var(--primary); align-self: flex-end; }
   </style>
 </head>
 <body>
+
+  <div id="splash">
+    <div class="loader-ring"></div>
+    <div class="splash-title">AXAC APEX</div>
+  </div>
 
   <header>
     <div class="brand">AXAC APEX</div>
@@ -108,10 +155,9 @@
     </div>
   </header>
 
-  <!-- AUTH SCREEN -->
   <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%;">
     <div class="panel">
-      <h2 style="text-align: center; margin-bottom: 20px;">LOGIN</h2>
+      <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">AXAC LOGIN</h2>
       <div class="input-grp"><input type="text" id="authUser" placeholder="Username"></div>
       <div class="input-grp"><input type="password" id="authPass" placeholder="Password"></div>
       <button class="btn" style="margin-bottom: 10px;" onclick="Auth.login()">MASUK</button>
@@ -119,7 +165,6 @@
     </div>
   </div>
 
-  <!-- GAME SCREEN -->
   <div id="gameScreen" class="main-layout hidden">
     <div class="board-container">
       <div class="status-bar">
@@ -133,17 +178,16 @@
             <div style="font-size: 2rem; animation: spin 2s linear infinite;">🧠</div>
         </div>
       </div>
-      <div style="display: flex; gap: 10px; width: 100%; max-width: 560px;">
+      <div style="display: flex; gap: 10px; width: 100%; max-width: 600px;">
         <button class="btn btn-danger" onclick="Game.resign()">Nyerah</button>
-        <button class="btn btn-purple" onclick="Game.hint()">💡 Bantuan</button>
+        <button class="btn btn-purple" onclick="Game.hint()">💡 Bantuan (<span id="kuotaText">0</span>)</button>
       </div>
     </div>
 
     <div class="right-panel">
-      <!-- PROFILE -->
       <div class="panel">
         <h3>Player Lobby</h3>
-        <div class="profile-card" onclick="UI.openModal('profileModal')">
+        <div class="profile-card" onclick="Profile.open()">
           <div class="avatar" id="profAvatar">A</div>
           <div class="profile-info">
             <h4 id="profName">User</h4>
@@ -152,7 +196,6 @@
         </div>
       </div>
 
-      <!-- GAME MODES -->
       <div class="panel">
         <h3>Game Modes</h3>
         <select id="modeSelect" onchange="Game.changeMode()" style="margin-bottom: 10px;">
@@ -161,18 +204,17 @@
           <option value="ai-medium">VS AI (Menengah)</option>
         </select>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="btn btn-purple" onclick="Story.open()">📖 Story Mode</button>
+            <button class="btn btn-purple" onclick="Story.open()">📖 Story Mode (50 Stage)</button>
             <button class="btn btn-success" onclick="UI.openModal('tournamentModal')">🏆 Tournament</button>
+            <button class="btn btn-gold" onclick="Chat.open()">💬 Global Chat / Admin</button>
         </div>
       </div>
 
-      <!-- ROLE FEATURES -->
       <div id="rolePanel" class="panel hidden">
         <h3 id="rolePanelTitle">Panel Khusus</h3>
         <div id="rolePanelContent"></div>
       </div>
 
-      <!-- AUDIO -->
       <div class="panel">
         <h3>Audio System</h3>
         <div class="music-player">
@@ -188,49 +230,71 @@
     </div>
   </div>
 
-  <!-- MODALS -->
-  <!-- PROFILE -->
   <div id="profileModal" class="overlay">
-    <div class="modal" style="text-align: center;">
-      <div class="avatar" style="margin: 0 auto 16px auto; width: 80px; height: 80px; font-size: 2rem;" id="modalAvatar">A</div>
-      <h2 id="modalName" style="margin-bottom: 8px;">Username</h2>
-      <span id="modalRole" class="badge r-member" style="margin-bottom: 16px; display: inline-block;">Member</span>
-      
-      <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
-        <p style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Status:</p>
-        <p style="font-weight: 800; margin-bottom: 8px;">Total Win: <span id="modalWins" style="color: var(--gold);">0</span></p>
-        <p style="font-size: 0.85rem;">Terdaftar sebagai <span id="modalRoleText">Member</span>.</p>
+    <div class="modal">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <div class="avatar" style="width: 70px; height: 70px; font-size: 2rem;" id="modalAvatar">A</div>
+          <div>
+            <h2 id="modalDisplayName" style="margin-bottom: 4px;">Display Name</h2>
+            <p style="color: var(--text-mut); font-size: 0.85rem;">@<span id="modalUsername">username</span></p>
+            <span id="modalRole" class="badge r-member" style="margin-top: 6px; display: inline-block;">Member</span>
+          </div>
+        </div>
       </div>
 
-      <button class="btn btn-gold" onclick="UI.openModal('shopModal')">💎 Beli VIP (Bebas Iklan)</button>
+      <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; border: 1px solid var(--border);">
+        <p style="margin-bottom: 8px;">📝 <b>Bio:</b> <span id="modalBio">-</span></p>
+        <p style="margin-bottom: 8px;">🎮 <b>Hobi:</b> <span id="modalHobi">-</span></p>
+        <p style="margin-bottom: 8px;">🎂 <b>Ultah:</b> <span id="modalUltah">-</span></p>
+        <p style="margin-bottom: 8px;">🏆 <b>Total Win:</b> <span id="modalWins" style="color: var(--gold);">0</span></p>
+        <p style="margin-bottom: 8px;">💡 <b>Sisa Kuota Bantuan:</b> <span id="modalKuota" style="color: var(--accent);">0</span></p>
+      </div>
+
+      <button class="btn btn-purple" onclick="Profile.openEdit()">✏️ Edit Profil</button>
+      <button class="btn btn-gold" style="margin-top: 8px;" onclick="UI.openModal('shopModal')">💎 AXAC Store</button>
       <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('profileModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- SHOP / UPGRADE -->
+  <div id="editProfileModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 16px;">✏️ Edit Profil</h3>
+      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName" placeholder="Nama Tampilan"></div>
+      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio" placeholder="Suka main catur..."></div>
+      <div class="input-grp"><label>Hobi / Genre Game</label><input type="text" id="editHobi" placeholder="Suka RPG, Strategy..."></div>
+      <div class="input-grp"><label>Tanggal Lahir</label><input type="date" id="editUltah"></div>
+      <button class="btn btn-success" onclick="Profile.saveEdit()">💾 Simpan Perubahan</button>
+      <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('editProfileModal')">Batal</button>
+    </div>
+  </div>
+
   <div id="shopModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--gold); margin-bottom: 16px;">💎 AXAC Store</h3>
       <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
+        <h4 style="color: var(--purple); margin-bottom: 4px;">Tambah Kuota Bantuan</h4>
+        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">Tonton iklan 30 detik untuk +5 Kuota.</p>
+        <button class="btn btn-purple" onclick="Ads.show('kuota')">Tonton Iklan 30s (+5 Kuota)</button>
+      </div>
+      <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="color: var(--purple); margin-bottom: 4px;">Semi-VIP (Rp 5.000)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">Buka God Mode, Dapat 50 Kuota Bantuan.</p>
-        <button class="btn btn-purple" onclick="Ads.show('semivip')">Tonton Iklan 30s (Gratis)</button>
+        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">50 Kuota Harian + 50 Bonus Iklan.</p>
+        <button class="btn btn-purple" onclick="Ads.show('semivip')">Tonton Iklan 30s</button>
       </div>
       <div style="background: rgba(236,72,153,0.1); border: 1px solid #ec4899; padding: 16px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="color: #ec4899; margin-bottom: 4px;">VIP Ultimate (Rp 10.000)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">Bebas Iklan Selamanya, Analisis Mendalam.</p>
-        <button class="btn" style="background: #ec4899;" onclick="Ads.show('vip')">Tonton Iklan 30s (Gratis)</button>
+        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">100 Kuota Harian + 100 Bonus Iklan. Bebas Iklan.</p>
+        <button class="btn" style="background: #ec4899;" onclick="Ads.show('vip')">Tonton Iklan 30s</button>
       </div>
       <div style="background: rgba(16,185,129,0.1); border: 1px solid var(--success); padding: 16px; border-radius: 12px;">
         <h4 style="color: var(--success); margin-bottom: 4px;">Hilangkan Iklan (Rp 20.000)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 10px;">Bayar sekali, main tenang tanpa pop-up.</p>
         <button class="btn btn-success" onclick="Payment.buyNoAds()">Bayar Rp 20.000</button>
       </div>
       <button class="btn" style="margin-top: 16px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('shopModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- STORY MODE -->
   <div id="storyModal" class="overlay">
     <div class="modal" style="text-align: center;">
       <h3 style="color: var(--purple); margin-bottom: 16px;">📖 Story Mode</h3>
@@ -242,26 +306,33 @@
     </div>
   </div>
 
-  <!-- TOURNAMENT -->
   <div id="tournamentModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--gold); margin-bottom: 16px;">🏆 Tournament</h3>
       <div style="background: rgba(251,191,36,0.1); border: 1px solid var(--gold); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
         <h4 style="color: var(--gold); margin-bottom: 4px;">AXAC Cyber Cup</h4>
-        <p style="font-size: 0.85rem; color: var(--text-mut); margin-bottom: 12px;">Hadiah: 1000 Diamond.</p>
         <button class="btn btn-gold" onclick="alert('Pendaftaran Berhasil!')">Daftar (Gratis)</button>
       </div>
       <button class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('tournamentModal')">Tutup</button>
     </div>
   </div>
 
-  <!-- OWNER / ADMIN PANEL -->
+  <div id="chatModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--accent); margin-bottom: 16px;">💬 Global Chat / Admin</h3>
+      <div id="chatBox" class="chat-box"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
+        <button class="btn btn-sm" style="width: auto;" onclick="Chat.send()">Kirim</button>
+      </div>
+      <button class="btn" style="margin-top: 12px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('chatModal')">Tutup</button>
+    </div>
+  </div>
+
   <div id="adminModal" class="overlay">
     <div class="modal">
       <h3 style="color: var(--gold); margin-bottom: 16px;">👑 Panel Owner/Admin</h3>
-      <div class="input-grp">
-        <input type="text" id="adminTarget" placeholder="Username target">
-      </div>
+      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target"></div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <button class="btn btn-success" onclick="Admin.act('guard')">Tunjuk jadi Guard</button>
         <button class="btn btn-primary" onclick="Admin.act('engineer')">Tunjuk jadi Engineer</button>
@@ -271,7 +342,6 @@
     </div>
   </div>
 
-  <!-- REWARDED AD OVERLAY -->
   <div id="adOverlay">
     <h2 style="color: var(--gold);">📺 Iklan Promosi</h2>
     <p style="color: var(--text-mut); margin-top: 8px;">Tonton hingga selesai untuk klaim reward.</p>
@@ -281,7 +351,7 @@
 
 <script>
 /* =========================================
-   KONFIGURASI & STATE
+   KONFIGURASI & STATE GLOBAL
    ========================================= */
 const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
@@ -302,16 +372,13 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* =========================================
-   UI MANAGER
-   ========================================= */
 const UI = {
   openModal: (id) => { const el = document.getElementById(id); if(el) el.classList.add('show'); },
   closeModal: (id) => { const el = document.getElementById(id); if(el) el.classList.remove('show'); }
 };
 
 /* =========================================
-   AUDIO SYSTEM
+   SISTEM AUDIO
    ========================================= */
 const Audio = {
   tracks: [
@@ -348,17 +415,17 @@ const Audio = {
 };
 
 /* =========================================
-   ADS & PAYMENT SYSTEM
+   IKLAN & PAYMENT
    ========================================= */
 const Ads = {
   timerInterval: null,
   currentType: null,
   show: (type) => {
-    if(userData.no_ads) return alert("Kamu sudah VIP/Bebas Iklan!");
+    if(userData.no_ads || userData.role === 'owner' || userData.role === 'admin' || userData.role === 'guard' || userData.role === 'engineer') return alert("Kamu bebas iklan!");
     Ads.currentType = type;
     UI.closeModal('shopModal');
     document.getElementById('adOverlay').classList.add('show');
-    let timeLeft = 5; // Singkatin jadi 5 detik buat tes (aslinya 30)
+    let timeLeft = 30;
     document.getElementById('adTimer').innerText = timeLeft;
     document.getElementById('adCloseBtn').classList.add('hidden');
     
@@ -374,11 +441,18 @@ const Ads = {
     }, 1000);
   },
   giveReward: () => {
-    let newRole = Ads.currentType === 'vip' ? 'vip' : 'semivip';
-    userData.role = newRole;
-    if(Ads.currentType === 'vip') userData.no_ads = true;
-    db.from('profiles').update({ role: newRole }).eq('username', currentUser).then();
-    alert(`Selamat! Kamu sekarang ${newRole.toUpperCase()}`);
+    let newRole = Ads.currentType === 'vip' ? 'vip' : (Ads.currentType === 'semivip' ? 'semivip' : 'member');
+    if(Ads.currentType === 'kuota') {
+        userData.kuota_harian = (userData.kuota_harian || 0) + 5;
+        db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
+        alert("Berhasil menambahkan 5 Kuota Bantuan!");
+    } else {
+        userData.role = newRole;
+        if(Ads.currentType === 'vip') userData.no_ads = true;
+        db.from('profiles').update({ role: newRole, no_ads: userData.no_ads }).eq('username', currentUser).then();
+        alert(`Selamat! Kamu sekarang ${newRole.toUpperCase()}`);
+    }
+    Ads.close();
     location.reload();
   },
   close: () => { document.getElementById('adOverlay').classList.remove('show'); }
@@ -386,16 +460,53 @@ const Ads = {
 
 const Payment = {
   buyNoAds: () => {
+    if(userData.role === 'owner') return alert("Owner bebas iklan!");
     if(confirm("Lanjutkan pembayaran Rp 20.000 untuk menghilangkan iklan?")) {
-      userData.no_ads = true;
-      alert("Pembayaran Berhasil! Iklan telah dihilangkan permanen.");
-      location.reload();
+      db.from('profiles').update({ no_ads: true, role: 'vip' }).eq('username', currentUser).then(() => {
+        alert("Pembayaran Berhasil! Iklan telah dihilangkan permanen.");
+        location.reload();
+      });
     }
   }
 };
 
 /* =========================================
-   AUTH & ROLE SYSTEM
+   CHAT PRIBADI REAL-TIME
+   ========================================= */
+const Chat = {
+  open: () => { UI.openModal('chatModal'); Chat.init(); },
+  init: () => {
+    if(!db) return;
+    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.append);
+    });
+    
+    // Simple polling
+    setInterval(async () => {
+      if(!document.getElementById('chatModal').classList.contains('show')) return;
+      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.append);
+    }, 3000);
+  },
+  append: (msg) => {
+    const box = document.getElementById('chatBox');
+    if(!box) return;
+    let cls = msg.username === currentUser ? 'chat-me' : '';
+    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
+    box.scrollTop = box.scrollHeight;
+  },
+  send: async () => {
+    const input = document.getElementById('chatInput');
+    if(!input.value.trim()) return;
+    await db.from('global_chats').insert([{ username: currentUser, role: userData.role, message: input.value.trim() }]);
+    input.value = '';
+  }
+};
+
+/* =========================================
+   AUTH SYSTEM
    ========================================= */
 const Auth = {
   login: async () => {
@@ -406,17 +517,22 @@ const Auth = {
     
     const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
     if(error || !data) return alert("Salah data!");
+    if(data.banned) return alert("Akun dibanned!");
     
     currentUser = data.username; 
     userData = data;
     localStorage.setItem('axac_user', currentUser); 
+    
+    // Panggil fungsi reset kuota harian
+    try { await db.rpc('check_daily_quota', { p_username: currentUser }); } catch(e) { console.log(e); }
+    
     Auth.showGame();
   },
   register: async () => {
     const u = document.getElementById('authUser').value.trim(); 
     const p = document.getElementById('authPass').value.trim();
-    const { error } = await db.from('profiles').insert([{ username: u, password: p }]);
-    if(error) return alert("Gagal daftar!");
+    const { error } = await db.from('profiles').insert([{ username: u, password: p, display_name: u }]);
+    if(error) return alert("Gagal daftar: " + error.message);
     alert("Silakan login.");
   },
   showGame: () => {
@@ -426,18 +542,21 @@ const Auth = {
     
     let role = userData.role || 'member';
     document.getElementById('uName').innerText = currentUser;
-    document.getElementById('profName').innerText = currentUser;
-    document.getElementById('profAvatar').innerText = currentUser.charAt(0).toUpperCase();
-    document.getElementById('modalAvatar').innerText = currentUser.charAt(0).toUpperCase();
-    document.getElementById('modalName').innerText = currentUser;
+    document.getElementById('profName').innerText = userData.display_name || currentUser;
+    document.getElementById('profAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    document.getElementById('modalAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    document.getElementById('modalName').innerText = userData.display_name || currentUser;
+    document.getElementById('modalUsername').innerText = currentUser;
     
     document.getElementById('profRole').innerText = role.toUpperCase();
     document.getElementById('profRole').className = `badge r-${role}`;
     document.getElementById('modalRole').innerText = role.toUpperCase();
     document.getElementById('modalRole').className = `badge r-${role}`;
-    document.getElementById('modalRoleText').innerText = role.toUpperCase();
+    document.getElementById('profWins').innerText = userData.wins || 0;
     
-    // ROLE FEATURES
+    document.getElementById('kuotaText').innerText = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
+    document.getElementById('modalKuota').innerText = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
+
     const rolePanel = document.getElementById('rolePanel');
     const rolePanelTitle = document.getElementById('rolePanelTitle');
     const rolePanelContent = document.getElementById('rolePanelContent');
@@ -449,11 +568,11 @@ const Auth = {
     } else if(role === 'guard') {
         rolePanel.classList.remove('hidden');
         rolePanelTitle.innerText = "🛡️ Guard Terminal";
-        rolePanelContent.innerHTML = `<div style="background:#000; color:var(--success); font-family:monospace; padding:10px; font-size:0.8rem; border-radius:8px;">> Scanning network... OK<br>> Anti-cheat active.<br>> Secure.</div>`;
+        rolePanelContent.innerHTML = `<div style="background:#000; color:var(--success); padding:10px; font-family:monospace; font-size:0.8rem; border-radius:8px;">> Scanning network... OK<br>> Anti-cheat active.</div>`;
     } else if(role === 'engineer') {
         rolePanel.classList.remove('hidden');
         rolePanelTitle.innerText = "🛠️ Engineer Terminal";
-        rolePanelContent.innerHTML = `<div style="background:#000; color:var(--accent); font-family:monospace; padding:10px; font-size:0.8rem; border-radius:8px;">> FPS: 60<br>> Memory: 24MB<br>> Optimizing...</div>`;
+        rolePanelContent.innerHTML = `<div style="background:#000; color:var(--accent); padding:10px; font-family:monospace; font-size:0.8rem; border-radius:8px;">> FPS: 60<br>> Memory: 24MB</div>`;
     }
 
     setTimeout(() => { Game.init(); Audio.init(); }, 100);
@@ -462,7 +581,41 @@ const Auth = {
 };
 
 /* =========================================
-   ADMIN PANEL
+   PROFILE SYSTEM
+   ========================================= */
+const Profile = {
+  open: () => {
+    document.getElementById('modalDisplayName').innerText = userData.display_name || currentUser;
+    document.getElementById('modalBio').innerText = userData.bio || '-';
+    document.getElementById('modalHobi').innerText = userData.hobi || '-';
+    document.getElementById('modalUltah').innerText = userData.tanggal_lahir || '-';
+    document.getElementById('modalWins').innerText = userData.wins || 0;
+    UI.openModal('profileModal');
+  },
+  openEdit: () => {
+    document.getElementById('editDisplayName').value = userData.display_name || '';
+    document.getElementById('editBio').value = userData.bio || '';
+    document.getElementById('editHobi').value = userData.hobi || '';
+    document.getElementById('editUltah').value = userData.tanggal_lahir || '';
+    UI.openModal('editProfileModal');
+  },
+  saveEdit: async () => {
+    const dName = document.getElementById('editDisplayName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    const hobi = document.getElementById('editHobi').value.trim();
+    const ultah = document.getElementById('editUltah').value;
+    
+    await db.from('profiles').update({ display_name: dName, bio: bio, hobi: hobi, tanggal_lahir: ultah }).eq('username', currentUser);
+    userData.display_name = dName; userData.bio = bio; userData.hobi = hobi; userData.tanggal_lahir = ultah;
+    
+    Auth.showGame();
+    Profile.open();
+    UI.closeModal('editProfileModal');
+  }
+};
+
+/* =========================================
+   ADMIN ACTIONS
    ========================================= */
 const Admin = {
   act: async (type) => {
@@ -480,7 +633,7 @@ const Admin = {
 };
 
 /* =========================================
-   STORY MODE (50 STAGES KURASI)
+   STORY MODE
    ========================================= */
 const Story = {
   currentStage: 0,
@@ -490,13 +643,8 @@ const Story = {
     { n:"Rian (Cyber Hacker)", d:"System hack initiated!", img:"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=200" },
     { n:"Alex (AI Prototype)", d:"Probabilitas kemenanganmu 0%.", img:"https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200" },
     { n:"Dewi (Ratu Catur)", d:"Tunduk pada taktikku!", img:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" },
-    { n:"Magnus (Juara Dunia)", d:"Aku juara dunia, kamu siapa?", img:"https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" },
-    { n:"Pak Broto (Legenda)", d:"Pengalaman mengalahkan segalanya.", img:"https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200" },
-    { n:"Vino (Neural Link)", d:"Neural link terhubung.", img:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200" },
-    { n:"Kiki (Paladin)", d:"Cahaya akan mengalahkan kegelapan.", img:"https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200" },
-    { n:"Guntur (Titan)", d:"Gebrak! Papan ini milikku.", img:"https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=200" }
+    { n:"Magnus (Juara Dunia)", d:"Aku juara dunia, kamu siapa?", img:"https://images.chesscomfiles.com/uploads/v1/user/8447814.73d2f1f3.200x200.png" }
   ],
-  
   open: () => {
     if(Story.currentStage >= 50) return alert("Kamu sudah tamat!");
     let char = Story.data[Story.currentStage % Story.data.length];
@@ -505,7 +653,6 @@ const Story = {
     document.getElementById('storyDesc').innerText = `"${char.d}"`;
     UI.openModal('storyModal');
   },
-  
   startBattle: () => {
     UI.closeModal('storyModal');
     let diff = Story.currentStage < 15 ? 'ai-medium' : Story.currentStage < 30 ? 'ai-hard' : 'ai-god';
@@ -517,7 +664,7 @@ const Story = {
 };
 
 /* =========================================
-   CHESS PIECES SVG
+   CHESS PIECES SVG (Disingkat biar ga kepanjangan)
    ========================================= */
 const P = {
   p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
@@ -539,7 +686,6 @@ const P = {
    ========================================= */
 const Game = {
   chess: null, sel: null, mode: 'ai-god', isThinking: false,
-  
   init: () => { Game.chess = new Chess(); Game.sel = null; Game.isThinking = false; Game.render(); },
   render: () => {
     const b = document.getElementById('board'); if(!b) return; b.innerHTML = '';
@@ -610,7 +756,25 @@ const Game = {
   },
   changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
   resign: () => { if(confirm("Yakin menyerah?")) Game.init(); },
-  hint: () => { alert("Gunakan logika terbaikmu!"); }
+  hint: () => {
+    let kuota = (userData.kuota_harian || 0) + (userData.kuota_iklan || 0);
+    if(kuota <= 0) {
+        alert("Kuota bantuan habis! Tonton iklan atau beli VIP.");
+        UI.openModal('shopModal');
+        return;
+    }
+    // Potong kuota
+    if((userData.kuota_iklan || 0) > 0) userData.kuota_iklan--;
+    else userData.kuota_harian--;
+    db.from('profiles').update({ kuota_harian: userData.kuota_harian, kuota_iklan: userData.kuota_iklan }).eq('username', currentUser).then();
+    document.getElementById('kuotaText').innerText = userData.kuota_harian + userData.kuota_iklan;
+    
+    // Kasih hint
+    const moves = Game.chess.moves({ verbose: true }); if(!moves.length) return;
+    let bestM = moves[0], bestV = -Infinity;
+    for(let m of moves) { Game.chess.move(m); let v = -Game.minimax(2, -Infinity, Infinity, false); Game.chess.undo(); if(v > bestV) { bestV = v; bestM = m; } }
+    alert(`Saran Langkah: ${bestM.san}`);
+  }
 };
 </script>
 </body>
