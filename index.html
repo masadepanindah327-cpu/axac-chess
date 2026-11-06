@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Deep-Core Engine</title>
+  <title>AXAC Chess - Apex Engine</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     /* =========================================
-       1. CORE VARIABLES & RESET
+       CSS VARIABLES & RESET
        ========================================= */
     :root {
       --bg-base: #03050a;
@@ -35,7 +35,7 @@
     body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%); background-attachment: fixed; }
 
     /* =========================================
-       2. SPLASH SCREEN (ANTI-STUCK CSS)
+       SPLASH SCREEN (ANTI-STUCK CSS MURNI)
        ========================================= */
     @keyframes forceHide {
       0% { opacity: 1; visibility: visible; }
@@ -47,27 +47,27 @@
     #splash { 
       position: fixed; inset: 0; background: var(--bg-base); z-index: 99999; 
       display: flex; flex-direction: column; justify-content: center; align-items: center; 
-      animation: forceHide 0.8s forwards;
+      animation: forceHide 0.6s forwards; /* Force hilang dalam 0.6 detik */
     }
     .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 24px; }
     .splash-title { font-weight: 800; font-size: 1.8rem; letter-spacing: 3px; color: var(--primary); }
 
     /* =========================================
-       3. HEADER & LAYOUT RATA KANAN
+       HEADER & LAYOUT RATA KANAN
        ========================================= */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     header { background: var(--bg-panel); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; animation: fadeIn 0.5s ease; }
     .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 24px; width: 100%; flex: 1; animation: fadeIn 0.5s ease; }
-    @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
+    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1300px; margin: 24px auto; padding: 0 24px; width: 100%; flex: 1; animation: fadeIn 0.5s ease; }
+    @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 
     /* =========================================
-       4. BOARD AREA
+       BOARD AREA
        ========================================= */
     .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-    .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
-    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+    .status-bar { width: 100%; max-width: 560px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
+    .board-wrap { width: 100%; max-width: 560px; aspect-ratio: 1; margin-bottom: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
     .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
     .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
     .sq.light { background: var(--sq-light); }
@@ -75,17 +75,17 @@
     .sq.hl { background: var(--sq-hl) !important; }
     .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; z-index: 10; box-shadow: 0 0 10px var(--sq-guide); }
     .sq svg { width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-    .board-controls { display: flex; gap: 12px; width: 100%; max-width: 600px; }
+    .board-controls { display: flex; gap: 12px; width: 100%; max-width: 560px; }
 
     /* =========================================
-       5. PANEL KANAN
+       PANEL KANAN
        ========================================= */
     .right-panel { display: flex; flex-direction: column; gap: 20px; height: 100%; }
     .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
     .panel h3 { font-size: 0.9rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
 
     /* =========================================
-       6. COMPONENTS
+       COMPONENTS
        ========================================= */
     .btn { background: var(--primary); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px var(--primary-glow); }
     .btn:hover { background: #2563eb; }
@@ -98,7 +98,7 @@
     .input-grp input:focus { border-color: var(--primary); }
 
     /* =========================================
-       7. MUSIC PLAYER
+       MUSIC PLAYER & TERMINAL
        ========================================= */
     .music-player { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
     .track-info { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 16px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -110,14 +110,11 @@
     .track-item:hover { background: rgba(255,255,255,0.05); }
     .track-item.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); font-weight: 700; }
 
-    /* =========================================
-       8. AI TERMINAL
-       ========================================= */
     .terminal { background: #000; color: var(--success); font-family: monospace; font-size: 0.75rem; padding: 12px; border-radius: 8px; height: 140px; overflow-y: auto; border: 1px solid var(--border); line-height: 1.4; }
     .terminal-eng { color: var(--accent); }
 
     /* =========================================
-       9. MODALS & UTILS
+       MODALS
        ========================================= */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
     .overlay.show { display: flex; }
@@ -129,7 +126,7 @@
 
   <div id="splash">
     <div class="loader-ring"></div>
-    <div class="splash-title">AXAC DEEP-CORE</div>
+    <div class="splash-title">AXAC APEX</div>
   </div>
 
   <header>
@@ -167,9 +164,9 @@
       <div class="panel">
         <h3>AI Difficulty</h3>
         <select id="modeSelect" onchange="Game.changeMode()">
-          <option value="ai-easy">Pemula (Depth 1)</option>
-          <option value="ai-medium">Menengah (Depth 2)</option>
-          <option value="ai-hard">Sulit (Depth 3)</option>
+          <option value="ai-easy">Pemula</option>
+          <option value="ai-medium">Menengah</option>
+          <option value="ai-hard">Sulit</option>
           <option value="ai-god" selected>🔥 God Mode (Depth 5)</option>
         </select>
       </div>
@@ -206,60 +203,28 @@
 
 <script>
 /* =========================================
-   KONFIGURASI GLOBAL & SUPABASE
+   KONFIGURASI & INISIALISASI
    ========================================= */
 const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
 let db = null;
 let currentUser = null;
 
-/* =========================================
-   UTILITY FUNCTIONS (BIAR RAPI)
-   ========================================= */
-const Utils = {
-    getEl: (id) => document.getElementById(id),
-    logTerminal: (id, msg) => {
-        const el = Utils.getEl(id);
-        if(el) {
-            el.innerHTML += `<br>> ${msg}`;
-            el.scrollTop = el.scrollHeight;
-        }
-    },
-    formatTime: () => {
-        return new Date().toLocaleTimeString('id-ID');
-    }
-};
-
-/* =========================================
-   INISIALISASI AWAL
-   ========================================= */
 window.addEventListener('DOMContentLoaded', () => {
-  try { 
-      db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
-  } catch(e) { 
-      console.error("Supabase Init Failed:", e); 
-  }
+  try { db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) { console.error("Supabase Init Failed"); }
 
-  // Jam Realtime
   setInterval(() => {
-    const clockEl = Utils.getEl('clock');
-    if(clockEl) clockEl.innerText = Utils.formatTime();
+    const clockEl = document.getElementById('clock');
+    if(clockEl) clockEl.innerText = new Date().toLocaleTimeString('id-ID');
   }, 1000);
 
-  // Auto Login Session
   const saved = localStorage.getItem('axac_user');
-  if(saved) { 
-    currentUser = saved; 
-    Auth.showGame(); 
-  }
+  if(saved) { currentUser = saved; Auth.showGame(); }
 });
 
-/* =========================================
-   UI CONTROLLER
-   ========================================= */
 const UI = {
-  openModal: (id) => { const el = Utils.getEl(id); if(el) el.classList.add('show'); },
-  closeModal: (id) => { const el = Utils.getEl(id); if(el) el.classList.remove('show'); }
+  openModal: (id) => { const el = document.getElementById(id); if(el) el.classList.add('show'); },
+  closeModal: (id) => { const el = document.getElementById(id); if(el) el.classList.remove('show'); }
 };
 
 /* =========================================
@@ -271,56 +236,30 @@ const Audio = {
     { title: "Terranova", url: "https://files.catbox.moe/f01dyl.mp3" },
     { title: "Medusa", url: "https://files.catbox.moe/h9cyas.mp3" }
   ],
-  idx: 0, 
-  audio: new window.Audio(), 
-  isPlaying: false,
-  
+  idx: 0, audio: new window.Audio(), isPlaying: false,
   init: () => {
-    const list = Utils.getEl('trackList'); 
-    if(!list) return;
+    const list = document.getElementById('trackList'); if(!list) return;
     list.innerHTML = '';
     Audio.tracks.forEach((t, i) => {
-      const div = document.createElement('div'); 
-      div.className = `track-item ${i === 0 ? 'active' : ''}`;
-      div.innerText = t.title; 
-      div.onclick = () => Audio.play(i); 
-      list.appendChild(div);
+      const div = document.createElement('div'); div.className = `track-item ${i === 0 ? 'active' : ''}`;
+      div.innerText = t.title; div.onclick = () => Audio.play(i); list.appendChild(div);
     });
-    Audio.audio.src = Audio.tracks[0].url; 
-    Audio.audio.onended = Audio.next;
+    Audio.audio.src = Audio.tracks[0].url; Audio.audio.onended = Audio.next;
   },
-  
   play: (i) => {
-    Audio.idx = i; 
-    Audio.audio.src = Audio.tracks[i].url; 
+    Audio.idx = i; Audio.audio.src = Audio.tracks[i].url; 
     Audio.audio.play().catch(e => console.log("Audio Error:", e));
     Audio.isPlaying = true; 
-    
-    const title = Utils.getEl('trackTitle'); 
-    if(title) title.innerText = Audio.tracks[i].title;
-    
-    const btn = Utils.getEl('playBtn'); 
-    if(btn) btn.innerText = "⏸";
-    
-    document.querySelectorAll('.track-item').forEach((el, idx) => {
-        el.className = `track-item ${idx === i ? 'active' : ''}`;
-    });
+    const title = document.getElementById('trackTitle'); if(title) title.innerText = Audio.tracks[i].title;
+    const btn = document.getElementById('playBtn'); if(btn) btn.innerText = "⏸";
+    document.querySelectorAll('.track-item').forEach((el, idx) => el.className = `track-item ${idx === i ? 'active' : ''}`);
   },
-  
   toggle: () => {
     if(!Audio.audio.src) return Audio.play(0);
-    if(Audio.isPlaying) { 
-        Audio.audio.pause(); 
-        const btn = Utils.getEl('playBtn'); 
-        if(btn) btn.innerText = "▶"; 
-    } else { 
-        Audio.audio.play().catch(e=>console.log(e)); 
-        const btn = Utils.getEl('playBtn'); 
-        if(btn) btn.innerText = "⏸"; 
-    }
+    if(Audio.isPlaying) { Audio.audio.pause(); const btn = document.getElementById('playBtn'); if(btn) btn.innerText = "▶"; }
+    else { Audio.audio.play().catch(e=>console.log(e)); const btn = document.getElementById('playBtn'); if(btn) btn.innerText = "⏸"; }
     Audio.isPlaying = !Audio.isPlaying;
   },
-  
   next: () => Audio.play((Audio.idx + 1) % Audio.tracks.length),
   prev: () => Audio.play((Audio.idx - 1 + Audio.tracks.length) % Audio.tracks.length)
 };
@@ -331,8 +270,8 @@ const Audio = {
 const Auth = {
   login: async () => {
     if(!db) return alert("Sistem database belum siap.");
-    const u = Utils.getEl('authUser').value.trim(); 
-    const p = Utils.getEl('authPass').value.trim();
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
     if(!u || !p) return alert("Isi data!");
     
     const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
@@ -342,96 +281,68 @@ const Auth = {
     localStorage.setItem('axac_user', currentUser); 
     Auth.showGame();
   },
-  
   register: async () => {
     if(!db) return alert("Sistem database belum siap.");
-    const u = Utils.getEl('authUser').value.trim(); 
-    const p = Utils.getEl('authPass').value.trim();
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
     if(!u || !p) return alert("Isi data!");
     const { error } = await db.from('profiles').insert([{ username: u, password: p }]);
     if(error) return alert("Gagal daftar!");
     alert("Silakan login.");
   },
-  
   showGame: () => {
-    const authScr = Utils.getEl('authScreen'); if(authScr) authScr.classList.add('hidden');
-    const gameScr = Utils.getEl('gameScreen'); if(gameScr) gameScr.classList.remove('hidden');
-    const logoutBtn = Utils.getEl('logoutBtn'); if(logoutBtn) logoutBtn.classList.remove('hidden');
-    const uName = Utils.getEl('uName'); if(uName) uName.innerText = currentUser;
+    const authScr = document.getElementById('authScreen'); if(authScr) authScr.classList.add('hidden');
+    const gameScr = document.getElementById('gameScreen'); if(gameScr) gameScr.classList.remove('hidden');
+    const logoutBtn = document.getElementById('logoutBtn'); if(logoutBtn) logoutBtn.classList.remove('hidden');
+    const uName = document.getElementById('uName'); if(uName) uName.innerText = currentUser;
     
     setTimeout(() => {
-      Game.init(); 
-      Audio.init(); 
-      GuardAI.start(); 
-      EngineerAI.start();
+      Game.init(); Audio.init(); GuardAI.start(); EngineerAI.start();
     }, 100);
   },
-  
-  logout: () => { 
-      localStorage.removeItem('axac_user'); 
-      location.reload(); 
-  }
+  logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
 };
 
 /* =========================================
-   AI GUARD SYSTEM (SECURITY)
+   AI GUARD & ENGINEER
    ========================================= */
 const GuardAI = {
   start: () => {
-    const term = Utils.getEl('guardTerminal'); 
-    if(!term) return;
-    
-    Utils.logTerminal('guardTerminal', '[SYS] Guard Online.');
-    
+    const term = document.getElementById('guardTerminal'); if(!term) return;
+    term.innerHTML += "<br>> [SYS] Guard Online.";
     setInterval(() => {
-      if(Math.random() > 0.6) { 
-          Utils.logTerminal('guardTerminal', '[AI] Scanning DOM Integrity... OK'); 
-      }
+      const t = document.getElementById('guardTerminal');
+      if(t && Math.random() > 0.6) { t.innerHTML += `<br>> [AI] Scanning... OK`; t.scrollTop = t.scrollHeight; }
     }, 5000);
   }
 };
 
-/* =========================================
-   AI ENGINEER SYSTEM (PERFORMANCE)
-   ========================================= */
 const EngineerAI = {
   start: () => {
-    const term = Utils.getEl('engTerminal'); 
-    if(!term) return;
-    
-    Utils.logTerminal('engTerminal', '[SYS] Engineer Online.');
-    
-    let lastTime = performance.now(); 
-    let frames = 0;
-    
+    const term = document.getElementById('engTerminal'); if(!term) return;
+    term.innerHTML += "<br>> [SYS] Engineer Online.";
+    let lastTime = performance.now(); let frames = 0;
     function loop() {
-      frames++; 
-      let now = performance.now();
-      
+      frames++; let now = performance.now();
       if(now - lastTime > 1000) {
-        if(frames < 40) { 
-            Utils.logTerminal('engTerminal', `[⚠️] Lag: ${frames}fps. Fixing...`); 
-            EngineerAI.cleanMemory(); 
-        } else if(Math.random() > 0.8) { 
-            Utils.logTerminal('engTerminal', `[AI] System Stable: ${frames}fps.`); 
-        }
-        frames = 0; 
-        lastTime = now;
+        const t = document.getElementById('engTerminal');
+        if(t && frames < 40) { t.innerHTML += `<br>> [⚠️] Lag: ${frames}fps. Fixing...`; EngineerAI.cleanMemory(); }
+        else if(t && Math.random() > 0.8) { t.innerHTML += `<br>> [AI] Stable ${frames}fps.`; }
+        if(t) t.scrollTop = t.scrollHeight;
+        frames = 0; lastTime = now;
       }
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
   },
-  
   cleanMemory: () => {
-    setTimeout(() => { 
-        Utils.logTerminal('engTerminal', '[AI] Memory Cleaned. Engine Restored.'); 
-    }, 800);
+    const term = document.getElementById('engTerminal');
+    setTimeout(() => { if(term) { term.innerHTML += `<br>> [AI] Memory Cleaned.`; term.scrollTop = term.scrollHeight; } }, 800);
   }
 };
 
 /* =========================================
-   SVG ASSETS (CHESS PIECES)
+   GAME ENGINE
    ========================================= */
 const P = {
   p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
@@ -448,16 +359,9 @@ const P = {
   K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>'
 };
 
-/* =========================================
-   GAME ENGINE (CHESS & AI)
-   ========================================= */
 const Game = {
-  chess: null, 
-  sel: null, 
-  mode: 'ai-god', 
-  isThinking: false,
+  chess: null, sel: null, mode: 'ai-god', isThinking: false,
   
-  // Piece Square Tables (PST) untuk posisi strategis
   pst: {
     p: [[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
     n: [[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
@@ -466,110 +370,66 @@ const Game = {
     q: [[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
     k: [[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
   },
-  
-  init: () => { 
-      Game.chess = new Chess(); 
-      Game.sel = null; 
-      Game.isThinking = false; 
-      Game.render(); 
-  },
-  
+  init: () => { Game.chess = new Chess(); Game.sel = null; Game.isThinking = false; Game.render(); },
   render: () => {
-    const b = Utils.getEl('board'); 
-    if(!b) return; 
-    b.innerHTML = '';
-    
+    const b = document.getElementById('board'); if(!b) return; b.innerHTML = '';
     Game.chess.board().forEach((row, r) => {
       row.forEach((p, c) => {
-        const sq = document.createElement('div'); 
-        sq.className = `sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
+        const sq = document.createElement('div'); sq.className = `sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
         const id = String.fromCharCode(97+c) + (8-r);
-        
         if(p) sq.innerHTML = P[p.color === 'w' ? p.type.toUpperCase() : p.type];
         if(Game.sel === id) sq.classList.add('hl');
-        if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
-            sq.classList.add('guide');
-        }
-        
-        sq.onclick = () => Game.click(id); 
-        b.appendChild(sq);
+        if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) sq.classList.add('guide');
+        sq.onclick = () => Game.click(id); b.appendChild(sq);
       });
     });
   },
-  
   click: (id) => {
     if(Game.chess.game_over() || Game.isThinking) return;
-    
     if(Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
-      Game.chess.move({ from: Game.sel, to: id, promotion: 'q' }); 
-      Game.sel = null; 
-      Game.render();
+      Game.chess.move({ from: Game.sel, to: id, promotion: 'q' }); Game.sel = null; Game.render();
       if(!Game.chess.game_over()) setTimeout(Game.aiMove, 100);
       return;
     }
-    
-    const p = Game.chess.get(id); 
-    Game.sel = (p && p.color === Game.chess.turn()) ? id : null; 
-    Game.render();
+    const p = Game.chess.get(id); Game.sel = (p && p.color === Game.chess.turn()) ? id : null; Game.render();
   },
-  
   aiMove: () => {
     if(Game.chess.game_over() || Game.isThinking) return;
     Game.isThinking = true;
-    
-    // Pake setTimeout biar UI sempet render dulu sebelum AI mikir berat
     setTimeout(() => {
       const moves = Game.chess.moves({ verbose: true }); 
       if(!moves.length) { Game.isThinking = false; return; }
-      
       let depth = Game.mode === 'ai-easy' ? 1 : Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 5;
       let bestMove = moves[0], bestVal = -Infinity;
-
       for(let m of moves) {
-        Game.chess.move(m); 
-        let val = -Game.minimax(depth - 1, -Infinity, Infinity, false); 
-        Game.chess.undo();
+        Game.chess.move(m); let val = -Game.minimax(depth - 1, -Infinity, Infinity, false); Game.chess.undo();
         if(val > bestVal) { bestVal = val; bestMove = m; }
       }
-      
-      Game.chess.move(bestMove); 
-      Game.isThinking = false;
-      Game.render();
+      Game.chess.move(bestMove); Game.isThinking = false; Game.render();
     }, 50);
   },
-  
   minimax: (depth, alpha, beta, isMax) => {
     if(depth === 0 || Game.chess.game_over()) return Game.evaluate();
     const moves = Game.chess.moves();
-    
     if(isMax) {
       let max = -Infinity;
       for(let m of moves) {
-        Game.chess.move(m); 
-        max = Math.max(max, Game.minimax(depth - 1, alpha, beta, false)); 
-        Game.chess.undo();
-        alpha = Math.max(alpha, max); 
-        if(beta <= alpha) break;
+        Game.chess.move(m); max = Math.max(max, Game.minimax(depth - 1, alpha, beta, false)); Game.chess.undo();
+        alpha = Math.max(alpha, max); if(beta <= alpha) break;
       }
       return max;
     } else {
       let min = Infinity;
       for(let m of moves) {
-        Game.chess.move(m); 
-        min = Math.min(min, Game.minimax(depth - 1, alpha, beta, true)); 
-        Game.chess.undo();
-        beta = Math.min(beta, min); 
-        if(beta <= alpha) break;
+        Game.chess.move(m); min = Math.min(min, Game.minimax(depth - 1, alpha, beta, true)); Game.chess.undo();
+        beta = Math.min(beta, min); if(beta <= alpha) break;
       }
       return min;
     }
   },
-  
   evaluate: () => {
-    const vals = { p: 10, n: 30, b: 35, r: 50, q: 90, k: 9000 }; 
-    let score = 0;
+    const vals = { p: 10, n: 30, b: 35, r: 50, q: 90, k: 9000 }; let score = 0;
     const board = Game.chess.board();
-    
     for(let r=0; r<8; r++) {
       for(let c=0; c<8; c++) {
         const p = board[r][c];
@@ -582,30 +442,13 @@ const Game = {
     }
     return Game.chess.turn() === 'w' ? score : -score;
   },
-  
-  changeMode: () => { 
-      Game.mode = Utils.getEl('modeSelect').value; 
-      Game.init(); 
-  },
-  
-  resign: () => { 
-      if(confirm("Yakin?")) Game.init(); 
-  },
-  
+  changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
+  resign: () => { if(confirm("Yakin?")) Game.init(); },
   hint: () => {
-    const moves = Game.chess.moves({ verbose: true }); 
-    if(!moves.length) return;
-    
+    const moves = Game.chess.moves({ verbose: true }); if(!moves.length) return;
     let bestM = moves[0], bestV = -Infinity;
-    for(let m of moves) { 
-        Game.chess.move(m); 
-        let v = -Game.minimax(2, -Infinity, Infinity, false); 
-        Game.chess.undo(); 
-        if(v > bestV) { bestV = v; bestM = m; } 
-    }
-    
-    Utils.getEl('hintText').innerText = `Langkah: ${bestM.san}`; 
-    UI.openModal('hintModal');
+    for(let m of moves) { Game.chess.move(m); let v = -Game.minimax(2, -Infinity, Infinity, false); Game.chess.undo(); if(v > bestV) { bestV = v; bestM = m; } }
+    document.getElementById('hintText').innerText = `Langkah: ${bestM.san}`; UI.openModal('hintModal');
   }
 };
 </script>
