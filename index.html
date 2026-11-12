@@ -3,277 +3,295 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AXAC Chess - Apex Final</title>
+  <title>AXAC Chess - Apex Final Secure</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     :root {
-      --bg-base: #020408; --bg-panel: rgba(13, 20, 36, 0.85); --bg-card: rgba(30, 41, 59, 0.6);
-      --border: rgba(255, 255, 255, 0.08); --border-hi: rgba(255, 255, 255, 0.15);
-      --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.4); --accent: #06b6d4;
-      --danger: #ef4444; --success: #10b981; --purple: #8b5cf6; --gold: #fbbf24;
-      --text-main: #f8fafc; --text-mut: #94a3b8;
-      --sq-light: #cbd5e1; --sq-dark: #334155; --sq-hl: rgba(59, 130, 246, 0.75); --sq-guide: rgba(16, 185, 129, 0.9);
-      --shadow: 0 10px 40px -10px rgba(0,0,0,0.9); --glass: blur(20px) saturate(180%);
+      --bg-base: #08080A; --bg-panel: #101014; --bg-card: #16161A;
+      --border: #2A2A30; --border-hi: #3A3A42;
+      --primary: #D4AF37; --primary-glow: rgba(212, 175, 55, 0.2); 
+      --danger: #ef4444; --success: #10b981; --purple: #a855f7;
+      --text-main: #EDE9E1; --text-mut: #8A867D;
+      --sq-light: #EDE9E1; --sq-dark: #2A2A2E; --sq-hl: rgba(212, 175, 55, 0.6); --sq-guide: rgba(212, 175, 55, 0.8);
+      --shadow: 0 20px 40px -10px rgba(0,0,0,0.8);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; background-image: radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 60%); background-attachment: fixed; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    header { background: var(--bg-panel); backdrop-filter: var(--glass); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .brand { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--primary), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; max-width: 1400px; margin: 24px auto; padding: 0 20px; width: 100%; flex: 1; }
-    @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
+    header { background: rgba(16,16,20,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand-container { display: flex; align-items: center; gap: 12px; }
+    .logo-svg { width: 32px; height: 32px; color: var(--text-main); --bg-logo: var(--bg-panel); }
+    .brand { font-weight: 300; font-size: 1.2rem; letter-spacing: 0.3em; text-transform: lowercase; margin-top: 4px; }
+    .clock { font-family: monospace; color: var(--primary); font-size: 0.9rem; }
 
+    .main-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+    @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
+    
     .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
-    .status-bar { width: 100%; max-width: 600px; display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; background: var(--bg-panel); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; }
-    .board-wrap { width: 100%; max-width: 600px; aspect-ratio: 1; margin-bottom: 16px; position: relative; box-shadow: var(--shadow); }
-    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 8px solid #0f172a; border-radius: 16px; overflow: hidden; background: #0f172a; }
+    .status-bar { width: 100%; max-width: 580px; display: flex; justify-content: space-between; font-size: 0.85rem; background: var(--bg-panel); padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; letter-spacing: 0.05em; }
+    .board-wrap { width: 100%; max-width: 580px; aspect-ratio: 1; margin-bottom: 16px; position: relative; }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-panel); box-shadow: var(--shadow); }
     .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
     .sq.light { background: var(--sq-light); } .sq.dark { background: var(--sq-dark); }
-    .sq.hl { background: var(--sq-hl) !important; box-shadow: inset 0 0 15px rgba(255,255,255,0.2); }
-    .sq.guide::after { content: ''; position: absolute; width: 28%; height: 28%; background: var(--sq-guide); border-radius: 50%; z-index: 10; }
-    .sq svg { width: 88%; height: 88%; pointer-events: none; }
-
-    #aiThinking { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 16px; }
+    .sq.hl { box-shadow: inset 0 0 0 4px var(--primary); }
+    .sq.guide::after { content: ''; position: absolute; width: 24%; height: 24%; background: var(--sq-guide); border-radius: 50%; z-index: 10; }
+    .sq svg { width: 88%; height: 88%; pointer-events: none; transition: 0.1s; }
+    
+    #aiThinking { position: absolute; inset: 0; background: rgba(8,8,10,0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 12px; }
     #aiThinking.show { display: flex; }
 
-    .right-panel { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
-    .panel h3 { font-size: 0.85rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+    .right-panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .panel h3 { font-size: 0.75rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 400; }
     
-    .btn { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px var(--primary-glow); }
-    .btn:hover { transform: translateY(-2px); }
-    .btn-danger { background: var(--danger); } .btn-purple { background: var(--purple); } .btn-success { background: var(--success); } .btn-gold { background: var(--gold); color: #000; }
+    .btn { background: var(--text-main); color: var(--bg-base); border: none; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
+    .btn:hover { opacity: 0.8; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-gold { background: var(--primary); color: #000; }
+    .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-purple { background: #3b0764; color: #d8b4fe; border: 1px solid #581c87; }
     
     .input-grp { margin-bottom: 12px; }
-    .input-grp label { display: block; font-size: 0.8rem; color: var(--text-mut); margin-bottom: 6px; }
-    .input-grp input, select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); outline: none; font-size: 0.9rem; }
+    .input-grp label { display: block; font-size: 0.75rem; color: var(--text-mut); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+    .input-grp input, select { width: 100%; padding: 14px 16px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); outline: none; font-size: 0.9rem; }
+    .input-grp input:focus { border-color: var(--primary); }
 
-    .profile-card { display: flex; align-items: center; gap: 16px; background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-    .profile-card:hover { background: rgba(255,255,255,0.1); }
-    .avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #fff; }
+    .profile-card { display: flex; align-items: center; gap: 16px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .profile-card:hover { border-color: var(--primary); }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-base); border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 300; color: var(--primary); }
 
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: var(--glass); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; backdrop-filter: blur(8px); }
     .overlay.show { display: flex; }
-    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 12px; padding: 28px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
     .hidden { display: none !important; }
     
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
-    .r-owner { background: linear-gradient(45deg, #fbbf24, #d97706); color: #000; }
-    .r-admin { background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: #fff; }
-    .r-vip { background: linear-gradient(45deg, #ec4899, #be185d); color: #fff; }
-    .r-semivip { background: linear-gradient(45deg, #a855f7, #6b21a8); color: #fff; }
-    .r-guard { background: linear-gradient(45deg, #10b981, #047857); color: #fff; }
-    .r-engineer { background: linear-gradient(45deg, #06b6d4, #0891b2); color: #000; }
-    .r-member { background: #475569; color: #fff; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--border); }
+    .r-owner { background: var(--primary); color: #000; border: none; }
+    .r-admin { background: #3b82f6; color: #fff; border: none; }
+    .r-vip { background: #ec4899; color: #fff; border: none; }
+    
+    .chat-box { height: 250px; overflow-y: auto; background: var(--bg-base); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; border: 1px solid var(--border); }
+    .chat-msg { padding: 10px 12px; border-radius: 6px; background: var(--bg-card); line-height: 1.4; border: 1px solid var(--border); }
+    .chat-me { background: var(--primary); color: #000; border: none; align-self: flex-end; }
 
-    .ad-timer { font-size: 4rem; font-weight: 800; color: var(--gold); font-family: monospace; margin: 20px 0; }
-    .chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; border: 1px solid var(--border); }
-    .chat-msg { padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); line-height: 1.4; }
-    .chat-me { background: rgba(59,130,246,0.2); border: 1px solid var(--primary); align-self: flex-end; }
+    .ad-timer { font-size: 4rem; font-weight: 800; color: var(--primary); font-family: monospace; margin: 20px 0; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="brand">AXAC APEX</div>
+    <div class="brand-container">
+      <svg class="logo-svg" viewBox="0 0 200 200" fill="none" stroke-width="10" stroke-linejoin="miter">
+        <g>
+          <path d="M40 140 L100 40 L160 140" stroke="currentColor"/>
+          <path d="M40 60 L100 160 L160 60" stroke="currentColor"/>
+          <path d="M127 85 L145 115" style="stroke: var(--bg-logo)" stroke-width="22"/>
+          <path d="M127 85 L145 115" stroke="currentColor"/>
+          <path d="M55 85 L73 115" style="stroke: var(--bg-logo)" stroke-width="22"/>
+          <path d="M55 85 L73 115" stroke="currentColor"/>
+        </g>
+      </svg>
+      <div class="brand">axac</div>
+    </div>
     <div style="display: flex; gap: 16px; align-items: center;">
-      <div id="clock" style="font-family: monospace; color: var(--accent);">00:00:00</div>
-      <button class="btn btn-sm btn-danger hidden" id="logoutBtn" onclick="Auth.logout()">Keluar</button>
+      <div class="clock" id="clock">00:00</div>
+      <button class="btn btn-outline hidden" id="logoutBtn" style="width: auto; padding: 8px 16px; font-size: 0.75rem;" onclick="Auth.logout()">Keluar</button>
     </div>
   </header>
 
-  <div id="authScreen" style="max-width: 400px; margin: 80px auto; width: 90%;">
+  <div id="authScreen" style="max-width: 380px; margin: 100px auto; width: 90%;">
     <div class="panel">
-      <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">AXAC LOGIN</h2>
-      <div class="input-grp"><input type="text" id="authUser" placeholder="Username"></div>
-      <div class="input-grp"><input type="password" id="authPass" placeholder="Password"></div>
-      <button class="btn" style="margin-bottom: 10px;" onclick="Auth.login()">MASUK</button>
-      <button class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="Auth.register()">DAFTAR</button>
+      <h2 style="text-align: center; margin-bottom: 24px; font-weight: 300; letter-spacing: 0.2em;">MASUK</h2>
+      <div class="input-grp"><input type="text" id="authUser" placeholder="Username" maxlength="20"></div>
+      <div class="input-grp"><input type="password" id="authPass" placeholder="Password" maxlength="50"></div>
+      <button class="btn btn-gold" style="margin-bottom: 12px;" onclick="Auth.login()">LOGIN</button>
+      <button class="btn btn-outline" onclick="Auth.register()">DAFTAR BARU</button>
     </div>
   </div>
 
   <div id="gameScreen" class="main-layout hidden">
     <div class="board-container">
       <div class="status-bar">
-        <span>Lawan: <span id="oppName" style="color: var(--danger);">AI</span></span>
-        <span>Kamu: <span id="uName" style="color: var(--primary);">-</span></span>
+        <span>Lawan: <b id="oppName" style="color: var(--text-mut);">AI</b></span>
+        <span>Kamu: <b id="uName" style="color: var(--primary);">-</b></span>
       </div>
       <div class="board-wrap">
         <div id="board" class="board"></div>
         <div id="aiThinking">
-            <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">AI Berpikir...</div>
-            <div style="font-size: 2rem; animation: spin 2s linear infinite;">🧠</div>
+            <div style="font-weight:400; color:var(--primary); margin-bottom:16px; letter-spacing:0.1em;">AI BERPIKIR...</div>
+            <div style="font-size: 1.5rem; animation: spin 2s linear infinite;">♟</div>
         </div>
       </div>
-      <div style="display: flex; gap: 10px; width: 100%; max-width: 600px;">
+      <div style="display: flex; gap: 12px; width: 100%; max-width: 580px;">
         <button class="btn btn-danger" onclick="Game.resign()">Nyerah</button>
-        <button class="btn btn-purple" onclick="Game.hint()">💡 Bantuan (<span id="kuotaText">0</span>)</button>
+        <button class="btn btn-gold" onclick="Game.hint()">💡 Bantuan (<span id="kuotaText">0</span>)</button>
       </div>
     </div>
 
     <div class="right-panel">
       <div class="panel">
-        <h3>Player Lobby</h3>
-        <div class="profile-card" onclick="Profile.open()">
+        <h3>Profil Pemain</h3>
+        <div class="profile-card" onclick="Profile.openSelf()">
           <div class="avatar" id="profAvatar">A</div>
           <div class="profile-info">
-            <h4 id="profName">User</h4>
-            <p><span id="profRole" class="badge r-member">Member</span> • <span id="profWins">0</span> Win</p>
+            <h4 id="profName" style="font-weight: 400; margin-bottom: 4px;">User</h4>
+            <p style="font-size: 0.8rem; color: var(--text-mut);"><span id="profRole" class="badge">Member</span> &nbsp;•&nbsp; <span id="profWins">0</span> Win</p>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h3>Game Modes</h3>
-        <select id="modeSelect" onchange="Game.changeMode()" style="margin-bottom: 10px;">
-          <option value="ai-god">🔥 VS AI (God Mode)</option>
-          <option value="ai-hard">VS AI (Sulit)</option>
-          <option value="ai-medium">VS AI (Menengah)</option>
-        </select>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="btn btn-purple" onclick="UI.openModal('storyModal')">📖 Story Mode</button>
-            <button class="btn btn-gold" onclick="Chat.open()">💬 Global Chat</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Audio System</h3>
-        <div class="music-player">
-          <div class="track-info" id="trackTitle">Pilih Lagu</div>
-          <div class="player-controls">
-            <button class="ctrl-btn" onclick="Audio.prev()">⏮</button>
-            <button class="ctrl-btn" id="playBtn" onclick="Audio.toggle()">▶</button>
-            <button class="ctrl-btn" onclick="Audio.next()">⏭</button>
+        <h3>Menu</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-gold" onclick="Shop.open()">💎 AXAC Store</button>
+            <button class="btn btn-outline" onclick="Chat.openGlobal()">💬 Global Chat</button>
+            <button class="btn btn-outline" onclick="Chat.openDMList()">✉️ Pesan Pribadi</button>
+            <button class="btn btn-danger hidden" id="btnDevPanel" style="margin-top: 10px;" onclick="UI.openModal('devPanelModal')">🛠️ Dev Panel</button>
+            <button class="btn hidden" id="btnOwnerPanel" style="background: var(--primary); color: #000; margin-top: 10px;" onclick="UI.openModal('ownerAdminModal')">👑 Panel Owner</button>
           </div>
-          <div class="track-list" id="trackList"></div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODALS -->
   <div id="profileModal" class="overlay">
     <div class="modal">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <div style="display: flex; gap: 16px; align-items: center;">
-          <div class="avatar" style="width: 70px; height: 70px; font-size: 2rem;" id="modalAvatar">A</div>
-          <div>
-            <h2 id="modalDisplayName" style="margin-bottom: 4px;">Display Name</h2>
-            <p style="color: var(--text-mut); font-size: 0.85rem;">@<span id="modalUsername">username</span></p>
-            <span id="modalRole" class="badge r-member" style="margin-top: 6px; display: inline-block;">Member</span>
-          </div>
+      <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+        <div class="avatar" style="width: 64px; height: 64px; font-size: 1.5rem;" id="modalAvatar">A</div>
+        <div>
+          <h2 id="modalDisplayName" style="margin-bottom: 4px; font-weight: 400;">Display Name</h2>
+          <p style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">@<span id="modalUsername">username</span></p>
+          <span id="modalRole" class="badge">Member</span>
         </div>
       </div>
-
-      <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; border: 1px solid var(--border);">
-        <p style="margin-bottom: 8px;">📝 <b>Bio:</b> <span id="modalBio">-</span></p>
-        <p style="margin-bottom: 8px;">🎮 <b>Hobi:</b> <span id="modalHobi">-</span></p>
-        <p style="margin-bottom: 8px;">🎂 <b>Ultah:</b> <span id="modalUltah">-</span></p>
-        <p style="margin-bottom: 8px;">🏆 <b>Total Win:</b> <span id="modalWins" style="color: var(--gold);">0</span></p>
-        <p style="margin-bottom: 8px;">💡 <b>Sisa Kuota:</b> <span id="modalKuota" style="color: var(--accent);">0</span></p>
+      <div style="background: var(--bg-base); border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 0.85rem; line-height: 1.8; border: 1px solid var(--border);">
+        <p>📝 <b>Bio:</b> <span id="modalBio" style="color: var(--text-mut);">-</span></p>
+        <p>🎮 <b>Hobi:</b> <span id="modalHobi" style="color: var(--text-mut);">-</span></p>
+        <p>🎂 <b>Ultah:</b> <span id="modalUltah" style="color: var(--text-mut);">-</span></p>
+        <p>🏆 <b>Total Win:</b> <span id="modalWins" style="color: var(--primary);">0</span></p>
+        <p>💡 <b>Sisa Kuota:</b> <span id="modalKuota" style="color: var(--primary);">0</span></p>
       </div>
-
-      <button class="btn btn-purple" onclick="Profile.openEdit()">✏️ Edit Profil</button>
-      <button class="btn btn-gold" style="margin-top: 8px;" onclick="UI.openModal('shopModal')">💎 AXAC Store</button>
-      <button class="btn hidden" id="btnOwnerPanel" style="margin-top: 8px; background: var(--gold); color: #000;" onclick="UI.openModal('ownerAdminModal')">👑 Panel Owner</button>
-      <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('profileModal')">Tutup</button>
+      <div id="selfProfileActions">
+        <button class="btn btn-gold" style="margin-bottom: 10px;" onclick="Profile.openEdit()">✏️ Edit Profil</button>
+        <button class="btn btn-outline" onclick="UI.closeModal('profileModal')">Tutup</button>
+      </div>
+      <div id="otherProfileActions" class="hidden">
+        <button class="btn btn-purple" style="margin-bottom: 10px;" onclick="Chat.startDMFromProfile()">✉️ Kirim Pesan</button>
+        <button class="btn btn-outline" onclick="UI.closeModal('profileModal')">Tutup</button>
+      </div>
     </div>
   </div>
 
   <div id="editProfileModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--primary); margin-bottom: 16px;">✏️ Edit Profil</h3>
-      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName"></div>
-      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio"></div>
-      <div class="input-grp"><label>Hobi / Genre Game</label><input type="text" id="editHobi"></div>
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">EDIT PROFIL</h3>
+      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName" maxlength="25"></div>
+      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio" maxlength="50"></div>
+      <div class="input-grp"><label>Hobi</label><input type="text" id="editHobi" maxlength="30"></div>
       <div class="input-grp"><label>Tanggal Lahir</label><input type="date" id="editUltah"></div>
-      <button class="btn btn-success" onclick="Profile.saveEdit()">💾 Simpan Perubahan</button>
-      <button class="btn" style="margin-top: 8px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('editProfileModal')">Batal</button>
+      <button class="btn btn-gold" onclick="Profile.saveEdit()">SIMPAN</button>
+      <button class="btn btn-outline" style="margin-top: 10px;" onclick="UI.closeModal('editProfileModal')">Batal</button>
     </div>
   </div>
 
   <div id="shopModal" class="overlay">
     <div class="modal">
-      <h3 style="color: var(--gold); margin-bottom: 16px;">💎 AXAC Store</h3>
-      <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
-        <h4 style="color: var(--purple); margin-bottom: 4px;">Tambah Kuota</h4>
-        <button class="btn btn-purple" onclick="Ads.show('kuota')">Tonton Iklan 30s (+5 Kuota)</button>
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">💎 AXAC STORE</h3>
+      <div style="background: var(--bg-base); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <h4 style="color: var(--text-main); margin-bottom: 4px;">Beli VIP (Rp 20.000)</h4>
+        <p style="font-size: 0.75rem; color: var(--text-mut); margin-bottom: 10px;">Dapet 150 Kuota (100+50) & Bebas Iklan.</p>
+        <button class="btn btn-gold" onclick="Shop.buyVIP()">Chat Admin</button>
       </div>
-      <div style="background: rgba(139,92,246,0.1); border: 1px solid var(--purple); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
-        <h4 style="color: var(--purple); margin-bottom: 4px;">Semi-VIP (Rp 5.000)</h4>
-        <button class="btn btn-purple" onclick="Ads.show('semivip')">Tonton Iklan 30s</button>
+      <div style="background: var(--bg-base); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <h4 style="color: var(--text-main); margin-bottom: 4px;">Isi Ulang Kuota (+5)</h4>
+        <p style="font-size: 0.75rem; color: var(--text-mut); margin-bottom: 10px;">Tonton iklan 30 detik.</p>
+        <button class="btn btn-outline" onclick="Ads.show('kuota')">Tonton Iklan</button>
       </div>
-      <div style="background: rgba(236,72,153,0.1); border: 1px solid #ec4899; padding: 16px; border-radius: 12px; margin-bottom: 12px;">
-        <h4 style="color: #ec4899; margin-bottom: 4px;">VIP Ultimate (Rp 10.000)</h4>
-        <button class="btn" style="background: #ec4899;" onclick="Ads.show('vip')">Tonton Iklan 30s</button>
-      </div>
-      <button class="btn" style="margin-top: 16px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('shopModal')">Tutup</button>
-    </div>
-  </div>
-
-  <div id="storyModal" class="overlay">
-    <div class="modal" style="text-align: center;">
-      <h3 style="color: var(--purple); margin-bottom: 16px;">📖 Story Mode</h3>
-      <p style="margin-bottom: 20px;">Fitur Story sedang dalam perbaikan.</p>
-      <button class="btn" onclick="UI.closeModal('storyModal')">Tutup</button>
-    </div>
-  </div>
-
-  <div id="chatModal" class="overlay">
-    <div class="modal">
-      <h3 style="color: var(--accent); margin-bottom: 16px;">💬 Global Chat</h3>
-      <div id="chatBox" class="chat-box"></div>
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; color: #fff;">
-        <button class="btn btn-sm" style="width: auto;" onclick="Chat.send()">Kirim</button>
-      </div>
-      <button class="btn" style="margin-top: 12px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('chatModal')">Tutup</button>
-    </div>
-  </div>
-
-  <div id="ownerAdminModal" class="overlay">
-    <div class="modal" style="max-width: 600px;">
-      <h3 style="color: var(--gold); margin-bottom: 16px;">👑 Panel Owner</h3>
-      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target"></div>
-      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
-        <button class="btn btn-success" onclick="Admin.act('guard')">Tunjuk jadi Guard</button>
-        <button class="btn btn-primary" onclick="Admin.act('engineer')">Tunjuk jadi Engineer</button>
-        <button class="btn btn-danger" onclick="Admin.act('ban')">Ban Akun</button>
-      </div>
-      <h4 style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Daftar Akun</h4>
-      <div id="adminUserList" style="background: rgba(0,0,0,0.5); border-radius: 12px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border);"></div>
-      <button class="btn" style="margin-top: 16px; background: transparent; border: 1px solid var(--border);" onclick="UI.closeModal('ownerAdminModal')">Tutup</button>
+      <button class="btn btn-outline" onclick="UI.closeModal('shopModal')">Tutup</button>
     </div>
   </div>
 
   <div id="adOverlay" class="overlay">
     <div class="modal" style="text-align: center;">
-      <h2 style="color: var(--gold);">📺 Iklan Promosi</h2>
-      <div id="adTimer" style="font-size: 4rem; font-weight: 800; color: var(--gold); font-family: monospace; margin: 20px 0;">30</div>
-      <button id="adCloseBtn" class="btn btn-danger hidden" onclick="Ads.close()">Tutup</button>
+      <h2 style="color: var(--primary); font-weight: 300;">SPONSOR VIP</h2>
+      <p style="font-size: 0.85rem; color: var(--text-mut);">Jadi VIP cuma 20rb. Dapet 150 kuota + bebas iklan selamanya. Chat Owner: axac</p>
+      <div id="adTimer" class="ad-timer">30</div>
+      <button id="adCloseBtn" class="btn btn-gold hidden" onclick="Ads.close()">Ambil Hadiah</button>
+    </div>
+  </div>
+
+  <div id="dmListModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">✉️ PESAN</h3>
+      <div class="input-grp">
+        <input type="text" id="dmSearchInput" placeholder="Ketik username orang..." style="padding: 10px;" maxlength="20">
+        <button class="btn btn-outline" style="padding: 10px; margin-top: 8px;" onclick="Chat.searchUserDM()">Cari & Chat</button>
+      </div>
+      <button class="btn btn-outline" onclick="UI.closeModal('dmListModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="dmChatModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">✉️ CHAT DENGAN <span id="dmTargetName" style="color: var(--text-main);">User</span></h3>
+      <div id="dmChatBox" class="chat-box"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="dmInput" placeholder="Ketik pesan..." style="flex: 1; padding: 14px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff;" maxlength="100">
+        <button class="btn btn-gold" style="width: auto; padding: 0 20px;" onclick="Chat.sendDM()">Kirim</button>
+      </div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('dmChatModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="chatModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">GLOBAL CHAT</h3>
+      <div id="chatBox" class="chat-box"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 14px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff;" maxlength="100">
+        <button class="btn btn-gold" style="width: auto; padding: 0 20px;" onclick="Chat.sendGlobal()">Kirim</button>
+      </div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('chatModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="ownerAdminModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">👑 PANEL OWNER</h3>
+      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target" maxlength="20"></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="Admin.act('vip')">Jadikan VIP</button>
+        <button class="btn btn-outline" onclick="Admin.act('admin')">Jadikan Admin</button>
+        <button class="btn btn-danger" onclick="Admin.act('ban')">Ban Akun</button>
+      </div>
+      <h4 style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Daftar Akun</h4>
+      <div id="adminUserList" style="background: var(--bg-base); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border);"></div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('ownerAdminModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="devPanelModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">🛠️ DEV PANEL</h3>
+      <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 16px;">Fitur Development untuk Admin & Owner.</p>
+      <button class="btn btn-outline" style="margin-bottom: 8px;" onclick="Admin.loadUsers()">Refresh Daftar User</button>
+      <button class="btn btn-outline" onclick="UI.closeModal('devPanelModal')">Tutup</button>
     </div>
   </div>
 
 <script>
-/* =========================================
-   KONFIGURASI & STATE
-   ========================================= */
 const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
 let db = null;
 let currentUser = null;
 let userData = {};
+let targetUserData = null;
+let dmInterval = null;
 
 window.addEventListener('DOMContentLoaded', () => {
   try { 
-    // FIX API ERROR: Pake konfigurasi headers buat key format baru
     db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
     }); 
@@ -285,11 +303,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if(saved) { 
       currentUser = saved; 
       db.from('profiles').select('*').eq('username', saved).single().then(({data}) => {
-          if(data) { 
-              userData = data; 
-              Auth.showGame(); 
-              if(data.role === 'owner' || data.role === 'admin') Admin.loadUsers();
-          }
+          if(data) { userData = data; Auth.showGame(); }
       });
   }
 });
@@ -299,12 +313,139 @@ const UI = {
   closeModal: (id) => { const el = document.getElementById(id); if(el) el.classList.remove('show'); }
 };
 
+const Auth = {
+  login: async () => {
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert("Isi data!");
+    
+    const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
+    if(error || !data) return alert("Username atau Password salah!");
+    if(data.banned) return alert("Akun ini telah dibanned!");
+    
+    currentUser = data.username; 
+    userData = data;
+    localStorage.setItem('axac_user', currentUser); 
+    Auth.showGame();
+  },
+  register: async () => {
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert("Isi data!");
+    
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    const autoDisplayName = `${u}#${randomId}`;
+    
+    const { error } = await db.from('profiles').insert([{ 
+        username: u, 
+        password: p, 
+        display_name: autoDisplayName, 
+        role: 'member',
+        kuota_harian: 5 
+    }]);
+    
+    if(error) {
+        if(error.code === '23505') return alert("Username sudah dipakai orang lain!");
+        return alert("Gagal daftar: " + error.message);
+    }
+    alert(`Akun berhasil dibuat!\n\nLogin: ${u}\nTampilan: ${autoDisplayName}\n\nSilakan klik LOGIN.`);
+  },
+  showGame: () => {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    let role = userData.role || 'member';
+    
+    document.getElementById('uName').innerText = userData.display_name || currentUser;
+    document.getElementById('profName').innerText = userData.display_name || currentUser;
+    document.getElementById('profAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    
+    document.getElementById('profRole').innerText = role.toUpperCase();
+    document.getElementById('profRole').className = `badge r-${role}`;
+    document.getElementById('profWins').innerText = userData.wins || 0;
+    document.getElementById('kuotaText').innerText = userData.kuota_harian === 'Infinity' ? '∞' : (userData.kuota_harian || 0);
+    
+    if(role === 'owner' || role === 'admin') {
+        document.getElementById('btnOwnerPanel').classList.remove('hidden');
+        document.getElementById('btnDevPanel').classList.remove('hidden');
+        Admin.loadUsers();
+    } else if (role === 'vip') {
+        document.getElementById('btnDevPanel').classList.add('hidden');
+        document.getElementById('btnOwnerPanel').classList.add('hidden');
+    }
+    setTimeout(() => { Game.init(); }, 100);
+  },
+  logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
+};
+
+const Profile = {
+  openSelf: () => {
+    targetUserData = userData;
+    document.getElementById('modalDisplayName').innerText = userData.display_name || currentUser;
+    document.getElementById('modalUsername').innerText = currentUser;
+    document.getElementById('modalBio').innerText = userData.bio || '-';
+    document.getElementById('modalHobi').innerText = userData.hobi || '-';
+    document.getElementById('modalUltah').innerText = userData.tanggal_lahir || '-';
+    document.getElementById('modalWins').innerText = userData.wins || 0;
+    document.getElementById('modalKuota').innerText = userData.kuota_harian === 'Infinity' ? '∞' : (userData.kuota_harian || 0);
+    
+    document.getElementById('modalAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    document.getElementById('modalRole').innerText = (userData.role || 'member').toUpperCase();
+    document.getElementById('modalRole').className = `badge r-${userData.role || 'member'}`;
+    
+    document.getElementById('selfProfileActions').classList.remove('hidden');
+    document.getElementById('otherProfileActions').classList.add('hidden');
+    UI.openModal('profileModal');
+  },
+  openOther: async (username) => {
+    const { data } = await db.from('profiles').select('*').eq('username', username).single();
+    if(!data) return alert("User tidak ditemukan.");
+    targetUserData = data;
+    
+    document.getElementById('modalDisplayName').innerText = data.display_name || data.username;
+    document.getElementById('modalUsername').innerText = data.username;
+    document.getElementById('modalBio').innerText = data.bio || '-';
+    document.getElementById('modalHobi').innerText = data.hobi || '-';
+    document.getElementById('modalUltah').innerText = data.tanggal_lahir || '-';
+    document.getElementById('modalWins').innerText = data.wins || 0;
+    document.getElementById('modalKuota').innerText = data.kuota_harian === 'Infinity' ? '∞' : (data.kuota_harian || 0);
+    
+    document.getElementById('modalAvatar').innerText = (data.display_name || data.username).charAt(0).toUpperCase();
+    document.getElementById('modalRole').innerText = (data.role || 'member').toUpperCase();
+    document.getElementById('modalRole').className = `badge r-${data.role || 'member'}`;
+    
+    document.getElementById('selfProfileActions').classList.add('hidden');
+    document.getElementById('otherProfileActions').classList.remove('hidden');
+    UI.openModal('profileModal');
+  },
+  openEdit: () => {
+    document.getElementById('editDisplayName').value = userData.display_name || '';
+    document.getElementById('editBio').value = userData.bio || '';
+    document.getElementById('editHobi').value = userData.hobi || '';
+    document.getElementById('editUltah').value = userData.tanggal_lahir || '';
+    UI.openModal('editProfileModal');
+  },
+  saveEdit: async () => {
+    const dName = document.getElementById('editDisplayName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    const hobi = document.getElementById('editHobi').value.trim();
+    const ultah = document.getElementById('editUltah').value;
+    
+    await db.from('profiles').update({ display_name: dName, bio: bio, hobi: hobi, tanggal_lahir: ultah }).eq('username', currentUser);
+    userData.display_name = dName; userData.bio = bio; userData.hobi = hobi; userData.tanggal_lahir = ultah;
+    Auth.showGame(); Profile.openSelf(); UI.closeModal('editProfileModal');
+  }
+};
+
+const Shop = {
+  open: () => UI.openModal('shopModal'),
+  buyVIP: () => { alert("Silakan chat Owner (axac) untuk pembelian VIP 20rb."); Chat.startDM('axac'); UI.closeModal('shopModal'); }
+};
+
 const Ads = {
   timerInterval: null,
-  currentType: null,
   show: (type) => {
-    if(userData.no_ads || userData.role === 'owner') return alert("Kamu bebas iklan!");
-    Ads.currentType = type;
+    if(userData.role === 'vip' || userData.role === 'owner' || userData.role === 'admin') return alert("Kamu bebas iklan!");
     UI.closeModal('shopModal');
     UI.openModal('adOverlay');
     let timeLeft = 30;
@@ -323,111 +464,90 @@ const Ads = {
     }, 1000);
   },
   giveReward: () => {
-    if(Ads.currentType === 'kuota') {
-        userData.kuota_harian = (userData.kuota_harian || 0) + 5;
-        db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
-        alert("Berhasil menambahkan 5 Kuota!");
-    } else {
-        let newRole = Ads.currentType === 'vip' ? 'vip' : 'semivip';
-        userData.role = newRole;
-        if(Ads.currentType === 'vip') userData.no_ads = true;
-        db.from('profiles').update({ role: newRole, no_ads: userData.no_ads }).eq('username', currentUser).then();
-        alert(`Selamat! Kamu sekarang ${newRole.toUpperCase()}`);
-    }
-    Ads.close();
-    location.reload();
+    let newKuota = (userData.kuota_harian === 'Infinity' ? 9999 : userData.kuota_harian || 0) + 5;
+    userData.kuota_harian = newKuota;
+    db.from('profiles').update({ kuota_harian: newKuota }).eq('username', currentUser).then();
+    document.getElementById('kuotaText').innerText = newKuota;
+    alert("Berhasil menambahkan 5 Kuota!");
   },
   close: () => { UI.closeModal('adOverlay'); }
 };
 
-const Auth = {
-  login: async () => {
-    const u = document.getElementById('authUser').value.trim(); 
-    const p = document.getElementById('authPass').value.trim();
-    if(!u || !p) return alert("Isi data!");
-    
-    const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
-    if(error || !data) return alert("Salah data!");
-    if(data.banned) return alert("Akun dibanned!");
-    
-    currentUser = data.username; 
-    userData = data;
-    localStorage.setItem('axac_user', currentUser); 
-    Auth.showGame();
-    if(data.role === 'owner' || data.role === 'admin') Admin.loadUsers();
+const Chat = {
+  openGlobal: () => { UI.openModal('chatModal'); Chat.initGlobal(); },
+  initGlobal: () => {
+    if(!db) return;
+    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.appendGlobal);
+    });
+    setInterval(async () => {
+      if(!document.getElementById('chatModal').classList.contains('show')) return;
+      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.appendGlobal);
+    }, 3000);
   },
-  register: async () => {
-    const u = document.getElementById('authUser').value.trim(); 
-    const p = document.getElementById('authPass').value.trim();
-    const randomId = Math.floor(1000 + Math.random() * 9000);
-    const autoDisplayName = `${u}#${randomId}`;
-    const { error } = await db.from('profiles').insert([{ username: u, password: p, display_name: autoDisplayName, kuota_harian: 5 }]);
-    if(error) return alert("Gagal daftar: " + error.message);
-    alert(`Akun dibuat!\nLogin: ${u}\nTampilan: ${autoDisplayName}`);
+  appendGlobal: (msg) => {
+    const box = document.getElementById('chatBox'); if(!box) return;
+    let cls = msg.username === currentUser ? 'chat-me' : '';
+    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
+    box.scrollTop = box.scrollHeight;
   },
-  showGame: () => {
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('gameScreen').classList.remove('hidden');
-    document.getElementById('logoutBtn').classList.remove('hidden');
-    
-    let role = userData.role || 'member';
-    document.getElementById('uName').innerText = userData.display_name || currentUser;
-    document.getElementById('profName').innerText = userData.display_name || currentUser;
-    document.getElementById('profAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
-    document.getElementById('modalAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
-    document.getElementById('modalName').innerText = userData.display_name || currentUser;
-    document.getElementById('modalUsername').innerText = currentUser;
-    
-    document.getElementById('profRole').innerText = role.toUpperCase();
-    document.getElementById('profRole').className = `badge r-${role}`;
-    document.getElementById('modalRole').innerText = role.toUpperCase();
-    document.getElementById('modalRole').className = `badge r-${role}`;
-    document.getElementById('profWins').innerText = userData.wins || 0;
-    
-    document.getElementById('kuotaText').innerText = (userData.kuota_harian || 0);
-    document.getElementById('modalKuota').innerText = (userData.kuota_harian || 0);
-
-    if(role === 'owner' || role === 'admin') document.getElementById('btnOwnerPanel').classList.remove('hidden');
-
-    setTimeout(() => { Game.init(); }, 200);
+  sendGlobal: async () => {
+    const input = document.getElementById('chatInput'); if(!input.value.trim()) return;
+    await db.from('global_chats').insert([{ username: userData.display_name || currentUser, role: userData.role, message: input.value.trim() }]);
+    input.value = '';
   },
-  logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
-};
-
-const Profile = {
-  open: () => {
-    document.getElementById('modalDisplayName').innerText = userData.display_name || currentUser;
-    document.getElementById('modalBio').innerText = userData.bio || '-';
-    document.getElementById('modalHobi').innerText = userData.hobi || '-';
-    document.getElementById('modalUltah').innerText = userData.tanggal_lahir || '-';
-    document.getElementById('modalWins').innerText = userData.wins || 0;
-    UI.openModal('profileModal');
+  
+  openDMList: () => UI.openModal('dmListModal'),
+  searchUserDM: () => {
+    const target = document.getElementById('dmSearchInput').value.trim();
+    if(!target) return;
+    UI.closeModal('dmListModal');
+    Chat.startDM(target);
   },
-  openEdit: () => {
-    document.getElementById('editDisplayName').value = userData.display_name || '';
-    document.getElementById('editBio').value = userData.bio || '';
-    document.getElementById('editHobi').value = userData.hobi || '';
-    document.getElementById('editUltah').value = userData.tanggal_lahir || '';
-    UI.openModal('editProfileModal');
+  startDMFromProfile: () => {
+    UI.closeModal('profileModal');
+    Chat.startDM(targetUserData.username);
   },
-  saveEdit: async () => {
-    const dName = document.getElementById('editDisplayName').value.trim();
-    const bio = document.getElementById('editBio').value.trim();
-    const hobi = document.getElementById('editHobi').value.trim();
-    const ultah = document.getElementById('editUltah').value;
+  startDM: (targetUser) => {
+    if(targetUser === currentUser) return alert("Gak bisa chat diri sendiri.");
+    document.getElementById('dmTargetName').innerText = targetUser;
+    UI.openModal('dmChatModal');
+    Chat.initDM(targetUser);
+  },
+  initDM: (target) => {
+    if(dmInterval) clearInterval(dmInterval);
+    const roomId = [currentUser, target].sort().join('_');
     
-    await db.from('profiles').update({ display_name: dName, bio: bio, hobi: hobi, tanggal_lahir: ultah }).eq('username', currentUser);
-    userData.display_name = dName; userData.bio = bio; userData.hobi = hobi; userData.tanggal_lahir = ultah;
+    const fetchDM = async () => {
+      const { data } = await db.from('private_chats').select('*').eq('room_id', roomId).order('created_at', { ascending: true });
+      const box = document.getElementById('dmChatBox'); if(!box) return;
+      box.innerHTML = '';
+      if(data) data.forEach(msg => {
+        let cls = msg.sender === currentUser ? 'chat-me' : '';
+        box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.sender}:</b> ${msg.message}</div>`;
+      });
+      box.scrollTop = box.scrollHeight;
+    };
     
-    Auth.showGame();
-    Profile.open();
-    UI.closeModal('editProfileModal');
+    fetchDM();
+    dmInterval = setInterval(fetchDM, 3000);
+  },
+  sendDM: async () => {
+    const input = document.getElementById('dmInput'); if(!input.value.trim()) return;
+    const target = document.getElementById('dmTargetName').innerText;
+    const roomId = [currentUser, target].sort().join('_');
+    
+    await db.from('private_chats').insert([{ room_id: roomId, sender: currentUser, message: input.value.trim() }]);
+    input.value = '';
   }
 };
 
 const Admin = {
   loadUsers: async () => {
-    const { data } = await db.from('profiles').select('username, display_name, password, role, wins').order('wins', { ascending: false });
+    const { data } = await db.from('profiles').select('username, display_name, role, wins').order('wins', { ascending: false });
     const list = document.getElementById('adminUserList');
     if(!list) return;
     list.innerHTML = '';
@@ -435,7 +555,7 @@ const Admin = {
         data.forEach(u => {
             list.innerHTML += `
                 <div style="padding: 8px; border-bottom: 1px solid var(--border); cursor: pointer;" onclick="Admin.viewUser('${u.username}')">
-                    <b>${u.display_name || u.username}</b> (@${u.username}) - <span class="badge r-${u.role}">${u.role}</span> - ${u.wins} Win
+                    <b>${u.display_name || u.username}</b> (@${u.username}) - <span class="badge r-${u.role}">${u.role}</span>
                 </div>
             `;
         });
@@ -443,49 +563,20 @@ const Admin = {
   },
   viewUser: async (username) => {
     const { data } = await db.from('profiles').select('*').eq('username', username).single();
-    alert(`Detail Akun:\n\nUsername: ${data.username}\nTampilan: ${data.display_name}\nPassword: ${data.password}\nRole: ${data.role}\nWins: ${data.wins}`);
+    alert(`Detail Akun:\n\nUsername: ${data.username}\nTampilan: ${data.display_name}\nRole: ${data.role}\nWins: ${data.wins}`);
   },
   act: async (type) => {
+    if(userData.role !== 'owner' && userData.role !== 'admin') return alert("Akses Ditolak!");
     const t = document.getElementById('adminTarget').value.trim();
-    if(!t) return alert("Isi target username (tanpa #)!");
+    if(!t) return alert("Isi target username!");
     let upd = {};
-    if(type === 'guard') upd = { role: 'guard' };
-    if(type === 'engineer') upd = { role: 'engineer' };
+    if(type === 'vip') upd = { role: 'vip', kuota_harian: 150 };
+    if(type === 'admin') upd = { role: 'admin', kuota_harian: 'Infinity' };
     if(type === 'ban') upd = { banned: true };
     
     await db.from('profiles').update(upd).eq('username', t);
     alert(`Berhasil update role ${t} menjadi ${type}`);
     Admin.loadUsers();
-  }
-};
-
-const Chat = {
-  open: () => { UI.openModal('chatModal'); Chat.init(); },
-  init: () => {
-    if(!db) return;
-    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
-      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
-      if(data) data.forEach(Chat.append);
-    });
-    setInterval(async () => {
-      if(!document.getElementById('chatModal').classList.contains('show')) return;
-      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
-      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
-      if(data) data.forEach(Chat.append);
-    }, 3000);
-  },
-  append: (msg) => {
-    const box = document.getElementById('chatBox');
-    if(!box) return;
-    let cls = msg.username === currentUser ? 'chat-me' : '';
-    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
-    box.scrollTop = box.scrollHeight;
-  },
-  send: async () => {
-    const input = document.getElementById('chatInput');
-    if(!input.value.trim()) return;
-    await db.from('global_chats').insert([{ username: userData.display_name || currentUser, role: userData.role, message: input.value.trim() }]);
-    input.value = '';
   }
 };
 
@@ -538,12 +629,16 @@ const Game = {
       const moves = Game.chess.moves({ verbose: true }); 
       if(!moves.length) { Game.isThinking = false; document.getElementById('aiThinking').classList.remove('show'); return; }
       
-      let depth = Game.mode === 'ai-easy' ? 1 : Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 4;
+      let depth = Game.mode === 'ai-medium' ? 2 : Game.mode === 'ai-hard' ? 3 : 4;
       let bestMove = moves[0], bestVal = -Infinity;
+      
       for(let m of moves) {
-        Game.chess.move(m); let val = -Game.minimax(depth - 1, -Infinity, Infinity, false); Game.chess.undo();
+        Game.chess.move(m); 
+        let val = -Game.minimax(depth - 1, -Infinity, Infinity, false); 
+        Game.chess.undo();
         if(val > bestVal) { bestVal = val; bestMove = m; }
       }
+      
       Game.chess.move(bestMove); 
       Game.isThinking = false; 
       document.getElementById('aiThinking').classList.remove('show');
@@ -577,15 +672,12 @@ const Game = {
   changeMode: () => { Game.mode = document.getElementById('modeSelect').value; Game.init(); },
   resign: () => { if(confirm("Yakin menyerah?")) Game.init(); },
   hint: () => {
-    let kuota = (userData.kuota_harian || 0);
-    if(kuota <= 0) {
-        alert("Kuota bantuan habis! Tonton iklan atau beli VIP.");
-        UI.openModal('shopModal');
-        return;
+    if(userData.role !== 'owner' && userData.role !== 'admin' && userData.role !== 'vip') {
+        if(userData.kuota_harian <= 0) { alert("Kuota habis! Tonton iklan."); return; }
+        userData.kuota_harian--;
+        db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
+        document.getElementById('kuotaText').innerText = userData.kuota_harian;
     }
-    userData.kuota_harian--;
-    db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
-    document.getElementById('kuotaText').innerText = userData.kuota_harian;
     
     const moves = Game.chess.moves({ verbose: true }); if(!moves.length) return;
     let bestM = moves[0], bestV = -Infinity;
