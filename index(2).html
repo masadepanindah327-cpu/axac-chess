@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AXAC Chess - Apex Final Secure</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    :root {
+      --bg-base: #08080A; --bg-panel: #101014; --bg-card: #16161A;
+      --border: #2A2A30; --border-hi: #3A3A42;
+      --primary: #D4AF37; --primary-glow: rgba(212, 175, 55, 0.2); 
+      --danger: #ef4444; --success: #10b981; --purple: #a855f7;
+      --text-main: #EDE9E1; --text-mut: #8A867D;
+      --sq-light: #EDE9E1; --sq-dark: #2A2A2E; --sq-hl: rgba(212, 175, 55, 0.6); --sq-guide: rgba(212, 175, 55, 0.8);
+      --shadow: 0 20px 40px -10px rgba(0,0,0,0.8);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    
+    header { background: rgba(16,16,20,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand-container { display: flex; align-items: center; gap: 12px; }
+    .logo-svg { width: 32px; height: 32px; color: var(--text-main); --bg-logo: var(--bg-panel); }
+    .brand { font-weight: 300; font-size: 1.2rem; letter-spacing: 0.3em; text-transform: lowercase; margin-top: 4px; }
+    .clock { font-family: monospace; color: var(--primary); font-size: 0.9rem; }
+    .chess-clocks { width: 100%; max-width: 580px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 16px; }
+    .chess-clock { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 5px; }
+    .chess-clock span { color: var(--text-mut); font-size: 0.68rem; letter-spacing: 0.1em; }
+    .chess-clock strong { color: var(--text-main); font-family: monospace; font-size: clamp(1.35rem, 4vw, 1.8rem); font-weight: 600; }
+    .chess-clock.active { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary-glow); }
+    .engine-status { color: var(--text-mut); font-size: 0.75rem; line-height: 1.5; }
+    .settings-note { color: var(--text-mut); font-size: 0.72rem; line-height: 1.5; }
+
+    .main-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+    @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
+    
+    .board-container { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
+    .status-bar { width: 100%; max-width: 580px; display: flex; justify-content: space-between; font-size: 0.85rem; background: var(--bg-panel); padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; letter-spacing: 0.05em; }
+    .board-wrap { width: 100%; max-width: 580px; aspect-ratio: 1; margin-bottom: 16px; position: relative; }
+    .board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-panel); box-shadow: var(--shadow); }
+    .sq { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
+    .sq.light { background: var(--sq-light); } .sq.dark { background: var(--sq-dark); }
+    .sq.hl { box-shadow: inset 0 0 0 4px var(--primary); }
+    .sq.guide::after { content: ''; position: absolute; width: 24%; height: 24%; background: var(--sq-guide); border-radius: 50%; z-index: 10; }
+    .sq svg { width: 88%; height: 88%; pointer-events: none; transition: 0.1s; }
+    
+    #aiThinking { position: absolute; inset: 0; background: rgba(8,8,10,0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 50; border-radius: 12px; }
+    #aiThinking.show { display: flex; }
+
+    .right-panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .panel h3 { font-size: 0.75rem; color: var(--text-mut); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 400; }
+    
+    .btn { background: var(--text-main); color: var(--bg-base); border: none; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
+    .btn:hover { opacity: 0.8; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-gold { background: var(--primary); color: #000; }
+    .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-purple { background: #3b0764; color: #d8b4fe; border: 1px solid #581c87; }
+    
+    .input-grp { margin-bottom: 12px; }
+    .input-grp label { display: block; font-size: 0.75rem; color: var(--text-mut); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+    .input-grp input, select { width: 100%; padding: 14px 16px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); outline: none; font-size: 0.9rem; }
+    .input-grp input:focus { border-color: var(--primary); }
+
+    .profile-card { display: flex; align-items: center; gap: 16px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .profile-card:hover { border-color: var(--primary); }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-base); border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 300; color: var(--primary); }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; backdrop-filter: blur(8px); }
+    .overlay.show { display: flex; }
+    .modal { background: var(--bg-panel); border: 1px solid var(--border-hi); border-radius: 12px; padding: 28px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+    .hidden { display: none !important; }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--border); }
+    .r-owner { background: var(--primary); color: #000; border: none; }
+    .r-admin { background: #3b82f6; color: #fff; border: none; }
+    .r-vip { background: #ec4899; color: #fff; border: none; }
+    
+    .chat-box { height: 250px; overflow-y: auto; background: var(--bg-base); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; border: 1px solid var(--border); }
+    .chat-msg { padding: 10px 12px; border-radius: 6px; background: var(--bg-card); line-height: 1.4; border: 1px solid var(--border); }
+    .chat-me { background: var(--primary); color: #000; border: none; align-self: flex-end; }
+
+    .ad-timer { font-size: 4rem; font-weight: 800; color: var(--primary); font-family: monospace; margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-container">
+      <svg class="logo-svg" viewBox="0 0 200 200" fill="none" stroke-width="10" stroke-linejoin="miter">
+        <g>
+          <path d="M40 140 L100 40 L160 140" stroke="currentColor"/>
+          <path d="M40 60 L100 160 L160 60" stroke="currentColor"/>
+          <path d="M127 85 L145 115" style="stroke: var(--bg-logo)" stroke-width="22"/>
+          <path d="M127 85 L145 115" stroke="currentColor"/>
+          <path d="M55 85 L73 115" style="stroke: var(--bg-logo)" stroke-width="22"/>
+          <path d="M55 85 L73 115" stroke="currentColor"/>
+        </g>
+      </svg>
+      <div class="brand">axac</div>
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div class="clock" id="clock">00:00</div>
+      <button class="btn btn-outline hidden" id="logoutBtn" style="width: auto; padding: 8px 16px; font-size: 0.75rem;" onclick="Auth.logout()">Keluar</button>
+    </div>
+  </header>
+
+  <div id="authScreen" style="max-width: 380px; margin: 100px auto; width: 90%;">
+    <div class="panel">
+      <h2 style="text-align: center; margin-bottom: 24px; font-weight: 300; letter-spacing: 0.2em;">MASUK</h2>
+      <div class="input-grp"><input type="text" id="authUser" placeholder="Username" maxlength="20"></div>
+      <div class="input-grp"><input type="password" id="authPass" placeholder="Password" maxlength="50"></div>
+      <button class="btn btn-gold" style="margin-bottom: 12px;" onclick="Auth.login()">LOGIN</button>
+      <button class="btn btn-outline" onclick="Auth.register()">DAFTAR BARU</button>
+    </div>
+  </div>
+
+  <div id="gameScreen" class="main-layout hidden">
+    <div class="board-container">
+      <div class="status-bar">
+        <span>Lawan: <b id="oppName" style="color: var(--text-mut);">AI</b></span>
+        <span>Kamu: <b id="uName" style="color: var(--primary);">-</b></span>
+      </div>
+      <div class="chess-clocks">
+        <div class="chess-clock" id="whiteClockCard">
+          <span>PUTIH · KAMU</span>
+          <strong id="whiteClock">10:00</strong>
+        </div>
+        <div class="chess-clock" id="blackClockCard">
+          <span>HITAM · STOCKFISH</span>
+          <strong id="blackClock">10:00</strong>
+        </div>
+      </div>
+      <div class="board-wrap">
+        <div id="board" class="board"></div>
+        <div id="aiThinking">
+            <div style="font-weight:400; color:var(--primary); margin-bottom:16px; letter-spacing:0.1em;">AI BERPIKIR...</div>
+            <div style="font-size: 1.5rem; animation: spin 2s linear infinite;">♟</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; width: 100%; max-width: 580px;">
+        <button class="btn btn-danger" onclick="Game.resign()">Nyerah</button>
+        <button class="btn btn-outline" onclick="Game.undo()">↶ Undo</button>
+        <button class="btn btn-gold" onclick="Game.hint()">💡 Hint (<span id="kuotaText">0</span>)</button>
+      </div>
+      <div class="panel" style="width:100%; max-width:580px; margin-top:12px;">
+        <h3>Riwayat Langkah</h3>
+        <div id="moveList" style="max-height:110px; overflow:auto; white-space:pre-wrap; font:0.8rem/1.7 monospace; color:var(--text-mut);">Belum ada langkah.</div>
+        <p id="matchStatus" class="settings-note">Pilih bidak untuk memulai.</p>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="panel">
+        <h3>Pengaturan Pertandingan</h3>
+        <div class="input-grp">
+          <label for="difficultySelect">Kekuatan AI</label>
+          <select id="difficultySelect" onchange="Game.changeDifficulty()">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="expert" selected>Expert</option>
+            <option value="impossible">Impossible</option>
+          </select>
+        </div>
+        <div class="input-grp">
+          <label for="timeControlSelect">Waktu per pemain</label>
+          <select id="timeControlSelect" onchange="Game.changeTimeControl()">
+            <option value="3">3 menit</option>
+            <option value="5">5 menit</option>
+            <option value="10" selected>10 menit</option>
+            <option value="15">15 menit</option>
+          </select>
+        </div>
+        <button class="btn btn-outline" onclick="Game.newGame()">↻ Pertandingan Baru</button>
+        <button class="btn btn-outline" onclick="Game.retryAI()">⟳ Coba AI lagi</button>
+        <p class="engine-status" id="engineStatus">Menyiapkan Stockfish WASM...</p>
+        <p class="settings-note">Impossible memakai Skill 20 dan analisis hingga 15 detik. Kekuatan tetap bergantung pada perangkat dan engine yang berhasil dimuat.</p>
+      </div>
+      <div class="panel">
+        <h3>Profil Pemain</h3>
+        <div class="profile-card" onclick="Profile.openSelf()">
+          <div class="avatar" id="profAvatar">A</div>
+          <div class="profile-info">
+            <h4 id="profName" style="font-weight: 400; margin-bottom: 4px;">User</h4>
+            <p style="font-size: 0.8rem; color: var(--text-mut);"><span id="profRole" class="badge">Member</span> &nbsp;•&nbsp; <span id="profWins">0</span> Win</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Menu</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-gold" onclick="Online.open()">♟️ Mabar Online</button>
+            <button class="btn btn-outline" onclick="Help.open()">❔ Bantuan & Panduan</button>
+            <button class="btn btn-outline" onclick="Shop.open()">💎 AXAC Store</button>
+            <button class="btn btn-outline" onclick="Chat.openGlobal()">💬 Global Chat</button>
+            <button class="btn btn-outline" onclick="Chat.openDMList()">✉️ Pesan Pribadi</button>
+            <button class="btn btn-danger hidden" id="btnDevPanel" style="margin-top: 10px;" onclick="UI.openModal('devPanelModal')">🛠️ Dev Panel</button>
+            <button class="btn hidden" id="btnOwnerPanel" style="background: var(--primary); color: #000; margin-top: 10px;" onclick="UI.openModal('ownerAdminModal')">👑 Panel Owner</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="onlineModal" class="overlay">
+    <div class="modal">
+      <h3 style="color:var(--primary); margin-bottom:16px;">♟️ MABAR ONLINE</h3>
+      <p class="settings-note" style="margin-bottom:16px;">Buat room untuk jadi putih, atau masukkan kode room teman untuk bermain sebagai hitam. Keduanya harus membuka AXAC Chess.</p>
+      <button class="btn btn-gold" onclick="Online.create()">＋ Buat Room Baru</button>
+      <div class="input-grp" style="margin-top:16px;">
+        <label for="joinRoomCode">Kode Room Teman</label>
+        <input id="joinRoomCode" type="text" maxlength="12" placeholder="Contoh: A1B2C3" style="text-transform:uppercase;">
+      </div>
+      <button class="btn btn-outline" onclick="Online.join()">Gabung Room</button>
+      <p id="onlineStatus" class="engine-status" style="margin-top:12px;">Belum terhubung.</p>
+      <button class="btn btn-outline" style="margin-top:12px;" onclick="UI.closeModal('onlineModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="onlineRoomModal" class="overlay">
+    <div class="modal" style="text-align:center;">
+      <h3 style="color:var(--primary); margin-bottom:14px;">ROOM BERHASIL DIBUAT</h3>
+      <p class="settings-note">Kirim kode ini ke temanmu. Kamu bermain sebagai putih.</p>
+      <div id="onlineRoomCode" style="font:bold 2.2rem monospace; letter-spacing:.18em; color:var(--primary); padding:20px 0;">------</div>
+      <button class="btn btn-gold" onclick="Online.copyCode()">Salin Kode Room</button>
+      <p class="settings-note" style="margin-top:12px;">Room akan mulai saat teman bergabung.</p>
+      <button class="btn btn-danger" style="margin-top:14px;" onclick="Online.leave()">Batalkan Room</button>
+    </div>
+  </div>
+
+  <div id="helpModal" class="overlay">
+    <div class="modal" style="max-width:560px;">
+      <h3 style="color:var(--primary); margin-bottom:18px;">❔ PUSAT BANTUAN AXAC CHESS</h3>
+      <div style="display:grid; gap:14px; font-size:.86rem; line-height:1.65; color:var(--text-main);">
+        <section><b>1. Cara bermain</b><p class="settings-note">Ketuk bidak milikmu, lalu ketuk kotak tujuan yang ditandai titik. Promosi pion otomatis menjadi ratu. Langkah ilegal akan ditolak.</p></section>
+        <section><b>2. Level Stockfish</b><p class="settings-note">Easy sengaja lebih santai. Medium dan Hard lebih serius. Expert dan Impossible memakai skill tertinggi; Impossible bisa berpikir sekitar 15 detik per langkah. Tidak ada AI yang benar-benar mustahil dikalahkan.</p></section>
+        <section><b>3. Mabar online</b><p class="settings-note">Satu pemain tekan Buat Room Baru lalu bagikan kode. Temannya masukkan kode itu di Gabung Room. Pembuat room bermain putih, yang bergabung bermain hitam. Pastikan keduanya online dan Realtime Supabase aktif.</p></section>
+        <section><b>4. Jam pertandingan</b><p class="settings-note">Jam mulai berjalan saat langkah pertama dimulai dan berpindah setelah setiap langkah. Di mabar, jam disinkronkan melalui koneksi realtime; sedikit selisih akibat jaringan masih mungkin terjadi.</p></section>
+        <section><b>5. Hint dan Undo</b><p class="settings-note">Hint meminta saran langkah terbaik dari Stockfish dan dapat memakai kuota. Undo hanya tersedia saat melawan AI, tidak tersedia saat mabar agar posisi tidak berbeda.</p></section>
+        <section><b>6. Kalau AI tidak bergerak</b><p class="settings-note">Periksa koneksi internet, tunggu status Stockfish siap, lalu tekan Coba AI lagi. AXAC tidak akan membuat langkah acak diam-diam ketika engine gagal.</p></section>
+        <section><b>7. Jika mabar terputus</b><p class="settings-note">Gunakan kode room yang sama untuk masuk kembali. Jika room tidak ditemukan, buat room baru dan bagikan kode terbaru.</p></section>
+      </div>
+      <button class="btn btn-gold" style="margin-top:18px;" onclick="UI.closeModal('helpModal')">Mengerti</button>
+    </div>
+  </div>
+
+  <div id="profileModal" class="overlay">
+    <div class="modal">
+      <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+        <div class="avatar" style="width: 64px; height: 64px; font-size: 1.5rem;" id="modalAvatar">A</div>
+        <div>
+          <h2 id="modalDisplayName" style="margin-bottom: 4px; font-weight: 400;">Display Name</h2>
+          <p style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">@<span id="modalUsername">username</span></p>
+          <span id="modalRole" class="badge">Member</span>
+        </div>
+      </div>
+      <div style="background: var(--bg-base); border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 0.85rem; line-height: 1.8; border: 1px solid var(--border);">
+        <p>📝 <b>Bio:</b> <span id="modalBio" style="color: var(--text-mut);">-</span></p>
+        <p>🎮 <b>Hobi:</b> <span id="modalHobi" style="color: var(--text-mut);">-</span></p>
+        <p>🎂 <b>Ultah:</b> <span id="modalUltah" style="color: var(--text-mut);">-</span></p>
+        <p>🏆 <b>Total Win:</b> <span id="modalWins" style="color: var(--primary);">0</span></p>
+        <p>💡 <b>Sisa Kuota:</b> <span id="modalKuota" style="color: var(--primary);">0</span></p>
+      </div>
+      <div id="selfProfileActions">
+        <button class="btn btn-gold" style="margin-bottom: 10px;" onclick="Profile.openEdit()">✏️ Edit Profil</button>
+        <button class="btn btn-outline" onclick="UI.closeModal('profileModal')">Tutup</button>
+      </div>
+      <div id="otherProfileActions" class="hidden">
+        <button class="btn btn-purple" style="margin-bottom: 10px;" onclick="Chat.startDMFromProfile()">✉️ Kirim Pesan</button>
+        <button class="btn btn-outline" onclick="UI.closeModal('profileModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editProfileModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">EDIT PROFIL</h3>
+      <div class="input-grp"><label>Display Name</label><input type="text" id="editDisplayName" maxlength="25"></div>
+      <div class="input-grp"><label>Bio Singkat</label><input type="text" id="editBio" maxlength="50"></div>
+      <div class="input-grp"><label>Hobi</label><input type="text" id="editHobi" maxlength="30"></div>
+      <div class="input-grp"><label>Tanggal Lahir</label><input type="date" id="editUltah"></div>
+      <button class="btn btn-gold" onclick="Profile.saveEdit()">SIMPAN</button>
+      <button class="btn btn-outline" style="margin-top: 10px;" onclick="UI.closeModal('editProfileModal')">Batal</button>
+    </div>
+  </div>
+
+  <div id="shopModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">💎 AXAC STORE</h3>
+      <div style="background: var(--bg-base); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <h4 style="color: var(--text-main); margin-bottom: 4px;">Beli VIP (Rp 20.000)</h4>
+        <p style="font-size: 0.75rem; color: var(--text-mut); margin-bottom: 10px;">Dapet 150 Kuota (100+50) & Bebas Iklan.</p>
+        <button class="btn btn-gold" onclick="Shop.buyVIP()">Chat Admin</button>
+      </div>
+      <div style="background: var(--bg-base); border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <h4 style="color: var(--text-main); margin-bottom: 4px;">Isi Ulang Kuota (+5)</h4>
+        <p style="font-size: 0.75rem; color: var(--text-mut); margin-bottom: 10px;">Tonton iklan 30 detik.</p>
+        <button class="btn btn-outline" onclick="Ads.show('kuota')">Tonton Iklan</button>
+      </div>
+      <button class="btn btn-outline" onclick="UI.closeModal('shopModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="adOverlay" class="overlay">
+    <div class="modal" style="text-align: center;">
+      <h2 style="color: var(--primary); font-weight: 300;">SPONSOR VIP</h2>
+      <p style="font-size: 0.85rem; color: var(--text-mut);">Jadi VIP cuma 20rb. Dapet 150 kuota + bebas iklan selamanya. Chat Owner: axac</p>
+      <div id="adTimer" class="ad-timer">30</div>
+      <button id="adCloseBtn" class="btn btn-gold hidden" onclick="Ads.close()">Ambil Hadiah</button>
+    </div>
+  </div>
+
+  <div id="dmListModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">✉️ PESAN</h3>
+      <div class="input-grp">
+        <input type="text" id="dmSearchInput" placeholder="Ketik username orang..." style="padding: 10px;" maxlength="20">
+        <button class="btn btn-outline" style="padding: 10px; margin-top: 8px;" onclick="Chat.searchUserDM()">Cari & Chat</button>
+      </div>
+      <button class="btn btn-outline" onclick="UI.closeModal('dmListModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="dmChatModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">✉️ CHAT DENGAN <span id="dmTargetName" style="color: var(--text-main);">User</span></h3>
+      <div id="dmChatBox" class="chat-box"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="dmInput" placeholder="Ketik pesan..." style="flex: 1; padding: 14px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff;" maxlength="100">
+        <button class="btn btn-gold" style="width: auto; padding: 0 20px;" onclick="Chat.sendDM()">Kirim</button>
+      </div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('dmChatModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="chatModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">GLOBAL CHAT</h3>
+      <div id="chatBox" class="chat-box"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex: 1; padding: 14px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff;" maxlength="100">
+        <button class="btn btn-gold" style="width: auto; padding: 0 20px;" onclick="Chat.sendGlobal()">Kirim</button>
+      </div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('chatModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="ownerAdminModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">👑 PANEL OWNER</h3>
+      <div class="input-grp"><input type="text" id="adminTarget" placeholder="Username target" maxlength="20"></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="Admin.act('vip')">Jadikan VIP</button>
+        <button class="btn btn-outline" onclick="Admin.act('admin')">Jadikan Admin</button>
+        <button class="btn btn-danger" onclick="Admin.act('ban')">Ban Akun</button>
+      </div>
+      <h4 style="color: var(--text-mut); font-size: 0.85rem; margin-bottom: 8px;">Daftar Akun</h4>
+      <div id="adminUserList" style="background: var(--bg-base); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border);"></div>
+      <button class="btn btn-outline" style="margin-top: 16px;" onclick="UI.closeModal('ownerAdminModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="devPanelModal" class="overlay">
+    <div class="modal">
+      <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 300; letter-spacing: 0.1em;">🛠️ DEV PANEL</h3>
+      <p style="font-size: 0.8rem; color: var(--text-mut); margin-bottom: 16px;">Fitur Development untuk Admin & Owner.</p>
+      <button class="btn btn-outline" style="margin-bottom: 8px;" onclick="Admin.loadUsers()">Refresh Daftar User</button>
+      <button class="btn btn-outline" onclick="UI.closeModal('devPanelModal')">Tutup</button>
+    </div>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://ybmnctzesvqgvyivvmfm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ygZ8QlCqTuVkVR_mKfpIYw_O3EuMr6C'; 
+let db = null;
+let currentUser = null;
+let userData = {};
+let targetUserData = null;
+let dmInterval = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  try { 
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    }); 
+  } catch(e) { console.error("Supabase Init Error:", e); }
+  
+  setInterval(() => { const c = document.getElementById('clock'); if(c) c.innerText = new Date().toLocaleTimeString('id-ID'); }, 1000);
+  
+  const saved = localStorage.getItem('axac_user');
+  if(saved) { 
+      currentUser = saved; 
+      db.from('profiles').select('*').eq('username', saved).single().then(({data}) => {
+          if(data) { userData = data; Auth.showGame(); }
+      });
+  }
+});
+
+const UI = {
+  openModal: (id) => { const el = document.getElementById(id); if(el) el.classList.add('show'); },
+  closeModal: (id) => { const el = document.getElementById(id); if(el) el.classList.remove('show'); }
+};
+
+const Auth = {
+  login: async () => {
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert("Isi data!");
+    
+    const { data, error } = await db.from('profiles').select('*').eq('username', u).eq('password', p).single();
+    if(error || !data) return alert("Username atau Password salah!");
+    if(data.banned) return alert("Akun ini telah dibanned!");
+    
+    currentUser = data.username; 
+    userData = data;
+    localStorage.setItem('axac_user', currentUser); 
+    Auth.showGame();
+  },
+  register: async () => {
+    const u = document.getElementById('authUser').value.trim(); 
+    const p = document.getElementById('authPass').value.trim();
+    if(!u || !p) return alert("Isi data!");
+    
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    const autoDisplayName = `${u}#${randomId}`;
+    
+    const { error } = await db.from('profiles').insert([{ 
+        username: u, 
+        password: p, 
+        display_name: autoDisplayName, 
+        role: 'member',
+        kuota_harian: 5 
+    }]);
+    
+    if(error) {
+        if(error.code === '23505') return alert("Username sudah dipakai orang lain!");
+        return alert("Gagal daftar: " + error.message);
+    }
+    alert(`Akun berhasil dibuat!\n\nLogin: ${u}\nTampilan: ${autoDisplayName}\n\nSilakan klik LOGIN.`);
+  },
+  showGame: () => {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    let role = userData.role || 'member';
+    
+    document.getElementById('uName').innerText = userData.display_name || currentUser;
+    document.getElementById('profName').innerText = userData.display_name || currentUser;
+    document.getElementById('profAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    
+    document.getElementById('profRole').innerText = role.toUpperCase();
+    document.getElementById('profRole').className = `badge r-${role}`;
+    document.getElementById('profWins').innerText = userData.wins || 0;
+    document.getElementById('kuotaText').innerText = userData.kuota_harian === 'Infinity' ? '∞' : (userData.kuota_harian || 0);
+    
+    if(role === 'owner' || role === 'admin') {
+        document.getElementById('btnOwnerPanel').classList.remove('hidden');
+        document.getElementById('btnDevPanel').classList.remove('hidden');
+        Admin.loadUsers();
+    } else if (role === 'vip') {
+        document.getElementById('btnDevPanel').classList.add('hidden');
+        document.getElementById('btnOwnerPanel').classList.add('hidden');
+    }
+    setTimeout(() => {
+      Game.init();
+      StockfishEngine.init().catch(error => {
+        console.error('AXAC Stockfish init:', error);
+        StockfishEngine.setStatus('Stockfish gagal dimuat · cek koneksi internet', true);
+      });
+    }, 100);
+  },
+  logout: () => { localStorage.removeItem('axac_user'); location.reload(); }
+};
+
+const Profile = {
+  openSelf: () => {
+    targetUserData = userData;
+    document.getElementById('modalDisplayName').innerText = userData.display_name || currentUser;
+    document.getElementById('modalUsername').innerText = currentUser;
+    document.getElementById('modalBio').innerText = userData.bio || '-';
+    document.getElementById('modalHobi').innerText = userData.hobi || '-';
+    document.getElementById('modalUltah').innerText = userData.tanggal_lahir || '-';
+    document.getElementById('modalWins').innerText = userData.wins || 0;
+    document.getElementById('modalKuota').innerText = userData.kuota_harian === 'Infinity' ? '∞' : (userData.kuota_harian || 0);
+    
+    document.getElementById('modalAvatar').innerText = (userData.display_name || currentUser).charAt(0).toUpperCase();
+    document.getElementById('modalRole').innerText = (userData.role || 'member').toUpperCase();
+    document.getElementById('modalRole').className = `badge r-${userData.role || 'member'}`;
+    
+    document.getElementById('selfProfileActions').classList.remove('hidden');
+    document.getElementById('otherProfileActions').classList.add('hidden');
+    UI.openModal('profileModal');
+  },
+  openOther: async (username) => {
+    const { data } = await db.from('profiles').select('*').eq('username', username).single();
+    if(!data) return alert("User tidak ditemukan.");
+    targetUserData = data;
+    
+    document.getElementById('modalDisplayName').innerText = data.display_name || data.username;
+    document.getElementById('modalUsername').innerText = data.username;
+    document.getElementById('modalBio').innerText = data.bio || '-';
+    document.getElementById('modalHobi').innerText = data.hobi || '-';
+    document.getElementById('modalUltah').innerText = data.tanggal_lahir || '-';
+    document.getElementById('modalWins').innerText = data.wins || 0;
+    document.getElementById('modalKuota').innerText = data.kuota_harian === 'Infinity' ? '∞' : (data.kuota_harian || 0);
+    
+    document.getElementById('modalAvatar').innerText = (data.display_name || data.username).charAt(0).toUpperCase();
+    document.getElementById('modalRole').innerText = (data.role || 'member').toUpperCase();
+    document.getElementById('modalRole').className = `badge r-${data.role || 'member'}`;
+    
+    document.getElementById('selfProfileActions').classList.add('hidden');
+    document.getElementById('otherProfileActions').classList.remove('hidden');
+    UI.openModal('profileModal');
+  },
+  openEdit: () => {
+    document.getElementById('editDisplayName').value = userData.display_name || '';
+    document.getElementById('editBio').value = userData.bio || '';
+    document.getElementById('editHobi').value = userData.hobi || '';
+    document.getElementById('editUltah').value = userData.tanggal_lahir || '';
+    UI.openModal('editProfileModal');
+  },
+  saveEdit: async () => {
+    const dName = document.getElementById('editDisplayName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    const hobi = document.getElementById('editHobi').value.trim();
+    const ultah = document.getElementById('editUltah').value;
+    
+    await db.from('profiles').update({ display_name: dName, bio: bio, hobi: hobi, tanggal_lahir: ultah }).eq('username', currentUser);
+    userData.display_name = dName; userData.bio = bio; userData.hobi = hobi; userData.tanggal_lahir = ultah;
+    Auth.showGame(); Profile.openSelf(); UI.closeModal('editProfileModal');
+  }
+};
+
+const Shop = {
+  open: () => UI.openModal('shopModal'),
+  buyVIP: () => { alert("Silakan chat Owner (axac) untuk pembelian VIP 20rb."); Chat.startDM('axac'); UI.closeModal('shopModal'); }
+};
+
+const Ads = {
+  timerInterval: null,
+  show: (type) => {
+    if(userData.role === 'vip' || userData.role === 'owner' || userData.role === 'admin') return alert("Kamu bebas iklan!");
+    UI.closeModal('shopModal');
+    UI.openModal('adOverlay');
+    let timeLeft = 30;
+    document.getElementById('adTimer').innerText = timeLeft;
+    document.getElementById('adCloseBtn').classList.add('hidden');
+    
+    Ads.timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('adTimer').innerText = timeLeft;
+      if(timeLeft <= 0) {
+        clearInterval(Ads.timerInterval);
+        document.getElementById('adTimer').innerText = "✓";
+        document.getElementById('adCloseBtn').classList.remove('hidden');
+        Ads.giveReward();
+      }
+    }, 1000);
+  },
+  giveReward: () => {
+    let newKuota = (userData.kuota_harian === 'Infinity' ? 9999 : userData.kuota_harian || 0) + 5;
+    userData.kuota_harian = newKuota;
+    db.from('profiles').update({ kuota_harian: newKuota }).eq('username', currentUser).then();
+    document.getElementById('kuotaText').innerText = newKuota;
+    alert("Berhasil menambahkan 5 Kuota!");
+  },
+  close: () => { UI.closeModal('adOverlay'); }
+};
+
+const Chat = {
+  openGlobal: () => { UI.openModal('chatModal'); Chat.initGlobal(); },
+  initGlobal: () => {
+    if(!db) return;
+    db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50).then(({data}) => {
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.appendGlobal);
+    });
+    setInterval(async () => {
+      if(!document.getElementById('chatModal').classList.contains('show')) return;
+      const { data } = await db.from('global_chats').select('*').order('created_at', { ascending: true }).limit(50);
+      const box = document.getElementById('chatBox'); if(box) box.innerHTML = '';
+      if(data) data.forEach(Chat.appendGlobal);
+    }, 3000);
+  },
+  appendGlobal: (msg) => {
+    const box = document.getElementById('chatBox'); if(!box) return;
+    let cls = msg.username === currentUser ? 'chat-me' : '';
+    box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.username}:</b> ${msg.message}</div>`;
+    box.scrollTop = box.scrollHeight;
+  },
+  sendGlobal: async () => {
+    const input = document.getElementById('chatInput'); if(!input.value.trim()) return;
+    await db.from('global_chats').insert([{ username: userData.display_name || currentUser, role: userData.role, message: input.value.trim() }]);
+    input.value = '';
+  },
+  
+  openDMList: () => UI.openModal('dmListModal'),
+  searchUserDM: () => {
+    const target = document.getElementById('dmSearchInput').value.trim();
+    if(!target) return;
+    UI.closeModal('dmListModal');
+    Chat.startDM(target);
+  },
+  startDMFromProfile: () => {
+    UI.closeModal('profileModal');
+    Chat.startDM(targetUserData.username);
+  },
+  startDM: (targetUser) => {
+    if(targetUser === currentUser) return alert("Gak bisa chat diri sendiri.");
+    document.getElementById('dmTargetName').innerText = targetUser;
+    UI.openModal('dmChatModal');
+    Chat.initDM(targetUser);
+  },
+  initDM: (target) => {
+    if(dmInterval) clearInterval(dmInterval);
+    const roomId = [currentUser, target].sort().join('_');
+    
+    const fetchDM = async () => {
+      const { data } = await db.from('private_chats').select('*').eq('room_id', roomId).order('created_at', { ascending: true });
+      const box = document.getElementById('dmChatBox'); if(!box) return;
+      box.innerHTML = '';
+      if(data) data.forEach(msg => {
+        let cls = msg.sender === currentUser ? 'chat-me' : '';
+        box.innerHTML += `<div class="chat-msg ${cls}"><b>${msg.sender}:</b> ${msg.message}</div>`;
+      });
+      box.scrollTop = box.scrollHeight;
+    };
+    
+    fetchDM();
+    dmInterval = setInterval(fetchDM, 3000);
+  },
+  sendDM: async () => {
+    const input = document.getElementById('dmInput'); if(!input.value.trim()) return;
+    const target = document.getElementById('dmTargetName').innerText;
+    const roomId = [currentUser, target].sort().join('_');
+    
+    await db.from('private_chats').insert([{ room_id: roomId, sender: currentUser, message: input.value.trim() }]);
+    input.value = '';
+  }
+};
+
+const Admin = {
+  loadUsers: async () => {
+    const { data } = await db.from('profiles').select('username, display_name, role, wins').order('wins', { ascending: false });
+    const list = document.getElementById('adminUserList');
+    if(!list) return;
+    list.innerHTML = '';
+    if(data) {
+        data.forEach(u => {
+            list.innerHTML += `
+                <div style="padding: 8px; border-bottom: 1px solid var(--border); cursor: pointer;" onclick="Admin.viewUser('${u.username}')">
+                    <b>${u.display_name || u.username}</b> (@${u.username}) - <span class="badge r-${u.role}">${u.role}</span>
+                </div>
+            `;
+        });
+    }
+  },
+  viewUser: async (username) => {
+    const { data } = await db.from('profiles').select('*').eq('username', username).single();
+    alert(`Detail Akun:\n\nUsername: ${data.username}\nTampilan: ${data.display_name}\nRole: ${data.role}\nWins: ${data.wins}`);
+  },
+  act: async (type) => {
+    if(userData.role !== 'owner' && userData.role !== 'admin') return alert("Akses Ditolak!");
+    const t = document.getElementById('adminTarget').value.trim();
+    if(!t) return alert("Isi target username!");
+    let upd = {};
+    if(type === 'vip') upd = { role: 'vip', kuota_harian: 150 };
+    if(type === 'admin') upd = { role: 'admin', kuota_harian: 'Infinity' };
+    if(type === 'ban') upd = { banned: true };
+    
+    await db.from('profiles').update(upd).eq('username', t);
+    alert(`Berhasil update role ${t} menjadi ${type}`);
+    Admin.loadUsers();
+  }
+};
+
+const P = {
+  p: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#0f172a"/></svg>',
+  r: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#0f172a"/></svg>',
+  n: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#0f172a"/></svg>',
+  b: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#0f172a"/></svg>',
+  q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#0f172a"/></svg>',
+  k: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#0f172a"/></svg>',
+  P: '<svg viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+  R: '<svg viewBox="0 0 45 45"><path d="M9 39h27v-3H9v3zm3-3h21v-4H12v4zm3-4h15v-8H15v8zm0-10h15v-2H15v2zm-3-4h21v-3H12v3zm-3-5v3h27v-3h-3v-2h-3v2h-3v-2h-3v2h-3v-2h-3v2h-3v-2H9z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+  N: '<svg viewBox="0 0 45 45"><path d="M22 10c-7 0-11 4-11 11 0 3 1 6 3 8 0-2 1-4 3-4 1 0 2 1 2 2 0 2-2 4-2 6 0 3 3 6 7 6s7-3 7-6c0-2-2-4-2-6 0-1 1-2 2-2 2 0 3 2 3 4 2-2 3-5 3-8 0-7-4-11-11-11z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+  B: '<svg viewBox="0 0 45 45"><path d="M22.5 8c-2.5 0-4.5 2-4.5 4.5 0 1.2.5 2.3 1.3 3.1C16.8 17.5 15 20.8 15 24.5c0 4.1 2.3 7.7 5.7 9.5H22v3h1v-3h1.3c3.4-1.8 5.7-5.4 5.7-9.5 0-3.7-1.8-7-4.3-8.9.8-.8 1.3-1.9 1.3-3.1C27 10 25 8 22.5 8z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+  Q: '<svg viewBox="0 0 45 45"><path d="M9 26c0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l2.5-8.2 4 6.5-2 3.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5l-2-3.5 4-6.5 2.5 8.2c-1.5.3-2.5 1.3-2.5 2.8 0 2 1.5 3 3.5 3s3.5-1 3.5-3c0-1.5-1-2.5-2.5-2.8l3.5-11.2H8.5L12 23.2C10.5 23.5 9 24.5 9 26z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>',
+  K: '<svg viewBox="0 0 45 45"><path d="M22.5 6v3h-3v2h3v3h2v-3h3V9h-3V6h-2zm-6.5 10c-3 0-5 2-5 5 0 2.5 1.5 4.5 3.5 5.5V33h16v-6.5c2-1 3.5-3 3.5-5.5 0-3-2-5-5-5h-13z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></svg>'
+};
+
+const StockfishEngine = {
+  worker: null,
+  ready: false,
+  loading: false,
+  initPromise: null,
+  pendingSearch: null,
+  searchTimeout: null,
+  setStatus: (message, isError = false) => {
+    const el = document.getElementById('engineStatus');
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = isError ? 'var(--danger)' : 'var(--text-mut)';
+  },
+  init: () => {
+    if (StockfishEngine.ready) return Promise.resolve(true);
+    if (StockfishEngine.initPromise) return StockfishEngine.initPromise;
+
+    StockfishEngine.loading = true;
+    StockfishEngine.setStatus('Mengunduh engine Stockfish...', false);
+    StockfishEngine.initPromise = new Promise((resolve, reject) => {
+      const candidates = [
+        {
+          script: 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/stockfish.js',
+          base: 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/'
+        },
+        {
+          script: 'https://unpkg.com/stockfish@16.0.0/stockfish.js',
+          base: 'https://unpkg.com/stockfish@16.0.0/'
+        },
+        {
+          script: 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish.js',
+          base: 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/'
+        }
+      ];
+      const workerSource = `
+        const candidates = ${JSON.stringify(candidates)};
+        let loaded = false;
+        for (const candidate of candidates) {
+          try {
+            self.Module = self.Module || {};
+            self.Module.locateFile = (file) => candidate.base + file;
+            importScripts(candidate.script);
+            loaded = true;
+            break;
+          } catch (error) {}
+        }
+        if (!loaded) self.postMessage('AXAC_ENGINE_LOAD_ERROR');
+      `;
+
+      const blobUrl = URL.createObjectURL(new Blob([workerSource], { type: 'application/javascript' }));
+      let settled = false;
+      const timeout = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        StockfishEngine.loading = false;
+        StockfishEngine.worker?.terminate();
+        StockfishEngine.worker = null;
+        StockfishEngine.initPromise = null;
+        URL.revokeObjectURL(blobUrl);
+        reject(new Error('Stockfish tidak merespons. Periksa koneksi internet lalu muat ulang halaman.'));
+      }, 30000);
+
+      try {
+        const worker = new Worker(blobUrl);
+        StockfishEngine.worker = worker;
+        worker.onmessage = (event) => {
+          const raw = event.data;
+          const lines = String(raw == null ? '' : raw).split(/\r?\n/);
+          for (const line of lines) {
+            const msg = line.trim();
+            if (!msg) continue;
+            if (msg === 'AXAC_ENGINE_LOAD_ERROR') {
+              if (!settled) {
+                settled = true;
+                clearTimeout(timeout);
+                StockfishEngine.loading = false;
+                StockfishEngine.worker?.terminate();
+                StockfishEngine.worker = null;
+                StockfishEngine.initPromise = null;
+                URL.revokeObjectURL(blobUrl);
+                reject(new Error('File Stockfish gagal dimuat dari CDN.'));
+              }
+              return;
+            }
+            if (msg.includes('uciok')) {
+              worker.postMessage('setoption name Threads value 1');
+              worker.postMessage('setoption name Hash value 64');
+              worker.postMessage('isready');
+            } else if (msg === 'readyok') {
+              if (!settled) {
+                settled = true;
+                clearTimeout(timeout);
+                StockfishEngine.ready = true;
+                StockfishEngine.loading = false;
+                StockfishEngine.setStatus('Stockfish siap · WASM aktif', false);
+                URL.revokeObjectURL(blobUrl);
+                resolve(true);
+              }
+            } else if (msg.startsWith('bestmove ')) {
+              const result = msg.split(/\s+/)[1];
+              const callback = StockfishEngine.pendingSearch;
+              StockfishEngine.pendingSearch = null;
+              if (StockfishEngine.searchTimeout) clearTimeout(StockfishEngine.searchTimeout);
+              StockfishEngine.searchTimeout = null;
+              if (callback) callback(result === '(none)' ? null : result);
+            }
+          }
+        };
+        worker.onerror = (error) => {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timeout);
+            StockfishEngine.loading = false;
+            StockfishEngine.initPromise = null;
+            URL.revokeObjectURL(blobUrl);
+            reject(new Error('Worker Stockfish gagal dijalankan. Browser mungkin memblokir engine.'));
+          }
+        };
+        worker.postMessage('uci');
+      } catch (error) {
+        clearTimeout(timeout);
+        StockfishEngine.loading = false;
+        StockfishEngine.initPromise = null;
+        URL.revokeObjectURL(blobUrl);
+        reject(error);
+      }
+    });
+    return StockfishEngine.initPromise;
+  },
+  search: async (fen, level = 'hard', customTime = null) => {
+    await StockfishEngine.init();
+    const levels = {
+      easy: { skill: 0, time: 350 },
+      medium: { skill: 8, time: 1500 },
+      hard: { skill: 14, time: 3500 },
+      expert: { skill: 19, time: 8000 },
+      impossible: { skill: 20, time: 15000 }
+    };
+    const config = levels[level] || levels.hard;
+    const time = customTime || config.time;
+    return new Promise((resolve, reject) => {
+      if (StockfishEngine.pendingSearch) {
+        StockfishEngine.worker?.postMessage('stop');
+        StockfishEngine.pendingSearch(null);
+        StockfishEngine.pendingSearch = null;
+      }
+      StockfishEngine.pendingSearch = resolve;
+      StockfishEngine.worker.postMessage('setoption name UCI_LimitStrength value false');
+      StockfishEngine.worker.postMessage(`setoption name Skill Level value ${config.skill}`);
+      StockfishEngine.worker.postMessage(`position fen ${fen}`);
+      StockfishEngine.worker.postMessage(`go movetime ${time}`);
+      StockfishEngine.searchTimeout = setTimeout(() => {
+        if (StockfishEngine.pendingSearch === resolve) {
+          StockfishEngine.pendingSearch = null;
+          StockfishEngine.worker?.postMessage('stop');
+          reject(new Error('Pencarian Stockfish melewati batas waktu.'));
+        }
+      }, time + 12000);
+    });
+  }
+};
+
+const Game = {
+  chess: null,
+  sel: null,
+  mode: 'expert',
+  isThinking: false,
+  isHinting: false,
+  roundId: 0,
+  timeMinutes: 10,
+  whiteTime: 600,
+  blackTime: 600,
+  clockActive: null,
+  clockLastTick: 0,
+  clockInterval: null,
+  finished: false,
+  onlineActive: false,
+  init: () => {
+    Game.roundId++;
+    if (StockfishEngine.pendingSearch) {
+      StockfishEngine.worker?.postMessage('stop');
+      StockfishEngine.pendingSearch(null);
+      StockfishEngine.pendingSearch = null;
+    }
+    if (StockfishEngine.searchTimeout) clearTimeout(StockfishEngine.searchTimeout);
+    StockfishEngine.searchTimeout = null;
+    Game.finished = false;
+    Game.onlineActive = false;
+    if (Game.clockInterval) clearInterval(Game.clockInterval);
+    Game.clockInterval = null;
+    Game.chess = new Chess();
+    Game.sel = null;
+    Game.isThinking = false;
+    Game.isHinting = false;
+    Game.whiteTime = Game.timeMinutes * 60;
+    Game.blackTime = Game.timeMinutes * 60;
+    Game.clockActive = null;
+    Game.clockLastTick = 0;
+    const overlay = document.getElementById('aiThinking');
+    if (overlay) overlay.classList.remove('show');
+    const text = overlay?.querySelector('div');
+    if (text) text.textContent = 'AI BERPIKIR...';
+    document.getElementById('difficultySelect').disabled = false;
+    document.getElementById('timeControlSelect').disabled = false;
+    Game.render();
+    Game.renderClocks();
+    Game.updateOpponentLabel();
+    Game.renderMoveList();
+  },
+  startOnline: (side, room) => {
+    Game.roundId++;
+    if (StockfishEngine.pendingSearch) {
+      StockfishEngine.worker?.postMessage('stop');
+      StockfishEngine.pendingSearch(null);
+      StockfishEngine.pendingSearch = null;
+    }
+    if (Game.clockInterval) clearInterval(Game.clockInterval);
+    Game.clockInterval = null;
+    Game.chess = new Chess();
+    Game.sel = null;
+    Game.finished = false;
+    Game.isThinking = false;
+    Game.isHinting = false;
+    Game.onlineActive = true;
+    Game.whiteTime = Game.timeMinutes * 60;
+    Game.blackTime = Game.timeMinutes * 60;
+    Game.clockActive = null;
+    Game.clockLastTick = 0;
+    document.getElementById('difficultySelect').disabled = true;
+    document.getElementById('timeControlSelect').disabled = true;
+    document.getElementById('oppName').textContent = side === 'w' ? 'Menunggu lawan…' : 'Pemain putih';
+    document.getElementById('uName').textContent = `${userData.display_name || currentUser} · ${side === 'w' ? 'PUTIH' : 'HITAM'}`;
+    const labels = document.querySelectorAll('.chess-clock span');
+    if (labels[0]) labels[0].textContent = side === 'w' ? 'PUTIH · KAMU' : 'PUTIH · LAWAN';
+    if (labels[1]) labels[1].textContent = side === 'b' ? 'HITAM · KAMU' : 'HITAM · LAWAN';
+    const opp = document.getElementById('oppName');
+    if (opp) opp.textContent = `Mabar · room ${room}`;
+    Game.render();
+    Game.renderClocks();
+    Game.renderMoveList();
+    Game.setMatchStatus(`Mabar aktif · kamu bermain ${side === 'w' ? 'putih' : 'hitam'}.`);
+  },
+  setMatchStatus: (message) => {
+    const el = document.getElementById('matchStatus');
+    if (el) el.textContent = message;
+  },
+  formatTime: (seconds) => {
+    const safe = Math.max(0, Math.ceil(seconds));
+    return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
+  },
+  renderClocks: () => {
+    const white = document.getElementById('whiteClock');
+    const black = document.getElementById('blackClock');
+    if (white) white.textContent = Game.formatTime(Game.whiteTime);
+    if (black) black.textContent = Game.formatTime(Game.blackTime);
+    document.getElementById('whiteClockCard')?.classList.toggle('active', Game.clockActive === 'w');
+    document.getElementById('blackClockCard')?.classList.toggle('active', Game.clockActive === 'b');
+  },
+  ensureClock: () => {
+    if (!Game.clockInterval) Game.clockInterval = setInterval(Game.tickClock, 200);
+  },
+  startClock: () => {
+    if (!Game.clockActive) {
+      Game.clockActive = 'w';
+      Game.clockLastTick = Date.now();
+      Game.ensureClock();
+      Game.renderClocks();
+    }
+  },
+  tickClock: () => {
+    if (!Game.clockActive || !Game.clockLastTick || Game.finished) return;
+    const now = Date.now();
+    const elapsed = Math.max(0, (now - Game.clockLastTick) / 1000);
+    Game.clockLastTick = now;
+    if (Game.clockActive === 'w') Game.whiteTime = Math.max(0, Game.whiteTime - elapsed);
+    else Game.blackTime = Math.max(0, Game.blackTime - elapsed);
+    Game.renderClocks();
+    if (Game.whiteTime <= 0 || Game.blackTime <= 0) {
+      const loser = Game.whiteTime <= 0 ? 'Putih' : 'Hitam';
+      Game.finished = true;
+      Game.stopClock();
+      if (Game.onlineActive) Online.send('timeout', { loser });
+      alert(`${loser} kehabisan waktu. Pertandingan selesai.`);
+    }
+  },
+  stopClock: () => {
+    Game.clockActive = null;
+    Game.clockLastTick = 0;
+    if (Game.clockInterval) clearInterval(Game.clockInterval);
+    Game.clockInterval = null;
+    Game.renderClocks();
+  },
+  updateOpponentLabel: () => {
+    const label = document.getElementById('oppName');
+    const names = { easy: 'AI · Easy', medium: 'AI · Medium', hard: 'AI · Hard', expert: 'AI · Expert', impossible: 'AI · Impossible' };
+    if (label) label.textContent = names[Game.mode] || 'Stockfish';
+    const labels = document.querySelectorAll('.chess-clock span');
+    if (!Game.onlineActive) {
+      if (labels[0]) labels[0].textContent = 'PUTIH · KAMU';
+      if (labels[1]) labels[1].textContent = 'HITAM · STOCKFISH';
+      const user = document.getElementById('uName');
+      if (user) user.textContent = userData.display_name || currentUser || '-';
+    }
+  },
+  render: () => {
+    const boardEl = document.getElementById('board');
+    if (!boardEl || !Game.chess) return;
+    boardEl.innerHTML = '';
+    const rows = Game.chess.board();
+    const flip = Game.onlineActive && Online.side === 'b';
+    for (let dr = 0; dr < 8; dr++) {
+      for (let dc = 0; dc < 8; dc++) {
+        const r = flip ? 7 - dr : dr;
+        const c = flip ? 7 - dc : dc;
+        const piece = rows[r][c];
+        const id = String.fromCharCode(97 + c) + (8 - r);
+        const sq = document.createElement('div');
+        sq.className = `sq ${(dr + dc) % 2 === 0 ? 'light' : 'dark'}`;
+        if (piece) sq.innerHTML = P[piece.color === 'w' ? piece.type.toUpperCase() : piece.type];
+        if (Game.sel === id) sq.classList.add('hl');
+        if (Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) sq.classList.add('guide');
+        sq.onclick = () => Game.click(id);
+        boardEl.appendChild(sq);
+      }
+    }
+    Game.renderMoveList();
+  },
+  renderMoveList: () => {
+    const el = document.getElementById('moveList');
+    if (!el || !Game.chess) return;
+    const hist = Game.chess.history();
+    if (!hist.length) { el.textContent = 'Belum ada langkah.'; return; }
+    const rows = [];
+    for (let i = 0; i < hist.length; i += 2) rows.push(`${Math.floor(i / 2) + 1}. ${hist[i]}${hist[i + 1] ? '  ' + hist[i + 1] : ''}`);
+    el.textContent = rows.join('\n');
+    el.scrollTop = el.scrollHeight;
+  },
+  click: (id) => {
+    if (!Game.chess || Game.finished || Game.chess.game_over() || Game.isThinking || Game.isHinting) return;
+    const side = Game.onlineActive ? Online.side : 'w';
+    if (Game.chess.turn() !== side) return;
+    if (Game.sel && Game.chess.moves({ square: Game.sel, verbose: true }).some(m => m.to === id)) {
+      const from = Game.sel;
+      const made = Game.chess.move({ from, to: id, promotion: 'q' });
+      Game.sel = null;
+      if (!made) return Game.render();
+      Game.render();
+      if (Game.chess.game_over()) {
+        if (Game.onlineActive) Online.broadcastPosition();
+        return Game.finishGame();
+      }
+      Game.clockActive = Game.chess.turn();
+      Game.clockLastTick = Date.now();
+      Game.ensureClock();
+      Game.renderClocks();
+      if (Game.onlineActive) {
+        Online.broadcastPosition();
+      } else if (Game.chess.turn() === 'b') {
+        Game.aiMove();
+      }
+      return;
+    }
+    const piece = Game.chess.get(id);
+    Game.sel = (piece && piece.color === side) ? id : null;
+    if (Game.sel && (!Game.onlineActive || (Online.side === 'w' && Game.chess.history().length === 0))) Game.startClock();
+    Game.render();
+  },
+  aiMove: async () => {
+    if (!Game.chess || Game.onlineActive || Game.chess.game_over() || Game.isThinking || Game.chess.turn() !== 'b') return;
+    Game.isThinking = true;
+    const thisRound = Game.roundId;
+    const position = Game.chess.fen();
+    const overlay = document.getElementById('aiThinking');
+    const overlayText = overlay?.querySelector('div');
+    if (overlayText) overlayText.textContent = `STOCKFISH ${Game.mode.toUpperCase()} SEDANG BERPIKIR...`;
+    overlay?.classList.add('show');
+    StockfishEngine.setStatus(`Stockfish menganalisis · ${Game.mode.toUpperCase()}`, false);
+    try {
+      const bestMove = await StockfishEngine.search(position, Game.mode);
+      if (thisRound !== Game.roundId || Game.finished) return;
+      if (!bestMove || !/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(bestMove)) throw new Error('Stockfish tidak mengirim langkah yang valid.');
+      const move = Game.chess.move({ from: bestMove.slice(0, 2), to: bestMove.slice(2, 4), promotion: bestMove[4] || 'q' });
+      if (!move) throw new Error('Langkah dari engine tidak sah pada posisi saat ini.');
+      Game.render();
+      if (Game.chess.game_over()) {
+        Game.stopClock();
+        Game.finishGame();
+      } else {
+        Game.clockActive = 'w';
+        Game.clockLastTick = Date.now();
+        Game.ensureClock();
+        Game.renderClocks();
+        StockfishEngine.setStatus(`Stockfish aktif · ${Game.mode.toUpperCase()} · langkah ${Game.chess.history().length}`, false);
+      }
+    } catch (error) {
+      if (thisRound !== Game.roundId || Game.finished) return;
+      console.error('AXAC Stockfish:', error);
+      Game.stopClock();
+      StockfishEngine.setStatus(`AI gagal: ${error.message}`, true);
+      alert(`Stockfish gagal memberi langkah. Tidak ada gerakan acak yang dipakai.\n\n${error.message}\n\nTekan "Coba AI lagi" setelah koneksi stabil.`);
+    } finally {
+      if (thisRound === Game.roundId) {
+        Game.isThinking = false;
+        overlay?.classList.remove('show');
+      }
+    }
+  },
+  retryAI: async () => {
+    try {
+      await StockfishEngine.init();
+      if (Game.chess && !Game.onlineActive && Game.chess.turn() === 'b' && !Game.finished) Game.aiMove();
+      else StockfishEngine.setStatus('Stockfish siap · WASM aktif', false);
+    } catch (error) {
+      StockfishEngine.setStatus(`Engine belum siap: ${error.message}`, true);
+      alert('Engine belum berhasil dimuat. Coba refresh halaman dan pastikan internet stabil.');
+    }
+  },
+  finishGame: () => {
+    if (!Game.chess) return;
+    Game.finished = true;
+    Game.stopClock();
+    let result = 'Pertandingan selesai.';
+    if (Game.chess.in_checkmate()) result = Game.chess.turn() === 'w' ? 'Skakmat. Hitam menang!' : 'Skakmat. Putih menang!';
+    else if (Game.chess.in_stalemate()) result = 'Seri · stalemate.';
+    else if (Game.chess.in_threefold_repetition()) result = 'Seri · posisi berulang tiga kali.';
+    else if (Game.chess.insufficient_material()) result = 'Seri · material tidak cukup.';
+    else if (Game.chess.in_draw()) result = 'Pertandingan seri.';
+    Game.setMatchStatus(result);
+    alert(result);
+  },
+  changeDifficulty: () => {
+    const select = document.getElementById('difficultySelect');
+    Game.mode = select?.value || 'hard';
+    Game.updateOpponentLabel();
+    const budgets = { easy: 'cepat', medium: 'ringan', hard: 'sedang', expert: 'lama', impossible: 'sangat lama' };
+    StockfishEngine.setStatus(`Level ${Game.mode.toUpperCase()} dipilih · analisis ${budgets[Game.mode] || ''}.`, false);
+  },
+  changeTimeControl: () => {
+    const select = document.getElementById('timeControlSelect');
+    Game.timeMinutes = Math.max(1, Number(select?.value) || 10);
+    Game.init();
+  },
+  newGame: () => {
+    if (Game.onlineActive) return alert('Untuk pertandingan online, keluar dari room dulu lalu buat room baru.');
+    if (Game.chess && Game.chess.history().length && !Game.chess.game_over()) {
+      if (!confirm('Mulai pertandingan baru? Posisi sekarang akan direset.')) return;
+    }
+    Game.init();
+  },
+  resign: () => {
+    if (!Game.chess || Game.finished) return;
+    if (!confirm('Yakin menyerah?')) return;
+    Game.finished = true;
+    Game.stopClock();
+    if (Game.onlineActive) {
+      Online.send('resign', { username: currentUser, side: Online.side });
+      Game.setMatchStatus('Kamu menyerah.');
+      alert('Kamu menyerah. Lawan mendapat kemenangan.');
+    } else {
+      alert('Kamu menyerah. Pertandingan selesai.');
+    }
+  },
+  undo: () => {
+    if (Game.onlineActive) return alert('Undo tidak tersedia saat mabar agar posisi kedua pemain tetap sinkron.');
+    if (!Game.chess || Game.isThinking || Game.finished) return;
+    if (!Game.chess.history().length) return;
+    Game.chess.undo();
+    if (Game.chess.turn() === 'b' && Game.chess.history().length) Game.chess.undo();
+    Game.sel = null;
+    Game.finished = false;
+    Game.whiteTime = Math.max(Game.whiteTime, 1);
+    Game.blackTime = Math.max(Game.blackTime, 1);
+    Game.clockActive = null;
+    Game.clockLastTick = 0;
+    Game.render();
+    Game.renderClocks();
+  },
+  hint: async () => {
+    if (!Game.chess || Game.finished || Game.chess.game_over()) return alert('Tidak ada pertandingan aktif.');
+    const side = Game.onlineActive ? Online.side : 'w';
+    if (Game.chess.turn() !== side) return alert('Tunggu giliran kamu dulu.');
+    if (Game.isThinking || Game.isHinting) return;
+    const isPrivileged = ['owner', 'admin', 'vip'].includes(userData.role);
+    if (!isPrivileged && Number(userData.kuota_harian || 0) <= 0) return alert('Kuota habis! Tonton iklan.');
+    Game.isHinting = true;
+    Game.isThinking = true;
+    const thisRound = Game.roundId;
+    const overlay = document.getElementById('aiThinking');
+    const overlayText = overlay?.querySelector('div');
+    if (overlayText) overlayText.textContent = 'MENCARI LANGKAH TERBAIK...';
+    overlay?.classList.add('show');
+    try {
+      const best = await StockfishEngine.search(Game.chess.fen(), 'expert', 1300);
+      if (thisRound !== Game.roundId || Game.finished) return;
+      if (!best) throw new Error('Engine tidak menemukan langkah.');
+      const move = Game.chess.move({ from: best.slice(0, 2), to: best.slice(2, 4), promotion: best[4] || 'q' });
+      if (!move) throw new Error('Langkah saran tidak valid.');
+      const san = move.san;
+      Game.chess.undo();
+      if (!isPrivileged) {
+        userData.kuota_harian = Math.max(0, Number(userData.kuota_harian || 0) - 1);
+        db.from('profiles').update({ kuota_harian: userData.kuota_harian }).eq('username', currentUser).then();
+        const quotaText = document.getElementById('kuotaText');
+        if (quotaText) quotaText.textContent = userData.kuota_harian;
+      }
+      alert(`Saran langkah terbaik: ${san}`);
+    } catch (error) {
+      console.error('AXAC hint:', error);
+      alert(`Bantuan gagal mengambil langkah dari Stockfish.\n${error.message}`);
+    } finally {
+      if (thisRound === Game.roundId) {
+        Game.isThinking = false;
+        Game.isHinting = false;
+        overlay?.classList.remove('show');
+      }
+    }
+  }
+};
+
+
+const Help = {
+  open: () => UI.openModal('helpModal')
+};
+
+const Online = {
+  channel: null,
+  active: false,
+  room: null,
+  side: null,
+  clientId: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `axac-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  status: 'offline',
+  pendingSync: false,
+  setStatus: (message, error = false) => {
+    const el = document.getElementById('onlineStatus');
+    if (el) { el.textContent = message; el.style.color = error ? 'var(--danger)' : 'var(--text-mut)'; }
+    Game.setMatchStatus(message);
+  },
+  open: () => UI.openModal('onlineModal'),
+  randomRoom: () => Math.random().toString(36).slice(2, 8).toUpperCase(),
+  send: (event, payload = {}) => {
+    if (!Online.channel || !Online.active) return Promise.resolve();
+    return Online.channel.send({ type: 'broadcast', event, payload: { ...payload, from: Online.clientId, username: currentUser } });
+  },
+  create: async () => {
+    if (!db) return alert('Koneksi Supabase belum siap.');
+    if (Online.active) await Online.leave(false);
+    const room = Online.randomRoom();
+    Online.room = room;
+    Online.side = 'w';
+    Online.status = 'connecting';
+    Online.setStatus(`Membuat room ${room}...`);
+    const channel = db.channel(`axac-chess-${room}`, { config: { broadcast: { self: false }, presence: { key: Online.clientId } } });
+    Online.channel = channel;
+    Online.bind(channel);
+    channel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        Online.active = true;
+        Online.status = 'waiting';
+        await channel.track({ clientId: Online.clientId, username: currentUser, side: 'w', joinedAt: Date.now() });
+        Game.startOnline('w', room);
+        document.getElementById('onlineRoomCode').textContent = room;
+        UI.closeModal('onlineModal');
+        UI.openModal('onlineRoomModal');
+        Online.setStatus(`Room ${room} dibuat · menunggu pemain hitam.`);
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        Online.active = false;
+        Online.setStatus('Gagal membuat koneksi room. Periksa izin Supabase Realtime.', true);
+      }
+    });
+  },
+  join: async () => {
+    if (!db) return alert('Koneksi Supabase belum siap.');
+    const room = (document.getElementById('joinRoomCode').value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+    if (room.length < 4) return alert('Masukkan kode room yang valid.');
+    if (Online.active) await Online.leave(false);
+    Online.room = room;
+    Online.side = 'b';
+    Online.status = 'connecting';
+    Online.setStatus(`Masuk ke room ${room}...`);
+    const channel = db.channel(`axac-chess-${room}`, { config: { broadcast: { self: false }, presence: { key: Online.clientId } } });
+    Online.channel = channel;
+    Online.bind(channel);
+    channel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        Online.active = true;
+        await channel.track({ clientId: Online.clientId, username: currentUser, side: 'b', joinedAt: Date.now() });
+        Game.startOnline('b', room);
+        UI.closeModal('onlineModal');
+        Online.setStatus('Terhubung. Menunggu sinkronisasi papan dari host...');
+        Online.send('join', { username: userData.display_name || currentUser });
+        setTimeout(async () => {
+          if (!Online.active || Online.side !== 'b') return;
+          const state = channel.presenceState();
+          const hasHost = Object.values(state || {}).flat().some(member => member.side === 'w' && member.clientId !== Online.clientId);
+          if (!hasHost) {
+            await Online.leave(false);
+            alert('Host room tidak ditemukan. Minta teman membuat room baru lalu kirim kode terbarunya.');
+          }
+        }, 1800);
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        Online.active = false;
+        Online.setStatus('Room tidak ditemukan atau akses Realtime ditolak.', true);
+      }
+    });
+  },
+  bind: (channel) => {
+    channel.on('broadcast', { event: 'join' }, async ({ payload }) => {
+      if (!Online.active || Online.side !== 'w') return;
+      const presence = channel.presenceState();
+      const peers = Object.values(presence || {}).flat().filter(x => x.clientId && x.clientId !== Online.clientId);
+      if (peers.length > 1) return Online.send('room-full', { message: 'Room sudah penuh.' });
+      Online.status = 'playing';
+      Online.setStatus(`${payload?.username || 'Lawan'} bergabung · pertandingan dimulai.`);
+      Online.broadcastPosition();
+      UI.closeModal('onlineRoomModal');
+    });
+    channel.on('broadcast', { event: 'position' }, ({ payload }) => {
+      if (!Online.active || payload?.from === Online.clientId || !payload?.fen) return;
+      if (!Game.chess) Game.chess = new Chess();
+      try {
+        if (!Game.chess.load(payload.fen)) throw new Error('FEN tidak valid');
+        Game.sel = null;
+        if (Number.isFinite(payload.whiteTime)) Game.whiteTime = payload.whiteTime;
+        if (Number.isFinite(payload.blackTime)) Game.blackTime = payload.blackTime;
+        Game.clockActive = payload.turn || Game.chess.turn();
+        Game.clockLastTick = Date.now();
+        if (!Game.finished) Game.ensureClock();
+        Game.render();
+        Game.renderClocks();
+        Online.status = 'playing';
+        Online.setStatus(`Terhubung dengan ${payload.username || 'lawan'} · giliran ${Game.clockActive === 'w' ? 'putih' : 'hitam'}.`);
+        if (Game.chess.game_over()) Game.finishGame();
+      } catch (error) {
+        console.error('AXAC online sync:', error);
+        Online.setStatus('Gagal menyinkronkan langkah lawan.', true);
+      }
+    });
+    channel.on('broadcast', { event: 'resign' }, ({ payload }) => {
+      if (payload?.from === Online.clientId) return;
+      Game.finished = true;
+      Game.stopClock();
+      Online.setStatus('Lawan menyerah. Kamu menang!');
+      alert('Lawan menyerah. Kamu menang!');
+    });
+    channel.on('broadcast', { event: 'timeout' }, ({ payload }) => {
+      if (payload?.from === Online.clientId) return;
+      Game.finished = true;
+      Game.stopClock();
+      Online.setStatus(`Waktu ${payload?.loser || 'lawan'} habis.`);
+      alert(`Waktu ${payload?.loser || 'lawan'} habis. Pertandingan selesai.`);
+    });
+    channel.on('broadcast', { event: 'room-full' }, ({ payload }) => {
+      alert(payload?.message || 'Room sudah penuh.');
+      Online.leave();
+    });
+    channel.on('presence', { event: 'sync' }, () => {
+      if (!Online.active) return;
+      const state = channel.presenceState();
+      const count = Object.values(state || {}).flat().length;
+      if (Online.side === 'w' && count > 1) Online.setStatus('Lawan terhubung · siap bermain.');
+      else if (Online.side === 'w' && count <= 1) Online.setStatus(`Room ${Online.room} · menunggu lawan.`);
+    });
+    channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
+      if (leftPresences?.some(p => p.clientId !== Online.clientId)) Online.setStatus('Lawan terputus. Kode room tetap sama; lawan bisa masuk kembali.', true);
+    });
+  },
+  broadcastPosition: () => {
+    if (!Online.active || !Game.chess) return;
+    Online.send('position', {
+      fen: Game.chess.fen(),
+      turn: Game.chess.turn(),
+      whiteTime: Game.whiteTime,
+      blackTime: Game.blackTime,
+      ply: Game.chess.history().length
+    });
+  },
+  copyCode: async () => {
+    const code = Online.room || document.getElementById('onlineRoomCode').textContent;
+    try {
+      await navigator.clipboard.writeText(code);
+      Online.setStatus(`Kode ${code} berhasil disalin.`);
+    } catch {
+      prompt('Salin kode room ini:', code);
+    }
+  },
+  leave: async (confirmLeave = true) => {
+    if (confirmLeave && !confirm('Keluar dari room online?')) return;
+    const channel = Online.channel;
+    Online.active = false;
+    Online.status = 'offline';
+    Online.channel = null;
+    Online.room = null;
+    Online.side = null;
+    if (channel) {
+      try { await channel.untrack(); } catch {}
+      try { await db.removeChannel(channel); } catch {}
+    }
+    Game.init();
+    Online.setStatus('Keluar dari mabar.');
+    UI.closeModal('onlineRoomModal');
+  }
+};</script>
+</body>
+</html>
